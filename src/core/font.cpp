@@ -16,7 +16,7 @@ font::font(const char *image_filename, const char *data_filename) {
 
     //Parse data file (binary format) (http://www.angelcode.com/products/bmfont/doc/file_format.html#bin)
     uint32_t file_size;
-    uint8_t *binary_data = (uint8_t*)read_binary_file(data_filename, file_size);
+    auto binary_data = (uint8_t*)read_binary_file(data_filename, file_size);
     int index_ptr = 3; //First three bytes are BMF
 
     //File version is fourth byte
@@ -32,7 +32,7 @@ font::font(const char *image_filename, const char *data_filename) {
         int block_type = binary_data[index_ptr++];
 
         //4-byte block size
-        uint32_t block_size = uint32_t(
+        auto block_size = uint32_t(
                 binary_data[index_ptr + 3] << 24 |
                 binary_data[index_ptr + 2] << 16 |
                 binary_data[index_ptr + 1] <<  8 |

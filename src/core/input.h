@@ -37,7 +37,7 @@ namespace minalear {
 
         bool button_states[NUM_JOYSTICK_BUTTONS];
 
-        void operator= (const controller_state &c_state);
+        controller_state& operator= (const controller_state &c_state);
     };
 
     void init_input();
