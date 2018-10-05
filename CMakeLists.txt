@@ -2,12 +2,25 @@ cmake_minimum_required(VERSION 3.12)
 project(TextThroughTime)
 
 set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_FLAGS "-O2 -static-libgcc -static-libstdc++")
+#set(CMAKE_CXX_FLAGS "-O2 -static-libgcc -static-libstdc++ -msse3")
+set(CMAKE_CXX_FLAGS "-pg -gdwarf-3 -static-libgcc -static-libstdc++ -msse3")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 
 file(GLOB SOURCE_FILES
         src/*.cpp src/*.h
-        src/core/*.cpp src/core/*.h)
+        src/core/*.cpp src/core/*.h
+        C:/Libraries/OpenGL/GLAD/src/glad.c)
+
+find_package(MINGW32 REQUIRED)
+find_package(SDL2 REQUIRED)
+find_package(OpenGL REQUIRED)
 
 add_executable(TextThroughTime ${SOURCE_FILES})
-target_link_libraries(TextThroughTime ${MINGW32_LIB})
+target_link_libraries(TextThroughTime ${MINGW32_LIB} ${SDL2_MAIN_LIB} ${SDL2_LIB} ${OPENGL_LIB})
+
+add_custom_command(
+        TARGET TextThroughTime POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "C:/Libraries/SDL2/x86/bin/SDL2.dll"
+        $<TARGET_FILE_DIR:TextThroughTime>
+)
