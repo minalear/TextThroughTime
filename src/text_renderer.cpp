@@ -56,6 +56,8 @@ TextRenderer::~TextRenderer() {
 }
 
 void TextRenderer::draw_string(std::string str, glm::vec2 pos, glm::vec2 scale) {
+    // TODO: Only recalculate buffers when the text changes
+
     // Set transform information
     glm::mat4 model = glm::translate(glm::mat4(1.f), glm::vec3(pos, 0.f)) *
                       glm::scale(glm::mat4(1.f), glm::vec3(scale, 1.f));
@@ -83,7 +85,7 @@ void TextRenderer::draw_string(std::string str, glm::vec2 pos, glm::vec2 scale) 
         // Skip spaces
         if (ch == ' ') {
             //cursor_x += text_font->info.font_size;
-            cursor_x += 12.f; //TODO: Above line produced large spacing
+            cursor_x += 8.f; //TODO: Above line produced large spacing
             continue;
         }
 
