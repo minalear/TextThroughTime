@@ -22,7 +22,7 @@ private:
 public:
     minalear::font *text_font;
 
-    TextRenderer(const std::string font_name);
+    TextRenderer(std::string font_name);
     ~TextRenderer();
 
     void draw_string(std::string str, glm::vec2 pos, glm::vec2 scale);
