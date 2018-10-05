@@ -2,6 +2,7 @@
 // Created by Trevor Fisher on 1/19/2018.
 //
 
+#include <fstream>
 #include "file_handler.h"
 
 const char* minalear::read_file(const char *filename) {

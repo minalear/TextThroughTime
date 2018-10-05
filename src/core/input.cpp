@@ -30,7 +30,7 @@ void minalear::init_input() {
     this_state = new minalear::controller_state;
     last_state = new minalear::controller_state;
 
-    memcpy(this_key_state, SDL_GetKeyboardState(NULL), sizeof(uint8_t) * SDL_NUM_SCANCODES);
+    memcpy(this_key_state, SDL_GetKeyboardState(nullptr), sizeof(uint8_t) * SDL_NUM_SCANCODES);
 
     handle_input();
 }
@@ -39,7 +39,7 @@ void minalear::handle_input() {
     SDL_PumpEvents();
     (*last_state) = (*this_state);
     memcpy(last_key_state, this_key_state, sizeof(uint8_t) * SDL_NUM_SCANCODES);
-    memcpy(this_key_state, SDL_GetKeyboardState(NULL), sizeof(uint8_t) * SDL_NUM_SCANCODES);
+    memcpy(this_key_state, SDL_GetKeyboardState(nullptr), sizeof(uint8_t) * SDL_NUM_SCANCODES);
 
     //Update button states
     for (int i = 0; i < NUM_JOYSTICK_BUTTONS; i++) {
@@ -106,7 +106,7 @@ minalear::controller_state* minalear::get_controller_ptr() {
     return this_state;
 }
 
-void minalear::controller_state::operator= (const controller_state &c_state) {
+minalear::controller_state& minalear::controller_state::operator= (const controller_state &c_state) {
     left_stick = c_state.left_stick;
     right_stick = c_state.left_stick;
 
@@ -119,4 +119,6 @@ void minalear::controller_state::operator= (const controller_state &c_state) {
     for (int i = 0; i < NUM_JOYSTICK_BUTTONS; i++) {
         button_states[i] = c_state.button_states[i];
     }
+
+    return *this;
 }

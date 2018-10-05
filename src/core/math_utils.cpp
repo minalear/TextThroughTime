@@ -5,6 +5,8 @@
 #include "math_utils.h"
 #include <random>
 
+//TODO: Investigate C++11 Random Library and replace rand()
+
 int minalear::rand_int(int min, int max) {
     return (int)((rand() / (float)RAND_MAX) * (max - min) + min);
 }

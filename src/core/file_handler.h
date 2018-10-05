@@ -5,7 +5,7 @@
 #ifndef MINALEAR_FILE_HANDLER_H
 #define MINALEAR_FILE_HANDLER_H
 
-#include <fstream>
+#include <cstdint>
 
 namespace minalear {
     const char *read_file(const char *filename);

@@ -17,8 +17,7 @@ namespace minalear {
         GLuint programID;
 
         std::map<const char*, int> uniform_map;
-        //TODO: Make this more robust and generic
-        int32_t projLoc, viewLoc, modelLoc;
+        int32_t get_uniform_location(const char* name);
 
     public:
         shader_program(const char *, const char *);
@@ -26,13 +25,11 @@ namespace minalear {
         void use();
         void load_shaders(const char *, const char *);
 
-        void init_uniforms();
-        void set_proj_mat4(const glm::mat4 &proj);
-        void set_view_mat4(const glm::mat4 &view);
-        void set_model_mat4(const glm::mat4 &model);
-
-        void set_uniform_vec3(const char *name, glm::vec3 value);
-        void set_uniform_bool(const char *name, bool value);
+        void set_uniform(const char* name, bool value);
+        void set_uniform(const char* name, glm::vec2 &value);
+        void set_uniform(const char* name, glm::vec3 &value);
+        void set_uniform(const char* name, glm::vec4 &value);
+        void set_uniform(const char* name, glm::mat4 &matrix);
     };
 }
 

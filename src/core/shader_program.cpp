@@ -14,7 +14,7 @@ bool checkShaderCompilation(GLuint shaderID) {
 
     if (compileStatus == GL_FALSE) {
         GLchar errorMessage[512];
-        glGetShaderInfoLog(shaderID, 512, NULL, errorMessage);
+        glGetShaderInfoLog(shaderID, 512, nullptr, errorMessage);
         printf("Shader Compilation Error, %s\n", errorMessage);
     }
 }
@@ -31,12 +31,12 @@ void minalear::shader_program::use() {
 }
 void minalear::shader_program::load_shaders(const char *vertexSource, const char *fragmentSource) {
     GLuint vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShaderID, 1, &vertexSource, NULL);
+    glShaderSource(vertexShaderID, 1, &vertexSource, nullptr);
     glCompileShader(vertexShaderID);
     checkShaderCompilation(vertexShaderID);
 
     GLuint fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShaderID, 1, &fragmentSource, NULL);
+    glShaderSource(fragmentShaderID, 1, &fragmentSource, nullptr);
     glCompileShader(fragmentShaderID);
     checkShaderCompilation(fragmentShaderID);
 
@@ -50,35 +50,34 @@ void minalear::shader_program::load_shaders(const char *vertexSource, const char
     glDeleteShader(fragmentShaderID);
 }
 
-void minalear::shader_program::init_uniforms() {
-    projLoc  = glGetUniformLocation(programID, "proj");
-    viewLoc  = glGetUniformLocation(programID, "view");
-    modelLoc = glGetUniformLocation(programID, "model");
-}
-void minalear::shader_program::set_proj_mat4(const glm::mat4 &proj) {
-    glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
-}
-void minalear::shader_program::set_view_mat4(const glm::mat4 &view) {
-    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-}
-void minalear::shader_program::set_model_mat4(const glm::mat4 &model) {
-    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-}
-
-void minalear::shader_program::set_uniform_vec3(const char *name, glm::vec3 value) {
+int32_t minalear::shader_program::get_uniform_location(const char *name) {
+    // Inserts the name and returns the uniform location if the name isn't already in the map
     if (uniform_map.find(name) == uniform_map.end()) {
         int loc = glGetUniformLocation(programID, name);
         uniform_map.insert(ShaderUniformLoc(name, loc));
+
+        return loc;
     }
 
-    glUniform3f(uniform_map[name], value.x, value.y, value.z);
+    return uniform_map[name];
 }
 
-void minalear::shader_program::set_uniform_bool(const char *name, bool value) {
-    if (uniform_map.find(name) == uniform_map.end()) {
-        int loc = glGetUniformLocation(programID, name);
-        uniform_map.insert(ShaderUniformLoc(name, loc));
-    }
+void minalear::shader_program::set_uniform(const char *name, bool value) {
+    glUniform1i(get_uniform_location(name), value);
+}
 
-    glUniform1i(uniform_map[name], value);
+void minalear::shader_program::set_uniform(const char *name, glm::vec2 &value) {
+    glUniform2f(get_uniform_location(name), value.x, value.y);
+}
+
+void minalear::shader_program::set_uniform(const char *name, glm::vec3 &value) {
+    glUniform3f(get_uniform_location(name), value.x, value.y, value.z);
+}
+
+void minalear::shader_program::set_uniform(const char *name, glm::vec4 &value) {
+    glUniform4f(get_uniform_location(name), value.x, value.y, value.z, value.w);
+}
+
+void minalear::shader_program::set_uniform(const char *name, glm::mat4 &matrix) {
+    glUniformMatrix4fv(get_uniform_location(name), 1, GL_FALSE, glm::value_ptr(matrix));
 }
