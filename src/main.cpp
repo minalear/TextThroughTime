@@ -16,7 +16,7 @@ std::string buffer_substr(std::string &buffer, const uint32_t cursor) {
     return str;
 }
 std::string get_render_string(std::string &buffer, const uint32_t cursor) {
-    std::string render_str = buffer.substr(0, cursor) + " | ";
+    std::string render_str = buffer.substr(0, cursor) + " I ";
     if (cursor < buffer.size()) {
         render_str += buffer.substr(cursor, buffer.size());
     }
@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
 	
 	glClearColor(0.f, 0.f, 0.f, 1.f);
 
-	TextRenderer text_renderer("Main");
+	TextRenderer text_renderer("main");
 
 	std::string input_buffer;
 	uint32_t cursor = 0;
@@ -64,8 +64,9 @@ int main(int argc, char* argv[]) {
 		
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		text_renderer.draw_string(get_render_string(input_buffer, cursor), glm::vec2(0.f), glm::vec2(1.f));
-		
+		//text_renderer.draw_string(get_render_string(input_buffer, cursor), glm::vec2(0.f), glm::vec2(0.4f));
+		text_renderer.draw_string("Whatever shall I do.", glm::vec2(0.f), glm::vec2(0.5f));
+
 		game_window.dt();
 		game_window.swap_buffers();
 	} // End main game loop
