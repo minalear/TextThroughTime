@@ -28,27 +28,33 @@ const wchar_t CHAR_SET_STRING[] =
         "≡±≥≤⌠⌡÷≈°∙·√ⁿ²■╠";
 
 Console::Console(minalear::GameWindow *game_window) {
+    // Load our charset (bitmap)
     charset = new minalear::texture("fonts/charset.png");
 
+    // The dimensions of each individual console cell
     const int CELL_WIDTH  = 8;
     const int CELL_HEIGHT = 12;
 
+    // The buffer width and height of our entire console
     width  = (uint16_t)(game_window->width() / 8);
     height = (uint16_t)(game_window->width() / 12);
 
+    // The total number of characters in our character set
     const int num_chars = sizeof(CHAR_SET_STRING) / sizeof(wchar_t);
-    cells = new ConsoleChar[num_chars];
+    char_data = new ConsoleChar[num_chars]; // Data is stored in char_data
 
+    // Initialize char_data with their relevant information (UV position)
     for (int i = 0; i < num_chars; i++) {
-        ConsoleChar ch = cells[i];
+        ConsoleChar ch = char_data[i];
         int x = i % 16;
         int y = i / 16;
 
-        cells[i].x = (x * CELL_WIDTH) / (float)charset->getWidth();
-        cells[i].y = (y * CELL_HEIGHT) / (float)charset->getHeight();
-        cells[i].ch = CHAR_SET_STRING[i];
+        char_data[i].x = (x * CELL_WIDTH) / (float)charset->getWidth();
+        char_data[i].y = (y * CELL_HEIGHT) / (float)charset->getHeight();
+        char_data[i].ch = CHAR_SET_STRING[i];
     }
 
+    // Generate OpenGL variables
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);
 
@@ -57,47 +63,6 @@ Console::Console(minalear::GameWindow *game_window) {
 
     const int num_cells = width * height;
     gl_buffer = new float[num_cells * 24];
-    for (int i = 0; i < num_cells; i++) {
-        int x = i % width;
-        int y = i / width;
-
-        // TL
-        gl_buffer[i * 24 + 0] = x * CELL_WIDTH;  // X
-        gl_buffer[i * 24 + 1] = y * CELL_HEIGHT; // Y
-        gl_buffer[i * 24 + 2] = 0.f;             // UV X
-        gl_buffer[i * 24 + 3] = 0.f;             // UV Y
-
-        // BL
-        gl_buffer[i * 24 + 4] = x * CELL_WIDTH;
-        gl_buffer[i * 24 + 5] = y * CELL_HEIGHT + CELL_HEIGHT;
-        gl_buffer[i * 24 + 6] = 0.f;
-        gl_buffer[i * 24 + 7] = 0.f;
-
-        // TR
-        gl_buffer[i * 24 + 8] = x * CELL_WIDTH + CELL_WIDTH;
-        gl_buffer[i * 24 + 9] = y * CELL_HEIGHT;
-        gl_buffer[i * 24 + 10] = 0.f;
-        gl_buffer[i * 24 + 11] = 0.f;
-
-
-        // TR
-        gl_buffer[i * 24 + 12] = x * CELL_WIDTH + CELL_WIDTH;
-        gl_buffer[i * 24 + 13] = y * CELL_HEIGHT;
-        gl_buffer[i * 24 + 14] = 0.f;
-        gl_buffer[i * 24 + 15] = 0.f;
-
-        // BL
-        gl_buffer[i * 24 + 16] = x * CELL_WIDTH;
-        gl_buffer[i * 24 + 17] = y * CELL_HEIGHT + CELL_HEIGHT;
-        gl_buffer[i * 24 + 18] = 0.f;
-        gl_buffer[i * 24 + 19] = 0.f;
-
-        // BR
-        gl_buffer[i * 24 + 20] = x * CELL_WIDTH + CELL_WIDTH;
-        gl_buffer[i * 24 + 21] = y * CELL_HEIGHT + CELL_HEIGHT;
-        gl_buffer[i * 24 + 22] = 0.f;
-        gl_buffer[i * 24 + 23] = 0.f;
-    }
 
     glBufferData(GL_ARRAY_BUFFER, num_cells * 24 * sizeof(float), gl_buffer, GL_DYNAMIC_DRAW);
 
@@ -109,6 +74,14 @@ Console::Console(minalear::GameWindow *game_window) {
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
+
+    // Initialize cells to default values (' ')
+    cursor = 0;
+    cells = new CellData[num_cells];
+    for (int i = 0; i < num_cells; i++) {
+        put(L' ', i % width, i / width);
+    }
+    update_buffer();
 
     // Initialize shader
     console_shader = new minalear::shader_program(
@@ -127,6 +100,7 @@ Console::Console(minalear::GameWindow *game_window) {
 }
 
 Console::~Console() {
+    delete [] char_data;
     delete [] cells;
     delete console_shader;
     delete charset;
@@ -134,57 +108,12 @@ Console::~Console() {
 }
 
 void Console::print(const std::string &str) {
-    int cursor = 0;
-
     for (auto& x : str) {
-        // Set letter buffer
-        for (int i = 0; i < 257; i++) {
-            if (x == cells[i].ch) {
-                float x_mod = 1.f / 16.f;
-                float y_mod = 1.f / 16.f;
-
-                gl_buffer[cursor * 24 + 0] = (cursor % width) * 8.f;
-                gl_buffer[cursor * 24 + 1] = (cursor / width) * 12.f;
-                gl_buffer[cursor * 24 + 2] = cells[i].x;
-                gl_buffer[cursor * 24 + 3] = cells[i].y;
-
-                gl_buffer[cursor * 24 + 4] = (cursor % width) * 8.f;
-                gl_buffer[cursor * 24 + 5] = (cursor / width) * 12.f + 12.f;
-                gl_buffer[cursor * 24 + 6] = cells[i].x;
-                gl_buffer[cursor * 24 + 7] = cells[i].y + y_mod;
-
-                gl_buffer[cursor * 24 + 8] = (cursor % width) * 8.f + 8.f;
-                gl_buffer[cursor * 24 + 9] = (cursor / width) * 12.f;
-                gl_buffer[cursor * 24 + 10] = cells[i].x + x_mod;
-                gl_buffer[cursor * 24 + 11] = cells[i].y;
-
-
-                gl_buffer[cursor * 24 + 12] = (cursor % width) * 8.f + 8.f;
-                gl_buffer[cursor * 24 + 13] = (cursor / width) * 12.f;
-                gl_buffer[cursor * 24 + 14] = cells[i].x + x_mod;
-                gl_buffer[cursor * 24 + 15] = cells[i].y;
-
-                gl_buffer[cursor * 24 + 16] = (cursor % width) * 8.f;
-                gl_buffer[cursor * 24 + 17] = (cursor / width) * 12.f + 12.f;
-                gl_buffer[cursor * 24 + 18] = cells[i].x;
-                gl_buffer[cursor * 24 + 19] = cells[i].y + y_mod;
-
-                gl_buffer[cursor * 24 + 20] = (cursor % width) * 8.f + 8.f;
-                gl_buffer[cursor * 24 + 21] = (cursor / width) * 12.f + 12.f;
-                gl_buffer[cursor * 24 + 22] = cells[i].x + x_mod;
-                gl_buffer[cursor * 24 + 23] = cells[i].y + y_mod;
-                break;
-            }
-        }
-
+        put(x, cursor % width, cursor / width);
         cursor++;
     }
 
-    glBindVertexArray(vao);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, 6600 * 24 * sizeof(float), gl_buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+    update_buffer();
 }
 
 void Console::draw() {
@@ -193,4 +122,66 @@ void Console::draw() {
     glBindVertexArray(vao);
     glDrawArrays(GL_TRIANGLES, 0, width * height * 6);
     glBindVertexArray(0);
+}
+
+ConsoleChar Console::find_char_data(wchar_t ch) {
+    for (int i = 0; i < 257; i++) {
+        if (char_data[i].ch == ch) {
+            return char_data[i];
+        }
+    }
+
+    return char_data[0]; //TODO: Replace with a throw
+}
+void Console::update_buffer() {
+    const float mod = 1.f / 16.f;
+    for (int i = 0; i < width * height; i++) {
+        auto cell = cells[i];
+        auto data = find_char_data(cell.ch);
+
+        float x = (i % width) * 8.f;
+        float y = (i / width) * 12.f;
+
+        // region *** gl_buffer update ***
+        gl_buffer[i * 24 +  0] = x;
+        gl_buffer[i * 24 +  1] = y;
+        gl_buffer[i * 24 +  2] = data.x;
+        gl_buffer[i * 24 +  3] = data.y;
+
+        gl_buffer[i * 24 +  4] = x;
+        gl_buffer[i * 24 +  5] = y + 12.f;
+        gl_buffer[i * 24 +  6] = data.x;
+        gl_buffer[i * 24 +  7] = data.y + mod;
+
+        gl_buffer[i * 24 +  8] = x + 8.f;
+        gl_buffer[i * 24 +  9] = y;
+        gl_buffer[i * 24 + 10] = data.x + mod;
+        gl_buffer[i * 24 + 11] = data.y;
+
+
+        gl_buffer[i * 24 + 12] = x + 8.f;
+        gl_buffer[i * 24 + 13] = y;
+        gl_buffer[i * 24 + 14] = data.x + mod;
+        gl_buffer[i * 24 + 15] = data.y;
+
+        gl_buffer[i * 24 + 16] = x;
+        gl_buffer[i * 24 + 17] = y + 12.f;
+        gl_buffer[i * 24 + 18] = data.x;
+        gl_buffer[i * 24 + 19] = data.y + mod;
+
+        gl_buffer[i * 24 + 20] = x + 8.f;
+        gl_buffer[i * 24 + 21] = y + 12.f;
+        gl_buffer[i * 24 + 22] = data.x + mod;
+        gl_buffer[i * 24 + 23] = data.y + mod;
+        // endregion
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, width * height * 24 * sizeof(float), gl_buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+
+void Console::put(wchar_t ch, int x, int y) {
+    cells[x + y * width].ch = ch;
 }
