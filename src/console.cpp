@@ -98,7 +98,6 @@ Console::Console(minalear::GameWindow *game_window) {
     console_shader->set_uniform("view", view);
     console_shader->set_uniform("model", model);
 }
-
 Console::~Console() {
     delete [] char_data;
     delete [] cells;
@@ -107,6 +106,27 @@ Console::~Console() {
     delete [] gl_buffer;
 }
 
+ConsoleChar Console::find_char_data(wchar_t ch) {
+    for (int i = 0; i < 257; i++) {
+        if (char_data[i].ch == ch) {
+            return char_data[i];
+        }
+    }
+
+    return char_data[0]; //TODO: Replace with a throw
+}
+
+void Console::set(int x, int y) {
+    cursor = x + y * width;
+}
+void Console::put(wchar_t ch, int x, int y) {
+    if (ch == '\n') {
+        cursor += width - x;
+    }
+    else {
+        cells[x + y * width].ch = ch;
+    }
+}
 void Console::print(const std::string &str) {
     for (auto& x : str) {
         put(x, cursor % width, cursor / width);
@@ -131,16 +151,6 @@ void Console::draw() {
     glBindVertexArray(vao);
     glDrawArrays(GL_TRIANGLES, 0, width * height * 6);
     glBindVertexArray(0);
-}
-
-ConsoleChar Console::find_char_data(wchar_t ch) {
-    for (int i = 0; i < 257; i++) {
-        if (char_data[i].ch == ch) {
-            return char_data[i];
-        }
-    }
-
-    return char_data[0]; //TODO: Replace with a throw
 }
 void Console::update_buffer() {
     const float mod = 1.f / 16.f;
@@ -188,16 +198,4 @@ void Console::update_buffer() {
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferSubData(GL_ARRAY_BUFFER, 0, width * height * 24 * sizeof(float), gl_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
-void Console::set(int x, int y) {
-    cursor = x + y * width;
-}
-void Console::put(wchar_t ch, int x, int y) {
-    if (ch == '\n') {
-        cursor += width - x;
-    }
-    else {
-        cells[x + y * width].ch = ch;
-    }
 }

@@ -70,6 +70,8 @@ public:
     void print(const std::string &str);
 
     int get_cursor();
+    int get_width();
+    int get_height();
 };
 
 

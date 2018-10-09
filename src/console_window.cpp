@@ -4,6 +4,15 @@
 
 #include "console.h"
 
+ConsoleWindow::ConsoleWindow(Console* console, uint16_t x, uint16_t y, uint16_t width, uint16_t height) {
+    this->console = console;
+    this->x = x;
+    this->y = y;
+    this->width = width;
+    this->height = height;
+    this->cursor = 0;
+}
+
 void ConsoleWindow::clear() {
     for (int k = 0; k < height; k++) {
         for (int j = 0; j < width; j++) {
@@ -14,18 +23,22 @@ void ConsoleWindow::clear() {
         }
     }
 
-    cursor = 0;
+    set(0);
+}
+void ConsoleWindow::set(int c) {
+    // Ensure that the cursor remains in bounds of the window.
+    cursor = (c >= 0 && c < width * height) ? c : cursor;
 }
 void ConsoleWindow::set(int x, int y) {
-    cursor = x + y * width;
+    set(x + y * width);
 }
 void ConsoleWindow::put(wchar_t ch) {
     put(ch, cursor % width, cursor / width);
-    cursor++;
+    set(cursor+1);
 }
 void ConsoleWindow::put(wchar_t ch, int x, int y) {
     if (ch == '\n' || ch == '\r') {
-        cursor += width - x - 1;
+        set(cursor + width - x - 1);
     } else {
         int ax = x + this->x;
         int ay = y + this->y;
@@ -36,25 +49,20 @@ void ConsoleWindow::put(wchar_t ch, int x, int y) {
 void ConsoleWindow::print(const std::string &str) {
     for (auto& x : str) {
         put(x, cursor % width, cursor / width);
-        cursor++;
+        set(cursor+1);
     }
 
     console->update_buffer();
-}
-
-ConsoleWindow::ConsoleWindow(Console* console, uint16_t x, uint16_t y, uint16_t width, uint16_t height) {
-    this->console = console;
-    this->x = x;
-    this->y = y;
-    this->width = width;
-    this->height = height;
-    this->cursor = 0;
 }
 
 int ConsoleWindow::get_cursor() {
     return cursor;
 }
 
-void ConsoleWindow::set(int c) {
-    cursor = c;
+int ConsoleWindow::get_width() {
+    return width;
+}
+
+int ConsoleWindow::get_height() {
+    return height;
 }

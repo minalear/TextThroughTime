@@ -37,7 +37,9 @@ int main(int argc, char* argv[]) {
 
     console.print("A Text Through Time", TextAlignment::Center, 50, 1);
 
-    std::string input;
+    std::string input, log_str;
+    int log_count = 0;
+
     ConsoleWindow window(&console, 1, 38, 98, 1);
     ConsoleWindow log(&console, 1, 3, 98, 34);
 
@@ -56,13 +58,18 @@ int main(int argc, char* argv[]) {
 			else if (windowEvent.type == SDL_KEYDOWN) {
 			    if (windowEvent.key.keysym.sym == SDLK_BACKSPACE) {
 			        input = input.substr(0, input.size() - 1);
-			        window.set(window.get_cursor() - 1);
-			        window.put(L' ');
-			        window.set(window.get_cursor() - 1);
+			        window.clear();
+			        window.set(0);
+			        window.print(input);
 			    }
 			    else if (windowEvent.key.keysym.sym == SDLK_RETURN) {
-			        log.print(input + "\n");
+			        log_str += input + "\n";
 			        input = "";
+
+			        log.clear();
+			        log_count++;
+			        log.set(0, log.get_height() - log_count);
+			        log.print(log_str);
 			        window.clear();
 			    }
 
