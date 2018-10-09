@@ -30,9 +30,16 @@ int main(int argc, char* argv[]) {
         console.put(L'║', 99, y);
     }
 
-    console.print("Title Text", TextAlignment::Center, 50, 1);
+    console.put(L'╠',  0,  2);
+    console.put(L'╠',  0, 37);
+    console.put(L'╣', 99,  2);
+    console.put(L'╣', 99, 37);
 
+    console.print("A Text Through Time", TextAlignment::Center, 50, 1);
+
+    std::string input;
     ConsoleWindow window(&console, 1, 38, 98, 1);
+    ConsoleWindow log(&console, 1, 3, 98, 34);
 
     console.update_buffer();
 	
@@ -42,14 +49,21 @@ int main(int argc, char* argv[]) {
 			// Break out of game loop
 			if (windowEvent.type == SDL_QUIT) break;
 			else if (windowEvent.type == SDL_TEXTINPUT) {
+			    input += windowEvent.text.text[0];
 			    window.put(windowEvent.text.text[0]);
 			    console.update_buffer();
 			}
 			else if (windowEvent.type == SDL_KEYDOWN) {
 			    if (windowEvent.key.keysym.sym == SDLK_BACKSPACE) {
+			        input = input.substr(0, input.size() - 1);
 			        window.set(window.get_cursor() - 1);
 			        window.put(L' ');
 			        window.set(window.get_cursor() - 1);
+			    }
+			    else if (windowEvent.key.keysym.sym == SDLK_RETURN) {
+			        log.print(input + "\n");
+			        input = "";
+			        window.clear();
 			    }
 
 			    console.update_buffer();

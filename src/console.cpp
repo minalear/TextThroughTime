@@ -194,5 +194,10 @@ void Console::set(int x, int y) {
     cursor = x + y * width;
 }
 void Console::put(wchar_t ch, int x, int y) {
-    cells[x + y * width].ch = ch;
+    if (ch == '\n') {
+        cursor += width - x;
+    }
+    else {
+        cells[x + y * width].ch = ch;
+    }
 }

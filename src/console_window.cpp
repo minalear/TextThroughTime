@@ -20,17 +20,18 @@ void ConsoleWindow::set(int x, int y) {
     cursor = x + y * width;
 }
 void ConsoleWindow::put(wchar_t ch) {
-    int ax = cursor % width + this->x;
-    int ay = cursor / width + this->y;
-
-    console->put(ch, ax, ay);
+    put(ch, cursor % width, cursor / width);
     cursor++;
 }
 void ConsoleWindow::put(wchar_t ch, int x, int y) {
-    int ax = x + this->x;
-    int ay = y + this->y;
+    if (ch == '\n' || ch == '\r') {
+        cursor += width - x - 1;
+    } else {
+        int ax = x + this->x;
+        int ay = y + this->y;
 
-    console->put(ch, ax, ay);
+        console->put(ch, ax, ay);
+    }
 }
 void ConsoleWindow::print(const std::string &str) {
     for (auto& x : str) {
