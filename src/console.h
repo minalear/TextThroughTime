@@ -18,6 +18,10 @@ struct CellData {
     wchar_t ch;
 };
 
+enum struct TextAlignment {
+    Left, Right, Center
+};
+
 /// The primary console window that encapsulates the entire GameWindow
 class Console {
     uint16_t width;
@@ -39,8 +43,10 @@ public:
     Console(minalear::GameWindow *game_window);
     ~Console();
 
+    void set(int x, int y);
     void put(wchar_t ch, int x, int y);
     void print(const std::string &str);
+    void print(const std::string &str, TextAlignment alignment, int x, int y);
 
     void draw();
     void update_buffer();
@@ -54,12 +60,16 @@ class ConsoleWindow {
     int cursor;
 
 public:
-    ConsoleWindow(Console *console, int x, int y, int width, int height);
+    ConsoleWindow(Console *console, uint16_t x, uint16_t y, uint16_t width, uint16_t height);
 
     void clear();
+    void set(int c);
     void set(int x, int y);
+    void put(wchar_t ch);
     void put(wchar_t ch, int x, int y);
     void print(const std::string &str);
+
+    int get_cursor();
 };
 
 

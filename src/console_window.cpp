@@ -13,9 +13,18 @@ void ConsoleWindow::clear() {
             console->put(L' ', ax, ay);
         }
     }
+
+    cursor = 0;
 }
 void ConsoleWindow::set(int x, int y) {
     cursor = x + y * width;
+}
+void ConsoleWindow::put(wchar_t ch) {
+    int ax = cursor % width + this->x;
+    int ay = cursor / width + this->y;
+
+    console->put(ch, ax, ay);
+    cursor++;
 }
 void ConsoleWindow::put(wchar_t ch, int x, int y) {
     int ax = x + this->x;
@@ -32,11 +41,19 @@ void ConsoleWindow::print(const std::string &str) {
     console->update_buffer();
 }
 
-ConsoleWindow::ConsoleWindow(Console* console, int x, int y, int width, int height) {
+ConsoleWindow::ConsoleWindow(Console* console, uint16_t x, uint16_t y, uint16_t width, uint16_t height) {
     this->console = console;
     this->x = x;
     this->y = y;
     this->width = width;
     this->height = height;
     this->cursor = 0;
+}
+
+int ConsoleWindow::get_cursor() {
+    return cursor;
+}
+
+void ConsoleWindow::set(int c) {
+    cursor = c;
 }

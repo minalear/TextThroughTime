@@ -115,6 +115,15 @@ void Console::print(const std::string &str) {
 
     update_buffer();
 }
+void Console::print(const std::string &str, TextAlignment alignment, int x, int y) {
+    set(x, y);
+    if (alignment == TextAlignment::Center) {
+        cursor -= str.size() / 2;
+    } else if (alignment == TextAlignment::Right) {
+        cursor -= str.size();
+    }
+    print(str);
+}
 
 void Console::draw() {
     charset->bind();
@@ -181,7 +190,9 @@ void Console::update_buffer() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-
+void Console::set(int x, int y) {
+    cursor = x + y * width;
+}
 void Console::put(wchar_t ch, int x, int y) {
     cells[x + y * width].ch = ch;
 }
