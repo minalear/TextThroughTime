@@ -14,12 +14,15 @@ ConsoleWindow::ConsoleWindow(Console* console, uint16_t x, uint16_t y, uint16_t 
 }
 
 void ConsoleWindow::clear() {
+    clear(L' ');
+}
+void ConsoleWindow::clear(wchar_t ch) {
     for (int k = 0; k < height; k++) {
         for (int j = 0; j < width; j++) {
             int ax = j + this->x;
             int ay = k + this->y;
 
-            console->put(L' ', ax, ay);
+            console->put(ch, ax, ay);
         }
     }
 
@@ -53,6 +56,15 @@ void ConsoleWindow::print(const std::string &str) {
     }
 
     console->update_buffer();
+}
+void ConsoleWindow::print(const std::string &str, TextAlignment alignment, int x, int y) {
+    set(x, y);
+    if (alignment == TextAlignment::Center) {
+        cursor -= str.size() / 2;
+    } else if (alignment == TextAlignment::Right) {
+        cursor -= str.size();
+    }
+    print(str);
 }
 
 int ConsoleWindow::get_cursor() {
