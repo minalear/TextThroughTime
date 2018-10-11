@@ -5,13 +5,11 @@
 #include "text_renderer.h"
 #include "console.h"
 #include "window_manager.h"
+#include "tokenizer.h"
 
 void callback(WindowManager* manager, const std::string &str) {
-    if (str[0] == '1') {
-        manager->print_to_log("This sentence begins with a one.");
-    } else {
-        manager->print_to_log("Too true my friend.");
-    }
+    auto tokens = tokenize(str);
+    manager->print_to_log(tokens.tokens[0]);
 }
 
 int main(int argc, char* argv[]) {
