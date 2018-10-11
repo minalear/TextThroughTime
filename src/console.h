@@ -63,13 +63,17 @@ public:
     ConsoleWindow(Console *console, uint16_t x, uint16_t y, uint16_t width, uint16_t height);
 
     void clear();
+    void clear(wchar_t ch);
     void set(int c);
     void set(int x, int y);
     void put(wchar_t ch);
     void put(wchar_t ch, int x, int y);
     void print(const std::string &str);
+    void print(const std::string &str, TextAlignment alignment, int x, int y);
 
     int get_cursor();
+    int get_width();
+    int get_height();
 };
 
 
