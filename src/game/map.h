@@ -5,12 +5,30 @@
 #ifndef TEXTTHROUGHTIME_MAP_H
 #define TEXTTHROUGHTIME_MAP_H
 
+#include <map>
+#include <string>
 
+class Room;
+typedef std::pair<std::string, Room*> RoomIndex;
 
-class Map {
-
+enum struct Directions {
+    North, South, East, West, None
 };
 
+class Map {
+private:
+    std::map<std::string, Room*> game_map;
 
+public:
+    void add_room(
+            const std::string &unique_id,
+            const std::string &name,
+            const std::string &description);
+    void attach_room(
+            const std::string &target_id,
+            const std::string &base_id,
+            const std::string &direction);
+    Room* get_room(const std::string &id);
+};
 
 #endif //TEXTTHROUGHTIME_MAP_H

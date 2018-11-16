@@ -9,6 +9,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 file(GLOB SOURCE_FILES
         src/*.cpp src/*.h
         src/core/*.cpp src/core/*.h
+        src/game/*.cpp src/game/*.h
         C:/Libraries/OpenGL/GLAD/src/glad.c)
 file(GLOB FONT_FILES fonts/*.fnt fonts/*.png)
 file(GLOB SHADER_FILES shaders/*.glsl)
@@ -20,13 +21,20 @@ file(COPY ${SHADER_FILES} DESTINATION ${PROJECT_BINARY_DIR}/shaders)
 find_package(MINGW32 REQUIRED)
 find_package(SDL2 REQUIRED)
 find_package(OpenGL REQUIRED)
+find_package(Lua REQUIRED)
 
 add_executable(TextThroughTime ${SOURCE_FILES})
-target_link_libraries(TextThroughTime ${MINGW32_LIB} ${SDL2_MAIN_LIB} ${SDL2_LIB} ${OPENGL_LIB})
+target_link_libraries(TextThroughTime ${MINGW32_LIB} ${SDL2_MAIN_LIB} ${SDL2_LIB} ${OPENGL_LIB} ${LUA_LIB})
 
 add_custom_command(
         TARGET TextThroughTime POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "C:/Libraries/SDL2/x86/bin/SDL2.dll"
+        $<TARGET_FILE_DIR:TextThroughTime>
+)
+add_custom_command(
+        TARGET TextThroughTime POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "C:/Libraries/lua-5.3.5/bin/lua53.dll"
         $<TARGET_FILE_DIR:TextThroughTime>
 )

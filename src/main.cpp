@@ -6,10 +6,15 @@
 #include "console.h"
 #include "window_manager.h"
 #include "tokenizer.h"
+#include "game/room.h"
+#include "game/game_manager.h"
 
-void callback(WindowManager* manager, const std::string &str) {
-    auto tokens = tokenize(str);
-    manager->print_to_log(tokens.tokens[0]);
+WindowManager *window_manager;
+GameManager *game_manager;
+//TODO: Find a more elegant solution than putting these in the global namespace
+
+void callback(const std::string &str) {
+    game_manager->process_input(str);
 }
 
 int main(int argc, char* argv[]) {
@@ -20,9 +25,10 @@ int main(int argc, char* argv[]) {
 	
 	glClearColor(0.f, 0.f, 0.f, 1.f);
 
-	WindowManager manager(&game_window);
-	manager.set_title("A Text Through Time");
-	manager.set_callback(callback);
+	window_manager = new WindowManager(&game_window);
+	game_manager = new GameManager(window_manager);
+	window_manager->set_title("A Text Through Time");
+	window_manager->set_callback(callback);
 	
 	SDL_Event windowEvent;
 	while (true) {
@@ -30,20 +36,22 @@ int main(int argc, char* argv[]) {
 			// Break out of game loop
 			if (windowEvent.type == SDL_QUIT) break;
 			else if (windowEvent.type == SDL_TEXTINPUT) {
-			    manager.text_input(windowEvent.text.text[0]);
+			    window_manager->text_input(windowEvent.text.text[0]);
 			}
 			else if (windowEvent.type == SDL_KEYDOWN) {
-			    manager.keydown(windowEvent.key.keysym.sym);
+			    window_manager->keydown(windowEvent.key.keysym.sym);
 			}
 		}
 		
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		manager.render_to_screen();
+		window_manager->render_to_screen();
 
 		game_window.dt();
 		game_window.swap_buffers();
 	} // End main game loop
 
+	delete game_manager;
+	delete window_manager;
     return 0;
 }

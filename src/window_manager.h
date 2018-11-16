@@ -11,7 +11,7 @@
 #include "log.h"
 
 class WindowManager;
-typedef void (*InputCallback)(WindowManager*, const std::string&);
+typedef void (*InputCallback)(const std::string&);
 
 /// Window Manager manages displaying text to the screen and processing input.
 class WindowManager {
