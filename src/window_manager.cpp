@@ -100,6 +100,11 @@ void WindowManager::print_to_log(const std::string &str) {
     }
 }
 
+void WindowManager::clear_log() {
+    log_window.clear();
+    log_list.clear();
+}
+
 void WindowManager::set_callback(InputCallback callback) {
     this->callback = callback;
 }

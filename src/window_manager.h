@@ -33,6 +33,7 @@ public:
     void text_input(wchar_t ch);
     void keydown(SDL_Keycode keycode);
     void print_to_log(const std::string &str);
+    void clear_log();
     void set_callback(InputCallback callback);
 };
 

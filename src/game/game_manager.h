@@ -8,6 +8,7 @@
 #include "map.h"
 #include "room.h"
 #include "../window_manager.h"
+#include "../tokenizer.h"
 #include <cstdlib>
 #include <ctime>
 
@@ -24,6 +25,13 @@ class GameManager {
     void s_set_current_room(const char* id);
     void s_add_room(const char* unique_id, const char* name, const char* desc);
     void s_attach_room(const char* target_id, const char* base_id, const char* dir);
+
+    // Command functions
+    void c_help();
+    void c_clear();
+    void c_move(const TokenGroup &tokens);
+    void c_look(const TokenGroup &tokens);
+    void c_suicide(const TokenGroup &tokens);
 
     void print(const char* line);
 
