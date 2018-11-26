@@ -13,10 +13,13 @@ file(GLOB SOURCE_FILES
         C:/Libraries/OpenGL/GLAD/src/glad.c)
 file(GLOB FONT_FILES fonts/*.fnt fonts/*.png)
 file(GLOB SHADER_FILES shaders/*.glsl)
+file(GLOB SCRIPT_FILES scripts/*.lua)
 file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/fonts)
 file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/shaders)
+file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/scripts)
 file(COPY ${FONT_FILES} DESTINATION ${PROJECT_BINARY_DIR}/fonts)
 file(COPY ${SHADER_FILES} DESTINATION ${PROJECT_BINARY_DIR}/shaders)
+file(COPY ${SCRIPT_FILES} DESTINATION ${PROJECT_BINARY_DIR}/scripts)
 
 find_package(MINGW32 REQUIRED)
 find_package(SDL2 REQUIRED)

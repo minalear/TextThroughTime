@@ -23,7 +23,7 @@ GameManager::GameManager(WindowManager *window_manager) {
     push(L, this);
     lua_setglobal(L, "Manager");
 
-    luaL_dofile(L, "init.lua");
+    luaL_dofile(L, "scripts/init.lua");
     lua_pcall(L, 0, 0, 0);
 
     initialize_game();
