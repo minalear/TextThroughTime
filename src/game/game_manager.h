@@ -34,6 +34,7 @@ class GameManager {
     void c_suicide(const TokenGroup &tokens);
 
     void print(const char* line);
+    void display_room();
 
 public:
     GameManager(WindowManager *window_manager);

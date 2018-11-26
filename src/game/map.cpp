@@ -7,7 +7,7 @@
 #include <cassert>
 #include <string>
 
-Directions str_to_direction(const std::string &text) {
+Directions Map::str_to_direction(const std::string &text) {
     // Set text to all caps
     std::string buffer;
     for (int i = 0; i < text.size(); i++) {
@@ -21,11 +21,13 @@ Directions str_to_direction(const std::string &text) {
     return Directions::None;
 }
 
-void Map::add_room(const std::string &unique_id, const std::string &name, const std::string &description) {
+Room* Map::add_room(const std::string &unique_id, const std::string &name, const std::string &description) {
     // Ensure that there is only one room with that unique id
     assert(game_map.find(unique_id) == game_map.end());
-    auto new_room = new Room(name, description);
+    auto new_room = new Room(this, name, description);
     game_map.insert(RoomIndex(unique_id, new_room));
+
+    return new_room;
 }
 
 void Map::attach_room(const std::string &target_id, const std::string &base_id, const std::string &dir) {

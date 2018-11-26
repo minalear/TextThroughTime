@@ -20,7 +20,8 @@ private:
     std::map<std::string, Room*> game_map;
 
 public:
-    void add_room(
+    Directions str_to_direction(const std::string &text);
+    Room* add_room(
             const std::string &unique_id,
             const std::string &name,
             const std::string &description);
