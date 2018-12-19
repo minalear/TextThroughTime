@@ -23,6 +23,9 @@ void Room::s_attach_room(const char *room_id, const char *direction) {
 
     attach_room(room, dir);
 }
+void Room::s_set_description(const char* desc) {
+    set_description(std::string(desc));
+}
 void Room::attach_room(Room *room, Directions direction) {
     if (connected_rooms.count(direction) == 0) {
         connected_rooms.insert(std::pair<Directions, Room*>(direction, room));
@@ -31,8 +34,12 @@ void Room::attach_room(Room *room, Directions direction) {
 bool Room::can_move(Directions direction) {
     return (connected_rooms.count(direction) > 0);
 }
-bool Room::can_move(std::string direction) {
+bool Room::can_move(const std::string &direction) {
     return can_move(game_map->str_to_direction(direction));
+}
+bool Room::can_move(const std::string &direction_str, Directions &direction) {
+    direction = game_map->str_to_direction(direction_str);
+    return can_move(direction);
 }
 
 std::string Room::get_name() {

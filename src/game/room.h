@@ -20,12 +20,13 @@ public:
     ~Room();
 
     void s_attach_room(const char* room_id, const char* direction);
+    void s_set_description(const char* desc);
     void attach_room(Room* room, Directions direction);
-
 
     Room* get_room(Directions direction);
     bool can_move(Directions direction);
-    bool can_move(std::string direction);
+    bool can_move(const std::string &direction);
+    bool can_move(const std::string &direction_str, Directions &direction);
 
     std::string get_name();
     std::string get_description();

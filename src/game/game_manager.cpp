@@ -21,6 +21,7 @@ GameManager::GameManager(WindowManager *window_manager) {
     .endClass()
     .beginClass<Room>("Room")
         .addFunction("AttachRoom", &Room::s_attach_room)
+        .addFunction("SetDescription", &Room::s_set_description)
     .endClass();
 
     push(L, this);
@@ -100,26 +101,26 @@ void GameManager::c_move(const TokenGroup &tokens) {
     }
 
     // Check for valid direction
-    std::string direction = tokens.tokens[0];
-    if (!current_room->can_move(direction)) {
+    Directions direction = Directions::None;
+    if (!current_room->can_move(tokens.tokens[0], direction)) {
         window_manager->print_to_log("You cannot travel in that direction!");
         return;
     }
 
     // Move the character in the desired direction
-    if (direction == "north") {
+    if (direction == Directions::North) {
         window_manager->print_to_log("You move towards the north.\n");
         current_room = current_room->get_room(Directions::North);
     }
-    else if (direction == "south") {
+    else if (direction == Directions::South) {
         window_manager->print_to_log("You move towards the south.\n");
         current_room = current_room->get_room(Directions::South);
     }
-    else if (direction == "east") {
+    else if (direction == Directions::East) {
         window_manager->print_to_log("You move towards the east.\n");
         current_room = current_room->get_room(Directions::East);
     }
-    else if (direction == "west") {
+    else if (direction == Directions::West) {
         window_manager->print_to_log("You move towards the west.\n");
         current_room = current_room->get_room(Directions::West);
     }
@@ -141,8 +142,8 @@ void GameManager::c_suicide(const TokenGroup &tokens) {
 
 void GameManager::display_room() {
     window_manager->set_title(current_room->get_name());
-    window_manager->print_to_log(current_room->get_description() + "\n");
-    window_manager->print_to_log("Directions =");
+    window_manager->print_to_log(current_room->get_description() + "\n\n");
+    window_manager->print_to_log("== Directions ==");
     if (current_room->can_move(Directions::North)) window_manager->print_to_log("- North");
     if (current_room->can_move(Directions::South)) window_manager->print_to_log("- South");
     if (current_room->can_move(Directions::East))  window_manager->print_to_log("- East");
