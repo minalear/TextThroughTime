@@ -10,13 +10,13 @@
 
 class Room {
     std::map<Directions, Room*> connected_rooms;
-    std::string name, description;
+    std::string id, name, description;
 
     Map *game_map;
 
 public:
-    Room();
-    Room(Map *map, const std::string &name, const std::string &description);
+    Room(const std::string &id);
+    Room(const std::string &id, const std::string &name, const std::string &description, Map *map);
     ~Room();
 
     void s_attach_room(const char* room_id, const char* direction);
@@ -28,6 +28,7 @@ public:
     bool can_move(const std::string &direction);
     bool can_move(const std::string &direction_str, Directions &direction);
 
+    std::string get_id();
     std::string get_name();
     std::string get_description();
 

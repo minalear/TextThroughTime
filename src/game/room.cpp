@@ -5,14 +5,16 @@
 #include "room.h"
 
 // Constructors/Destructor
-Room::Room(Map *map, const std::string &name, const std::string &description) {
-    this->game_map = map;
-    this->name = name;
-    this->description = description;
+Room::Room(const std::string &id) {
+    this->id = id;
+    set_name("[ROOM]");
+    set_description("[DESCRIPTION]");
 }
-Room::Room() {
-    this->name = "[ROOM]";
-    this->description = "[DESCRIPTION]";
+Room::Room(const std::string &id, const std::string &name, const std::string &description, Map *map) {
+    this->id = id;
+    this->game_map = map;
+    set_name(name);
+    set_description(description);
 }
 Room::~Room() { }
 
@@ -42,6 +44,9 @@ bool Room::can_move(const std::string &direction_str, Directions &direction) {
     return can_move(direction);
 }
 
+std::string Room::get_id() {
+    return id;
+}
 std::string Room::get_name() {
     return name;
 }

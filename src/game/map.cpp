@@ -24,7 +24,7 @@ Directions Map::str_to_direction(const std::string &text) {
 Room* Map::add_room(const std::string &unique_id, const std::string &name, const std::string &description) {
     // Ensure that there is only one room with that unique id
     assert(game_map.find(unique_id) == game_map.end());
-    auto new_room = new Room(this, name, description);
+    auto new_room = new Room(unique_id, name, description, this);
     game_map.insert(RoomIndex(unique_id, new_room));
 
     return new_room;

@@ -144,9 +144,9 @@ void GameManager::display_room() {
     window_manager->set_title(current_room->get_name());
     window_manager->print_to_log(current_room->get_description() + "\n\n");
     window_manager->print_to_log("== Directions ==");
-    if (current_room->can_move(Directions::North)) window_manager->print_to_log("- North");
-    if (current_room->can_move(Directions::South)) window_manager->print_to_log("- South");
-    if (current_room->can_move(Directions::East))  window_manager->print_to_log("- East");
-    if (current_room->can_move(Directions::West))  window_manager->print_to_log("- West");
+    if (current_room->can_move(Directions::North)) window_manager->print_to_log("- North (" + current_room->get_room(Directions::North)->get_name() + ")");
+    if (current_room->can_move(Directions::South)) window_manager->print_to_log("- South (" + current_room->get_room(Directions::South)->get_name() + ")");
+    if (current_room->can_move(Directions::East))  window_manager->print_to_log("- East (" + current_room->get_room(Directions::East)->get_name() + ")");
+    if (current_room->can_move(Directions::West))  window_manager->print_to_log("- West (" + current_room->get_room(Directions::West)->get_name() + ")");
     window_manager->print_to_log(" ");
 }
