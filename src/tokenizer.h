@@ -14,8 +14,11 @@ struct TokenGroup {
 
     TokenGroup();
     ~TokenGroup();
+
+    std::string& operator[](int index) const;
 };
 
 TokenGroup tokenize(const std::string &str);
+std::string to_caps(const std::string &str);
 
 #endif //TEXTTHROUGHTIME_TOKENIZER_H

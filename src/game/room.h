@@ -7,10 +7,12 @@
 
 #include <string>
 #include "map.h"
+#include "inventory.h"
 
 class Room {
     std::map<Directions, Room*> connected_rooms;
     std::string id, name, description;
+    Inventory room_inventory;
 
     Map *game_map;
 
@@ -21,6 +23,7 @@ public:
 
     void s_attach_room(const char* room_id, const char* direction);
     void s_set_description(const char* desc);
+    void s_add_item(const char* item_id);
     void attach_room(Room* room, Directions direction);
 
     Room* get_room(Directions direction);
@@ -35,6 +38,8 @@ public:
     void set_name(const std::string& name);
     void set_description(const std::string& desc);
     void set_map(Map *map);
+
+    Inventory* get_inventory();
 };
 
 #endif //TEXTTHROUGHTIME_ROOM_H

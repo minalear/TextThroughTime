@@ -18,10 +18,12 @@ GameManager::GameManager(WindowManager *window_manager) {
         .addFunction("AddRoom", &GameManager::s_add_room)
         .addFunction("SetCurrentRoom", &GameManager::s_set_current_room)
         .addFunction("Print", &GameManager::print)
+        .addFunction("CreateItem", &GameManager::s_create_item)
     .endClass()
     .beginClass<Room>("Room")
         .addFunction("AttachRoom", &Room::s_attach_room)
         .addFunction("SetDescription", &Room::s_set_description)
+        .addFunction("AddItem", &Room::s_add_item)
     .endClass();
 
     push(L, this);
@@ -63,6 +65,15 @@ void GameManager::process_input(const std::string &input) {
     else if (tokenized_input.command == "go") {
         c_suicide(tokenized_input);
     }
+    else if (tokenized_input.command == "pickup") {
+        c_pickup(tokenized_input);
+    }
+    else if (tokenized_input.command == "drop") {
+        c_drop(tokenized_input);
+    }
+    else if (tokenized_input.command == "inventory") {
+        c_inventory(tokenized_input);
+    }
 
     // No valid input
     else {
@@ -78,12 +89,18 @@ void GameManager::s_add_room(const char *unique_id, const char *name, const char
     // Add the room to the game map
     auto new_room = game_map.add_room(std::string(unique_id), std::string(name), std::string(desc));
 
-    // Make the room available in the script
+    // Make the room available in the init script
     push(L, new_room);
     lua_setglobal(L, unique_id);
 }
-void GameManager::s_attach_room(const char *target_id, const char *base_id, const char *dir) {
-    game_map.attach_room(std::string(target_id), std::string(base_id), std::string(dir));
+void GameManager::s_create_item(const char *item_id, const char *name, const char *desc) {
+    // Create the item
+    auto new_item = new Item(std::string(item_id), std::string(name), std::string(desc));
+    game_map.get_inventory()->add_item(new_item);
+
+    // Make the item available in the init script
+    //push(L, new_item);
+    //lua_setglobal(L, item_id);
 }
 
 // Command Functions
@@ -102,7 +119,7 @@ void GameManager::c_move(const TokenGroup &tokens) {
 
     // Check for valid direction
     Directions direction = Directions::None;
-    if (!current_room->can_move(tokens.tokens[0], direction)) {
+    if (!current_room->can_move(tokens[0], direction)) {
         window_manager->print_to_log("You cannot travel in that direction!");
         return;
     }
@@ -131,18 +148,53 @@ void GameManager::c_look(const TokenGroup &tokens) {
     if (tokens.n_tokens == 0) {
         display_room();
     }
-
-    //TODO: Add item description lookup here
+    else if (tokens.n_tokens == 1) {
+        Item *item = nullptr;
+        if (player_inventory.get_item_by_name(tokens[0], item)) {
+            window_manager->print_to_log(item->get_description() + "\n\n");
+        }
+        else if (current_room->get_inventory()->get_item_by_name(tokens[0], item)) {
+            window_manager->print_to_log(item->get_description() + "\n\n");
+        }
+    }
 }
 void GameManager::c_suicide(const TokenGroup &tokens) {
-    if (tokens.tokens[0] == "commit" && tokens.tokens[1] == "die") {
+    if (tokens[0] == "commit" && tokens[1] == "die") {
         window_manager->print_to_log("You can't do that yet boi.\n");
     }
+}
+void GameManager::c_pickup(const TokenGroup &tokens) {
+    Item *item = nullptr;
+    if (current_room->get_inventory()->get_item_by_name(tokens[0], item)) {
+        current_room->get_inventory()->remove_item(item->get_id());
+        player_inventory.add_item(item);
+        window_manager->print_to_log("You pick up " + item->get_name() + " and add it to your knapsack.\n");
+    }
+    else {
+        window_manager->print_to_log("There is no item to pickup by that name.\n");
+    }
+}
+void GameManager::c_drop(const TokenGroup &tokens) {
+    Item *item = nullptr;
+    if (player_inventory.get_item_by_name(tokens[0], item)) {
+        player_inventory.remove_item(item->get_id());
+        current_room->get_inventory()->add_item(item);
+        window_manager->print_to_log("You remove " + item->get_name() + " from your knapsack and place it on the floor.\n");
+    }
+    else {
+        window_manager->print_to_log("There is no item to drop by that name.\n");
+    }
+}
+void GameManager::c_inventory(const TokenGroup &tokens) {
+    window_manager->print_to_log("== Current Inventory ==");
+    window_manager->print_to_log(player_inventory.get_item_list());
 }
 
 void GameManager::display_room() {
     window_manager->set_title(current_room->get_name());
     window_manager->print_to_log(current_room->get_description() + "\n\n");
+    window_manager->print_to_log("== Room Items ==");
+    window_manager->print_to_log(current_room->get_inventory()->get_item_list() + "\n");
     window_manager->print_to_log("== Directions ==");
     if (current_room->can_move(Directions::North)) window_manager->print_to_log("- North (" + current_room->get_room(Directions::North)->get_name() + ")");
     if (current_room->can_move(Directions::South)) window_manager->print_to_log("- South (" + current_room->get_room(Directions::South)->get_name() + ")");

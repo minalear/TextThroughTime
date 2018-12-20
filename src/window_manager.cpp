@@ -64,6 +64,7 @@ void WindowManager::keydown(SDL_Keycode keycode) {
         input_window.print(input_text);
     }
     else if (keycode == SDLK_RETURN) {
+        print_to_log("\n\n\n");
         print_to_log(">> " + input_text);
         callback(input_text);
         input_text = "";

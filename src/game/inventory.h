@@ -14,7 +14,13 @@ class Inventory {
 
 public:
     void add_item(Item* item);
-    Item* remove_item(const std::string &unique_id);
+    bool remove_item(const std::string &unique_id);
+    bool remove_item(const std::string &unique_id, Item *&item);
+    bool get_item(const std::string &unique_id, Item *&item);
+    bool get_item_by_name(const std::string &name, Item *&item);
+
+    std::string get_item_list();
+    void delete_items();
 };
 
 #endif //TEXTTHROUGHTIME_INVENTORY_H

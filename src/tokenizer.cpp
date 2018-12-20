@@ -12,6 +12,10 @@ TokenGroup::~TokenGroup() {
     delete[] tokens;
 }
 
+std::string &TokenGroup::operator[](int index) const {
+    return tokens[index];
+}
+
 TokenGroup tokenize(const std::string &str) {
     std::string buffer;
     std::string temp_tokens[100];
@@ -46,4 +50,14 @@ TokenGroup tokenize(const std::string &str) {
     token_group.n_tokens -= 1; // Don't count the command as a token
 
     return token_group;
+}
+
+std::string to_caps(const std::string &str) {
+    // Set text to all caps
+    std::string buffer;
+    for (int i = 0; i < str.size(); i++) {
+        buffer += (char)std::toupper(str[i]);
+    }
+
+    return buffer;
 }

@@ -8,13 +8,14 @@
 #include <string>
 
 class Item {
-    std::string name, description;
+    std::string id, name, description;
 
 public:
-    Item();
-    Item(const std::string &name, const std::string desc);
+    Item(const std::string &id);
+    Item(const std::string &id, const std::string &name, const std::string &desc);
     ~Item();
 
+    std::string get_id();
     std::string get_name();
     std::string get_description();
 

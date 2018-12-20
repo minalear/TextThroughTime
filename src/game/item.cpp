@@ -4,16 +4,21 @@
 
 #include "item.h"
 
-Item::Item() {
+Item::Item(const std::string &id) {
+    this->id = id;
     set_name("[ROOM]");
     set_description("[DESCRIPTION]");
 }
-Item::Item(const std::string &name, const std::string desc) {
+Item::Item(const std::string &id, const std::string &name, const std::string &desc) {
+    this->id = id;
     set_name(name);
     set_description(desc);
 }
 Item::~Item() { }
 
+std::string Item::get_id() {
+    return this->id;
+}
 std::string Item::get_name() {
     return this->name;
 }

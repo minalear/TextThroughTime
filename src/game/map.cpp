@@ -2,17 +2,20 @@
 // Created by Trevor Fisher on 10/11/2018.
 //
 
-#include "map.h"
-#include "room.h"
 #include <cassert>
 #include <string>
+#include "map.h"
+#include "room.h"
+#include "../tokenizer.h"
+
+Map::Map() { }
+Map::~Map() {
+    // Only the game map should delete items, since it has a master list of all items in the game
+    all_items.delete_items();
+}
 
 Directions Map::str_to_direction(const std::string &text) {
-    // Set text to all caps
-    std::string buffer;
-    for (int i = 0; i < text.size(); i++) {
-        buffer += (char)std::toupper(text[i]);
-    }
+    std::string buffer = to_caps(text);
     if (buffer == "NORTH") return Directions::North;
     if (buffer == "SOUTH") return Directions::South;
     if (buffer == "EAST")  return Directions::East;
@@ -41,4 +44,7 @@ void Map::attach_room(const std::string &target_id, const std::string &base_id, 
 
 Room *Map::get_room(const std::string &id) {
     return game_map[id];
+}
+Inventory* Map::get_inventory() {
+    return &all_items;
 }

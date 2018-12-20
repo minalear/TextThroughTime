@@ -28,6 +28,12 @@ void Room::s_attach_room(const char *room_id, const char *direction) {
 void Room::s_set_description(const char* desc) {
     set_description(std::string(desc));
 }
+void Room::s_add_item(const char *item_id) {
+    Item *item = nullptr;
+    if (game_map->get_inventory()->get_item(std::string(item_id), item)) {
+        room_inventory.add_item(item);
+    }
+}
 void Room::attach_room(Room *room, Directions direction) {
     if (connected_rooms.count(direction) == 0) {
         connected_rooms.insert(std::pair<Directions, Room*>(direction, room));
@@ -65,4 +71,7 @@ void Room::set_map(Map *map) {
 
 Room *Room::get_room(Directions direction) {
     return connected_rooms[direction];
+}
+Inventory* Room::get_inventory() {
+    return &room_inventory;
 }
