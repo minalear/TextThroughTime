@@ -2,6 +2,7 @@
 -- Adding a room makes a global variable under UNIQUE_ID
 -- To attach rooms to other rooms use BASE_ID:AttachRoom("OTHER_ROOM_ID", "Direction")
 
+-- Room Creation --
 Manager:AddRoom("HH_LIVING_ROOM", "Living Room", "")
 Manager:AddRoom("HH_KITCHEN", "Kitchen", "")
 Manager:AddRoom("HH_PANTRY", "Pantry", "")
@@ -10,7 +11,7 @@ Manager:AddRoom("SHIRE_LANE", "Wumdledon Lane", "")
 Manager:AddRoom("SHIRE_MAIN", "Shire Main Street", "")
 Manager:AddRoom("HH_SECRET_ROOM", "Secret Hobbit Room", "")
 
-
+-- Room Attachments --
 HH_LIVING_ROOM:AttachRoom("HH_KITCHEN", "South")
 HH_LIVING_ROOM:AttachRoom("HH_LAWN", "North")
 HH_KITCHEN:AttachRoom("HH_LIVING_ROOM", "North")
@@ -20,7 +21,7 @@ HH_LAWN:AttachRoom("HH_LIVING_ROOM", "South")
 
 Manager:SetCurrentRoom("HH_LIVING_ROOM")
 
--- Room Descriptions
+-- Room Descriptions --
 HH_LIVING_ROOM:SetDescription(
 	"A quaint little abode settled partially underground, furnished to the brim with antiques acquired from your family.  "..
 	"A small round door leads to your front lawn while an archway leads to your kitchen behind you.  A end table sits next to your leather couch "..
@@ -48,15 +49,48 @@ HH_LIVING_ROOM:AddItem("JOURNAL")
 HH_LIVING_ROOM:AddItem("THE_RING")
 HH_KITCHEN:AddItem("SMOKE_PIPE")
 HH_PANTRY:AddItem("CHEESE_WHEEL")
+HH_SECRET_ROOM:AddItem("THE_LIAR")
 
--- Room Functions
-HH_PANTRY_FUNCTIONS = {
-	OnItemDrop = function (item)
-		if item:GetName() == "Journal" then
-			HH_PANTRY:AppendDescription("The journal has manifested itself into a doorway into another dimension.")
-			HH_PANTRY:RemoveItem("JOURNAL")
+-- Room Scripts
+HH_LIVING_ROOM_SCRIPTS = {
+	OnEnter = function() end,
+	OnExit = function() end,
+	OnItemPickup = function(item) end,
+	OnItemDrop = function(item) end,
+}
+
+HH_KITCHEN_SCRIPTS = {
+	OnEnter = function() end,
+	OnExit = function() end,
+	OnItemPickup = function(item) end,
+	OnItemDrop = function(item) end,
+}
+
+HH_PANTRY_SCRIPTS = {
+	OnEnter = function() end,
+	OnExit = function() end,
+	OnItemPickup = function(item) end,
+	OnItemDrop = function(item) 
+		if item:GetID() == "THE_RING" then
+			-- Display a message to the player about the ring opening up a portal
+			HH_PANTRY:AppendDescription("A portal to a secret room is open on the opposite side of the room")
+			HH_PANTRY:RemoveItem("THE_RING")
 			HH_PANTRY:AttachRoom("HH_SECRET_ROOM", "West")
 			HH_SECRET_ROOM:AttachRoom("HH_PANTRY", "East")
 		end
-	end
+	end,
+}
+
+HH_LAWN_SCRIPTS = {
+	OnEnter = function() end,
+	OnExit = function() end,
+	OnItemPickup = function(item) end,
+	OnItemDrop = function(item) end,
+}
+
+HH_SECRET_ROOM_SCRIPTS = {
+	OnEnter = function() end,
+	OnExit = function() end,
+	OnItemPickup = function(item) end,
+	OnItemDrop = function(item) end,
 }

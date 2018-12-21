@@ -36,6 +36,9 @@ void Item::set_description(const std::string &desc) {
 void Item::s_set_description(const char *desc) {
     set_description(std::string(desc));
 }
+const char* Item::s_get_id() {
+    return id.c_str();
+}
 const char* Item::s_get_name() {
     return name.c_str();
 }

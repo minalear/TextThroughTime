@@ -29,6 +29,7 @@ GameManager::GameManager(WindowManager *window_manager) {
     .endClass()
     .beginClass<Item>("Item")
         .addFunction("SetDescription", &Item::s_set_description)
+        .addFunction("GetID", &Item::s_get_id)
         .addFunction("GetName", &Item::s_get_name)
     .endClass();
 
@@ -98,6 +99,8 @@ void GameManager::s_add_room(const char *unique_id, const char *name, const char
     // Make the room available in the init script
     push(L, new_room);
     lua_setglobal(L, unique_id);
+
+    LuaRef room_table = getGlobal(L, unique_id);
 }
 void GameManager::s_create_item(const char *item_id, const char *name, const char *desc) {
     // Create the item
@@ -133,19 +136,23 @@ void GameManager::c_move(const TokenGroup &tokens) {
     // Move the character in the desired direction
     if (direction == Directions::North) {
         window_manager->print_to_log("You move towards the north.\n");
-        current_room = current_room->get_room(Directions::North);
+        auto next_room = current_room->get_room(Directions::North);
+        set_current_room(next_room);
     }
     else if (direction == Directions::South) {
         window_manager->print_to_log("You move towards the south.\n");
-        current_room = current_room->get_room(Directions::South);
+        auto next_room = current_room->get_room(Directions::South);
+        set_current_room(next_room);
     }
     else if (direction == Directions::East) {
         window_manager->print_to_log("You move towards the east.\n");
-        current_room = current_room->get_room(Directions::East);
+        auto next_room = current_room->get_room(Directions::East);
+        set_current_room(next_room);
     }
     else if (direction == Directions::West) {
         window_manager->print_to_log("You move towards the west.\n");
-        current_room = current_room->get_room(Directions::West);
+        auto next_room = current_room->get_room(Directions::West);
+        set_current_room(next_room);
     }
 
     display_room();
@@ -187,10 +194,10 @@ void GameManager::c_drop(const TokenGroup &tokens) {
         current_room->get_inventory()->add_item(item);
         window_manager->print_to_log("You remove " + item->get_name() + " from your knapsack and place it on the floor.\n");
 
-        std::string function_title = current_room->get_name() + "_FUNCTIONS";
-        LuaRef room_functions = getGlobal(L, "HH_PANTRY_FUNCTIONS");
-        if (!room_functions.isNil()) {
-            room_functions["OnItemDrop"](item);
+        std::string script_table_name = current_room->get_id() + "_SCRIPTS";
+        LuaRef room_scripts = getGlobal(L, script_table_name.c_str());
+        if (!room_scripts.isNil()) {
+            room_scripts["OnItemDrop"](item);
         }
     }
     else {
@@ -215,5 +222,5 @@ void GameManager::display_room() {
     window_manager->print_to_log(" ");
 }
 void GameManager::set_current_room(Room *new_room){
-
+    current_room = new_room;
 }
