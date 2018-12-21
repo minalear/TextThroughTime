@@ -19,6 +19,7 @@ public:
 
     void add(std::string str);
     void remove(int i);
+    void clear();
     int count();
 
     std::string operator[](int i);

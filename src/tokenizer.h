@@ -8,49 +8,17 @@
 #include <iostream>
 
 struct TokenGroup {
+    std::string command;
     std::string *tokens;
     int n_tokens;
 
-    TokenGroup() {
-        n_tokens = 0;
-        tokens = nullptr;
-    }
-    ~TokenGroup() {
-        delete [] tokens;
-    }
+    TokenGroup();
+    ~TokenGroup();
+
+    std::string& operator[](int index) const;
 };
 
-TokenGroup tokenize(const std::string &str) {
-    std::string buffer;
-    auto temp_tokens = new std::string[100];
-    TokenGroup token_group;
-    token_group.n_tokens = 0;
-
-    bool ignore_spaces = false;
-
-    for (auto& x : str) {
-        if (x == ' ' && !ignore_spaces) {
-            temp_tokens[token_group.n_tokens] = buffer;
-            token_group.n_tokens++;
-            buffer.clear();
-        } else if (x == '"') {
-            ignore_spaces = !ignore_spaces;
-        } else {
-            buffer += x;
-        }
-    }
-    if (!buffer.empty()) {
-        temp_tokens[token_group.n_tokens] = buffer;
-        token_group.n_tokens++;
-    }
-
-    token_group.tokens = new std::string[token_group.n_tokens];
-    for (int i = 0; i < token_group.n_tokens; i++) {
-        token_group.tokens[i] = temp_tokens[i];
-    }
-    delete [] temp_tokens;
-
-    return token_group;
-}
+TokenGroup tokenize(const std::string &str);
+std::string to_caps(const std::string &str);
 
 #endif //TEXTTHROUGHTIME_TOKENIZER_H

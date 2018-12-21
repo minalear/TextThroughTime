@@ -17,6 +17,8 @@ bool checkShaderCompilation(GLuint shaderID) {
         glGetShaderInfoLog(shaderID, 512, nullptr, errorMessage);
         printf("Shader Compilation Error, %s\n", errorMessage);
     }
+
+    return (bool)compileStatus;
 }
 
 minalear::shader_program::shader_program(const char *vertexSource, const char *fragmentSource) {

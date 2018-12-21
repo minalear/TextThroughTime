@@ -30,7 +30,12 @@ void Log::add(const std::string str) {
     size++;
 }
 void Log::remove(int i) {
-
+    //TODO: Actually write this function wtf
+}
+void Log::clear() {
+    for (int i = 0; i < capacity; i++) {
+        lines[i] = "";
+    }
 }
 int Log::count() {
     return size;
