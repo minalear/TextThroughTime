@@ -38,14 +38,7 @@ GameManager::GameManager(WindowManager *window_manager) {
     push(L, this);
     lua_setglobal(L, "Manager");
 
-    // TODO: Investigate why Lua modules (require()) doesn't seem to work
-    // Manually load each script file since require() doesn't work
-
-    std::string game_script = std::string(minalear::read_file("scripts/init.lua"));
-    game_script += std::string(minalear::read_file("scripts/room_scripts.lua"));
-
-    //luaL_dofile(L, "scripts/init.lua");
-    luaL_dostring(L, game_script.c_str());
+    luaL_dofile(L, "scripts/init.lua");
     lua_pcall(L, 0, 0, 0);
 
     initialize_game();

@@ -51,4 +51,4 @@ HH_KITCHEN:AddItem("SMOKE_PIPE")
 HH_PANTRY:AddItem("CHEESE_WHEEL")
 HH_SECRET_ROOM:AddItem("THE_LIAR")
 
--- require("room_scripts") -- Doesn't seem to work??
+require("scripts.room_scripts")
