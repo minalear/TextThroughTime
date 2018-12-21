@@ -21,6 +21,9 @@ public:
 
     void set_name(const std::string &name);
     void set_description(const std::string &desc);
+
+    void s_set_description(const char* desc);
+    const char* s_get_name();
 };
 
 #endif //TEXTTHROUGHTIME_ITEM_H

@@ -28,11 +28,17 @@ void Room::s_attach_room(const char *room_id, const char *direction) {
 void Room::s_set_description(const char* desc) {
     set_description(std::string(desc));
 }
+void Room::s_append_description(const char* desc) {
+    set_description(description + "\n" + std::string(desc));
+}
 void Room::s_add_item(const char *item_id) {
     Item *item = nullptr;
     if (game_map->get_inventory()->get_item(std::string(item_id), item)) {
         room_inventory.add_item(item);
     }
+}
+void Room::s_remove_item(const char* item_id) {
+    room_inventory.remove_item(item_id);
 }
 void Room::attach_room(Room *room, Directions direction) {
     if (connected_rooms.count(direction) == 0) {

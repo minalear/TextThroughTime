@@ -8,6 +8,7 @@ Manager:AddRoom("HH_PANTRY", "Pantry", "")
 Manager:AddRoom("HH_LAWN", "Front Lawn", "")
 Manager:AddRoom("SHIRE_LANE", "Wumdledon Lane", "")
 Manager:AddRoom("SHIRE_MAIN", "Shire Main Street", "")
+Manager:AddRoom("HH_SECRET_ROOM", "Secret Hobbit Room", "")
 
 
 HH_LIVING_ROOM:AttachRoom("HH_KITCHEN", "South")
@@ -33,14 +34,29 @@ HH_PANTRY:SetDescription(
 HH_LAWN:SetDescription(
 	"Your spacious lawn sprawls out in front of you, with your garden stretching out to your right.  The surrounding hills are very green for this "..
 	"time of year.  Various noises can be heard from down the lane, nothing too out of the ordinary.")
+HH_SECRET_ROOM:SetDescription(
+	"A secret room with secret stuff.")
 	
 -- Items for the Hobbit Hole
 Manager:CreateItem("SMOKE_PIPE", "Pipe", "A luxuriously crafted wooden pipe, carved with various designs from the Ancient Kingdom.  It is loaded with some Deborah's famous Kush.")
 Manager:CreateItem("CHEESE_WHEEL", "Cheese Wheel", "A very rotund piece of cheddar cheese.")
 Manager:CreateItem("JOURNAL", "Journal", "Your personal journal where you keep notes about that one book you're writing about the Dark Lord and stuff.")
 Manager:CreateItem("THE_RING", "Ring", "A small golden ring.")
+Manager:CreateItem("THE_LIAR", "Khajiit Statue", "A strange looking statue of a Khajiit.  Inscribed on the bottom is the name \"M'aiq the Liar.\"")
 
 HH_LIVING_ROOM:AddItem("JOURNAL")
 HH_LIVING_ROOM:AddItem("THE_RING")
 HH_KITCHEN:AddItem("SMOKE_PIPE")
 HH_PANTRY:AddItem("CHEESE_WHEEL")
+
+-- Room Functions
+HH_PANTRY_FUNCTIONS = {
+	OnItemDrop = function (item)
+		if item:GetName() == "Journal" then
+			HH_PANTRY:AppendDescription("The journal has manifested itself into a doorway into another dimension.")
+			HH_PANTRY:RemoveItem("JOURNAL")
+			HH_PANTRY:AttachRoom("HH_SECRET_ROOM", "West")
+			HH_SECRET_ROOM:AttachRoom("HH_PANTRY", "East")
+		end
+	end
+}

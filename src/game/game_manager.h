@@ -40,6 +40,7 @@ class GameManager {
 
     void print(const char* line);
     void display_room();
+    void set_current_room(Room* new_room);
 
 public:
     GameManager(WindowManager *window_manager);

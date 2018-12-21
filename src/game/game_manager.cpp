@@ -23,7 +23,13 @@ GameManager::GameManager(WindowManager *window_manager) {
     .beginClass<Room>("Room")
         .addFunction("AttachRoom", &Room::s_attach_room)
         .addFunction("SetDescription", &Room::s_set_description)
+        .addFunction("AppendDescription", &Room::s_append_description)
         .addFunction("AddItem", &Room::s_add_item)
+        .addFunction("RemoveItem", &Room::s_remove_item)
+    .endClass()
+    .beginClass<Item>("Item")
+        .addFunction("SetDescription", &Item::s_set_description)
+        .addFunction("GetName", &Item::s_get_name)
     .endClass();
 
     push(L, this);
@@ -99,8 +105,8 @@ void GameManager::s_create_item(const char *item_id, const char *name, const cha
     game_map.get_inventory()->add_item(new_item);
 
     // Make the item available in the init script
-    //push(L, new_item);
-    //lua_setglobal(L, item_id);
+    push(L, new_item);
+    lua_setglobal(L, item_id);
 }
 
 // Command Functions
@@ -180,6 +186,12 @@ void GameManager::c_drop(const TokenGroup &tokens) {
         player_inventory.remove_item(item->get_id());
         current_room->get_inventory()->add_item(item);
         window_manager->print_to_log("You remove " + item->get_name() + " from your knapsack and place it on the floor.\n");
+
+        std::string function_title = current_room->get_name() + "_FUNCTIONS";
+        LuaRef room_functions = getGlobal(L, "HH_PANTRY_FUNCTIONS");
+        if (!room_functions.isNil()) {
+            room_functions["OnItemDrop"](item);
+        }
     }
     else {
         window_manager->print_to_log("There is no item to drop by that name.\n");
@@ -201,4 +213,7 @@ void GameManager::display_room() {
     if (current_room->can_move(Directions::East))  window_manager->print_to_log("- East (" + current_room->get_room(Directions::East)->get_name() + ")");
     if (current_room->can_move(Directions::West))  window_manager->print_to_log("- West (" + current_room->get_room(Directions::West)->get_name() + ")");
     window_manager->print_to_log(" ");
+}
+void GameManager::set_current_room(Room *new_room){
+
 }

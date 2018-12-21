@@ -32,3 +32,10 @@ void Item::set_name(const std::string &name) {
 void Item::set_description(const std::string &desc) {
     this->description = desc;
 }
+
+void Item::s_set_description(const char *desc) {
+    set_description(std::string(desc));
+}
+const char* Item::s_get_name() {
+    return name.c_str();
+}
