@@ -2,9 +2,10 @@
 // Created by Trevor Fisher on 10/11/2018.
 //
 
-#include "game_manager.h"
 #include <lua.hpp>
 #include <LuaBridge.h>
+#include "game_manager.h"
+#include "../core/file_handler.h"
 
 using namespace luabridge;
 
@@ -13,6 +14,7 @@ GameManager::GameManager(WindowManager *window_manager) {
 
     L = luaL_newstate();
     luaL_openlibs(L);
+
     getGlobalNamespace(L)
     .beginClass<GameManager>("GameManager")
         .addFunction("AddRoom", &GameManager::s_add_room)
@@ -36,7 +38,14 @@ GameManager::GameManager(WindowManager *window_manager) {
     push(L, this);
     lua_setglobal(L, "Manager");
 
-    luaL_dofile(L, "scripts/init.lua");
+    // TODO: Investigate why Lua modules (require()) doesn't seem to work
+    // Manually load each script file since require() doesn't work
+
+    std::string game_script = std::string(minalear::read_file("scripts/init.lua"));
+    game_script += std::string(minalear::read_file("scripts/room_scripts.lua"));
+
+    //luaL_dofile(L, "scripts/init.lua");
+    luaL_dostring(L, game_script.c_str());
     lua_pcall(L, 0, 0, 0);
 
     initialize_game();
