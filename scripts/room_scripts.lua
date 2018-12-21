@@ -1,28 +1,31 @@
 --[[ITEM_ID_SCRIPTS = {
 	OnEnter = function() end,
-	OnExit = function() end,
+	OnExit = function() return true end,
 	OnItemPickup = function(item) end,
 	OnItemDrop = function(item) end,
+	OnLook = function(item) end
 }]]--
 
 -- Room Scripts
 HH_LIVING_ROOM_SCRIPTS = {
 	OnEnter = function() end,
-	OnExit = function() end,
+	OnExit = function() return true end,
 	OnItemPickup = function(item) end,
 	OnItemDrop = function(item) end,
+	OnLook = function(item) end
 }
 
 HH_KITCHEN_SCRIPTS = {
 	OnEnter = function() end,
-	OnExit = function() end,
+	OnExit = function() return true end,
 	OnItemPickup = function(item) end,
 	OnItemDrop = function(item) end,
+	OnLook = function(item) end
 }
 
 HH_PANTRY_SCRIPTS = {
 	OnEnter = function() end,
-	OnExit = function() end,
+	OnExit = function() return true end,
 	OnItemPickup = function(item) end,
 	OnItemDrop = function(item) 
 		if item:GetID() == "THE_RING" then
@@ -33,18 +36,23 @@ HH_PANTRY_SCRIPTS = {
 			HH_SECRET_ROOM:AttachRoom("HH_PANTRY", "East")
 		end
 	end,
+	OnLook = function(item) end
 }
 
 HH_LAWN_SCRIPTS = {
 	OnEnter = function() end,
-	OnExit = function() end,
+	OnExit = function() return true end,
 	OnItemPickup = function(item) end,
 	OnItemDrop = function(item) end,
+	OnLook = function(item) end
 }
 
 HH_SECRET_ROOM_SCRIPTS = {
 	OnEnter = function() end,
-	OnExit = function() end,
+	OnExit = function() 
+		return Manager:PlayerHasItem("THE_LIAR")
+	end,
 	OnItemPickup = function(item) end,
 	OnItemDrop = function(item) end,
+	OnLook = function(item) end
 }

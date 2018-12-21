@@ -27,6 +27,8 @@ class GameManager {
     void s_set_current_room(const char* id);
     void s_add_room(const char* unique_id, const char* name, const char* desc);
     void s_create_item(const char* item_id, const char* name, const char* desc);
+    bool s_player_has_item(const char* item_id);
+    void s_print(const char* line);
 
     // Command functions
     void c_help();
@@ -38,7 +40,6 @@ class GameManager {
     void c_drop(const TokenGroup &tokens);
     void c_inventory(const TokenGroup &tokens);
 
-    void print(const char* line);
     void display_room();
     void set_current_room(Room* new_room);
 
