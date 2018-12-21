@@ -3,23 +3,51 @@
 -- To attach rooms to other rooms use BASE_ID:AttachRoom("OTHER_ROOM_ID", "Direction")
 
 -- Room Creation --
-Manager:AddRoom("HH_LIVING_ROOM", "Living Room", "")
-Manager:AddRoom("HH_KITCHEN", "Kitchen", "")
-Manager:AddRoom("HH_PANTRY", "Pantry", "")
-Manager:AddRoom("HH_LAWN", "Front Lawn", "")
-Manager:AddRoom("SHIRE_LANE", "Wumdledon Lane", "")
-Manager:AddRoom("SHIRE_MAIN", "Shire Main Street", "")
-Manager:AddRoom("HH_SECRET_ROOM", "Secret Hobbit Room", "")
+Manager:AddRoom("DUNG_CELL", "Dungeon Cell", "")
+Manager:AddRoom("DUNG_HALLWAY", "Dungeon Hallway", "")
+Manager:AddRoom("DUNG_ENTRANCE", "Dungeon Entrance", "")
+Manager:AddRoom("DUNG_SECRET_PASSAGE", "Secret Passage", "")
+
+Manager:AddRoom("CASTLE", "Castle Courtyard", "")
+
+Manager:AddRoom("SEWER_SE", "South-East Sewer", "")
+Manager:AddRoom("SEWER_NE", "North-East Sewer", "")
+Manager:AddRoom("SEWER_SW", "South-West Sewer", "")
+Manager:AddRoom("SEWER_NW", "North-West Sewer", "")
+Manager:AddRoom("SEWER_HIDEOUT", "Secret Hideout", "")
+
+Manager:AddRoom("CITY_STREET", "Main Avenue", "")
+Manager:AddRoom("CITY_STREET_NORTH", "North Main Avenue", "")
+Manager:AddRoom("CITY_MERCHANT", "Merchant Quarter", "")
+Manager:AddRoom("CITY_GARDEN", "Memorial Garden", "")
+Manager:AddRoom("CITY_CLOTHING", "Clothing Shoppe", "")
+Manager:AddRoom("CITY_GATE", "Main Gate", "")
+
+Manager:AddRoom("VICTORY", "Outside", "")
 
 -- Room Attachments --
-HH_LIVING_ROOM:AttachRoom("HH_KITCHEN", "South")
-HH_LIVING_ROOM:AttachRoom("HH_LAWN", "North")
-HH_KITCHEN:AttachRoom("HH_LIVING_ROOM", "North")
-HH_KITCHEN:AttachRoom("HH_PANTRY", "West")
-HH_PANTRY:AttachRoom("HH_KITCHEN", "East")
-HH_LAWN:AttachRoom("HH_LIVING_ROOM", "South")
+DUNG_CELL:AttachRoom("DUNG_SECRET_PASSAGE", "East")
+DUNG_CELL:AttachRoom("DUNG_HALLWAY", "North")
+DUNG_HALLWAY:AttachRoom("DUNG_CELL", "South")
+DUNG_HALLWAY:AttachRoom("DUNG_ENTRANCE", "North")
+DUNG_ENTRANCE:AttachRoom("DUNG_HALLWAY", "South")
+DUNG_ENTRANCE:AttachRoom("CASTLE", "East")
+DUNG_SECRET_PASSAGE:AttachRoom("DUNG_CELL", "West")
+DUNG_SECRET_PASSAGE:AttachRoom("SEWER_SE", "East")
 
-Manager:SetCurrentRoom("HH_LIVING_ROOM")
+CASTLE:AttachRoom("DUNG_ENTRANCE", "West")
+CASTLE:AttachRoom("CITY_MERCHANT", "East")
+
+SEWER_SE:AttachRoom("DUNG_SECRET_PASSAGE", "West")
+SEWER_SE:AttachRoom("SEWER_NE", "North")
+SEWER_NE:AttachRoom("SEWER_SE", "South")
+SEWER_NE:AttachRoom("SEWER_NW", "West")
+SEWER_SW:AttachRoom("SEWER_HIDEOUT", "South")
+SEWER_SW:AttachRoom("SEWER_NW", "North")
+SEWER_NW:AttachRoom("SEWER_NE", "West")
+
+-- Starting Room --
+Manager:SetCurrentRoom("DUNG_CELL")
 
 -- Room Descriptions --
 HH_LIVING_ROOM:SetDescription(
