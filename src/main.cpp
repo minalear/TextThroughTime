@@ -26,9 +26,10 @@ int main(int argc, char* argv[]) {
 	glClearColor(0.f, 0.f, 0.f, 1.f);
 
 	window_manager = new WindowManager(&game_window);
-	game_manager = new GameManager(window_manager);
 	window_manager->set_title("A Text Through Time");
 	window_manager->set_callback(callback);
+
+	game_manager = new GameManager(window_manager);
 	
 	SDL_Event windowEvent;
 	while (true) {

@@ -33,38 +33,43 @@ DUNG_HALLWAY:AttachRoom("DUNG_ENTRANCE", "North")
 DUNG_ENTRANCE:AttachRoom("DUNG_HALLWAY", "South")
 DUNG_ENTRANCE:AttachRoom("CASTLE", "East")
 DUNG_SECRET_PASSAGE:AttachRoom("DUNG_CELL", "West")
-DUNG_SECRET_PASSAGE:AttachRoom("SEWER_SE", "East")
+DUNG_SECRET_PASSAGE:AttachRoom("SEWER_SW", "East")
 
 CASTLE:AttachRoom("DUNG_ENTRANCE", "West")
 CASTLE:AttachRoom("CITY_MERCHANT", "East")
 
-SEWER_SE:AttachRoom("DUNG_SECRET_PASSAGE", "West")
-SEWER_SE:AttachRoom("SEWER_NE", "North")
-SEWER_NE:AttachRoom("SEWER_SE", "South")
-SEWER_NE:AttachRoom("SEWER_NW", "West")
-SEWER_SW:AttachRoom("SEWER_HIDEOUT", "South")
+SEWER_SW:AttachRoom("DUNG_SECRET_PASSAGE", "West")
 SEWER_SW:AttachRoom("SEWER_NW", "North")
-SEWER_NW:AttachRoom("SEWER_NE", "West")
+SEWER_NW:AttachRoom("SEWER_SW", "South")
+SEWER_NW:AttachRoom("SEWER_NE", "East")
+SEWER_NE:AttachRoom("SEWER_NW", "West")
+SEWER_NE:AttachRoom("CITY_STREET", "North")
+SEWER_NE:AttachRoom("SEWER_SE", "South")
+SEWER_SE:AttachRoom("SEWER_NE", "North")
+SEWER_SE:AttachRoom("SEWER_HIDEOUT", "South")
+SEWER_HIDEOUT:AttachRoom("SEWER_SE", "North")
+
+CITY_STREET:AttachRoom("CITY_STREET_NORTH", "North")
+CITY_STREET:AttachRoom("SEWER_NW", "South")
+CITY_STREET:AttachRoom("CITY_GARDEN", "East")
+CITY_STREET:AttachRoom("CITY_MERCHANT", "West")
+CITY_STREET_NORTH:AttachRoom("CITY_GATE", "North")
+CITY_STREET_NORTH:AttachRoom("CITY_STREET", "South")
+CITY_MERCHANT:AttachRoom("CITY_CLOTHING", "North")
+CITY_MERCHANT:AttachRoom("CITY_STREET", "East")
+CITY_MERCHANT:AttachRoom("CASTLE", "West")
+CITY_GARDEN:AttachRoom("CITY_STREET", "West")
+CITY_CLOTHING:AttachRoom("CITY_MERCHANT", "South")
+CITY_GATE:AttachRoom("VICTORY", "North")
+CITY_GATE:AttachRoom("CITY_STREET_NORTH", "South")
+
+VICTORY:AttachRoom("CITY_GATE", "South")
 
 -- Starting Room --
 Manager:SetCurrentRoom("DUNG_CELL")
 
 -- Room Descriptions --
-HH_LIVING_ROOM:SetDescription(
-	"A quaint little abode settled partially underground, furnished to the brim with antiques acquired from your family.  "..
-	"A small round door leads to your front lawn while an archway leads to your kitchen behind you.  A end table sits next to your leather couch "..
-	"which you tend to store important trinkets lies closed as well.")
-HH_KITCHEN:SetDescription(
-	"A kitchen set against the back of the house with your basic array of cooking appliances; a stove, sink, and various storage bins.  "..
-	"A door leading to your expansive pantry is also located to the side here.")
-HH_PANTRY:SetDescription(
-	"A very spacious pantry cut into the heart of the hill, making it much cooler than the other rooms in the house, allowing  "..
-	"for storage of food.")
-HH_LAWN:SetDescription(
-	"Your spacious lawn sprawls out in front of you, with your garden stretching out to your right.  The surrounding hills are very green for this "..
-	"time of year.  Various noises can be heard from down the lane, nothing too out of the ordinary.")
-HH_SECRET_ROOM:SetDescription(
-	"A secret room with secret stuff.")
+
 	
 -- Items for the Hobbit Hole
 Manager:CreateItem("SMOKE_PIPE", "Pipe", "A luxuriously crafted wooden pipe, carved with various designs from the Ancient Kingdom.  It is loaded with some Deborah's famous Kush.")
@@ -73,10 +78,10 @@ Manager:CreateItem("JOURNAL", "Journal", "Your personal journal where you keep n
 Manager:CreateItem("THE_RING", "Ring", "A small golden ring.")
 Manager:CreateItem("THE_LIAR", "Khajiit Statue", "A strange looking statue of a Khajiit.  Inscribed on the bottom is the name \"M'aiq the Liar.\"")
 
-HH_LIVING_ROOM:AddItem("JOURNAL")
+--[[HH_LIVING_ROOM:AddItem("JOURNAL")
 HH_LIVING_ROOM:AddItem("THE_RING")
 HH_KITCHEN:AddItem("SMOKE_PIPE")
 HH_PANTRY:AddItem("CHEESE_WHEEL")
-HH_SECRET_ROOM:AddItem("THE_LIAR")
+HH_SECRET_ROOM:AddItem("THE_LIAR")]]--
 
 require("scripts.room_scripts")
