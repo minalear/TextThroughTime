@@ -27,8 +27,8 @@ Manager:AddRoom("VICTORY", "Outside", "")
 
 -- Room Attachments --
 DUNG_CELL:AttachRoom("DUNG_SECRET_PASSAGE", "East")
-DUNG_CELL:AttachRoom("DUNG_HALLWAY", "North")
-DUNG_HALLWAY:AttachRoom("DUNG_CELL", "South")
+--DUNG_CELL:AttachRoom("DUNG_HALLWAY", "North")
+--UNG_HALLWAY:AttachRoom("DUNG_CELL", "South")
 DUNG_HALLWAY:AttachRoom("DUNG_ENTRANCE", "North")
 DUNG_ENTRANCE:AttachRoom("DUNG_HALLWAY", "South")
 DUNG_ENTRANCE:AttachRoom("CASTLE", "East")
@@ -76,9 +76,13 @@ Manager:CreateItem("DISGUISE", "Disguise", "A set of clothing designed to concea
 Manager:CreateItem("CELL_DOOR", 
 	"Cell Door", "A wrought iron fence that has degraded slightly due to the moist environment of the dungeon.  "..
 	"It looks very heavy and is locked with a fairly primitive locking mechanism.", true)
+Manager:CreateItem("CELL_KEYS",
+	"Keys", "Set of bronze keys that look like they could unlock a certain cell door.", false)
 
 CITY_CLOTHING:AddItem("DISGUISE")
 DUNG_CELL:AddItem("CELL_DOOR")
+DUNG_CELL:AddItem("CELL_KEYS")
+DUNG_HALLWAY:AddItem("CELL_DOOR")
 
 --[[HH_LIVING_ROOM:AddItem("JOURNAL")
 HH_LIVING_ROOM:AddItem("THE_RING")
@@ -87,3 +91,4 @@ HH_PANTRY:AddItem("CHEESE_WHEEL")
 HH_SECRET_ROOM:AddItem("THE_LIAR")]]--
 
 require("scripts.room_scripts")
+require("scripts.item_scripts")

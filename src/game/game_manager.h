@@ -42,6 +42,8 @@ class GameManager {
     void c_drop(const TokenGroup &tokens);
     void c_inventory(const TokenGroup &tokens);
 
+    void item_interact(const TokenGroup &tokens);
+
     void display_room();
     void set_current_room(Room* new_room);
 

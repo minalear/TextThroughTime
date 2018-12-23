@@ -88,8 +88,11 @@ void GameManager::process_input(const std::string &input) {
     }
 
     // No valid input
+    // TODO: Rewrite command input processing
+    // Assume a non-valid input as an action on an item until we redo the rewrite
     else {
-        window_manager->print_to_log("Please input a valid command.  Type 'help' for a complete list.");
+        item_interact(tokenized_input);
+        //window_manager->print_to_log("Please input a valid command.  Type 'help' for a complete list.");
     }
 }
 
@@ -253,6 +256,18 @@ void GameManager::c_drop(const TokenGroup &tokens) {
 void GameManager::c_inventory(const TokenGroup &tokens) {
     window_manager->print_to_log("== Current Inventory ==");
     window_manager->print_to_log(player_inventory.get_item_list());
+}
+
+void GameManager::item_interact(const TokenGroup &tokens) {
+    Item *item = nullptr;
+    if (current_room->get_inventory()->get_item_by_name(tokens[0], item)) {
+        // Execute the OnInteract item trigger
+        std::string script_table_name = item->get_id() + "_SCRIPTS";
+        LuaRef item_scripts = getGlobal(L, script_table_name.c_str());
+        if (!item_scripts.isNil()) {
+            item_scripts["OnInteract"](tokens.command);
+        }
+    }
 }
 
 void GameManager::display_room() {
