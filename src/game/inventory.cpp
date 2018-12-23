@@ -53,10 +53,15 @@ bool Inventory::get_item_by_name(const std::string &name, Item *&item) {
     return false;
 }
 
-std::string Inventory::get_item_list() {
+std::string Inventory::get_item_list(bool ignore_static) {
     std::string buffer;
     for (const auto &x : items) {
-        buffer += x->get_name() + "\n";
+        if (!ignore_static && x->get_is_static()) {
+            buffer += x->get_name() + "(static)\n";
+        }
+        else if (!x->get_is_static()) {
+            buffer += x->get_name() + "\n";
+        }
     }
 
     return buffer;

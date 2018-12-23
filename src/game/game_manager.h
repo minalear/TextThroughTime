@@ -26,12 +26,14 @@ class GameManager {
     // Scripting functions
     void s_set_current_room(const char* id);
     void s_add_room(const char* unique_id, const char* name, const char* desc);
-    void s_create_item(const char* item_id, const char* name, const char* desc);
+    void s_create_item(const char* item_id, const char* name, const char* desc, bool is_static);
     bool s_player_has_item(const char* item_id);
+    bool s_remove_item(const char* item_id);
     void s_print(const char* line);
 
     // Command functions
     void c_help();
+    void c_debug(const TokenGroup &tokens);
     void c_clear();
     void c_move(const TokenGroup &tokens);
     void c_look(const TokenGroup &tokens);

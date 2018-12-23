@@ -22,6 +22,7 @@ GameManager::GameManager(WindowManager *window_manager) {
         .addFunction("Print", &GameManager::s_print)
         .addFunction("CreateItem", &GameManager::s_create_item)
         .addFunction("PlayerHasItem", &GameManager::s_player_has_item)
+        .addFunction("RemoveItem", &GameManager::s_remove_item)
     .endClass()
     .beginClass<Room>("Room")
         .addFunction("AttachRoom", &Room::s_attach_room)
@@ -34,6 +35,8 @@ GameManager::GameManager(WindowManager *window_manager) {
         .addFunction("SetDescription", &Item::s_set_description)
         .addFunction("GetID", &Item::s_get_id)
         .addFunction("GetName", &Item::s_get_name)
+        .addFunction("IsStatic", &Item::get_is_static)
+        .addFunction("SetIsStatic", &Item::set_is_static)
     .endClass();
 
     push(L, this);
@@ -58,6 +61,9 @@ void GameManager::process_input(const std::string &input) {
     // Commands
     if (tokenized_input.command == "help") {
         c_help();
+    }
+    else if (tokenized_input.command == "debug") {
+        c_debug(tokenized_input);
     }
     else if (tokenized_input.command == "clear") {
         c_clear();
@@ -101,9 +107,10 @@ void GameManager::s_add_room(const char *unique_id, const char *name, const char
 
     LuaRef room_table = getGlobal(L, unique_id);
 }
-void GameManager::s_create_item(const char *item_id, const char *name, const char *desc) {
+void GameManager::s_create_item(const char *item_id, const char *name, const char *desc, bool is_static) {
     // Create the item
     auto new_item = new Item(std::string(item_id), std::string(name), std::string(desc));
+    new_item->set_is_static(is_static);
     game_map.get_inventory()->add_item(new_item);
 
     // Make the item available in the init script
@@ -114,6 +121,9 @@ bool GameManager::s_player_has_item(const char* item_id) {
     Item* item;
     return player_inventory.get_item(item_id, item);
 }
+bool GameManager::s_remove_item(const char* item_id) {
+    return player_inventory.remove_item(item_id);
+}
 void GameManager::s_print(const char *line) {
     window_manager->print_to_log(std::string(line));
 }
@@ -121,6 +131,14 @@ void GameManager::s_print(const char *line) {
 // Command Functions
 void GameManager::c_help() {
     window_manager->print_to_log("This is a helpful response.");
+}
+void GameManager::c_debug(const TokenGroup &tokens) {
+    if (tokens[0] == "inventory") {
+        window_manager->print_to_log("== Current Player Inventory (Debug) ==");
+        window_manager->print_to_log(player_inventory.get_item_list(false));
+        window_manager->print_to_log("\n== Current Room Inventory (Debug) ==");
+        window_manager->print_to_log(current_room->get_inventory()->get_item_list(false));
+    }
 }
 void GameManager::c_clear() {
     window_manager->clear_log();
@@ -192,15 +210,22 @@ void GameManager::c_suicide(const TokenGroup &tokens) {
 void GameManager::c_pickup(const TokenGroup &tokens) {
     Item *item = nullptr;
     if (current_room->get_inventory()->get_item_by_name(tokens[0], item)) {
-        current_room->get_inventory()->remove_item(item->get_id());
-        player_inventory.add_item(item);
-        window_manager->print_to_log("You pick up " + item->get_name() + " and add it to your knapsack.\n");
+        if (item->get_is_static()) {
+            // We cannot pickup static items.
+            window_manager->print_to_log("You cannot pick that up!");
+        }
+        else {
+            // We can pickup non-static items.
+            current_room->get_inventory()->remove_item(item->get_id());
+            player_inventory.add_item(item);
+            window_manager->print_to_log("You pick up " + item->get_name() + " and add it to your knapsack.\n");
 
-        // Execute the OnItemPickup trigger
-        std::string script_table_name = current_room->get_id() + "_SCRIPTS";
-        LuaRef room_scripts = getGlobal(L, script_table_name.c_str());
-        if (!room_scripts.isNil()) {
-            room_scripts["OnItemPickup"](item);
+            // Execute the OnItemPickup trigger
+            std::string script_table_name = current_room->get_id() + "_SCRIPTS";
+            LuaRef room_scripts = getGlobal(L, script_table_name.c_str());
+            if (!room_scripts.isNil()) {
+                room_scripts["OnItemPickup"](item);
+            }
         }
     }
     else {

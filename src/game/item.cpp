@@ -25,12 +25,18 @@ std::string Item::get_name() {
 std::string Item::get_description() {
     return this->description;
 }
+bool Item::get_is_static() {
+    return this->is_static;
+}
 
 void Item::set_name(const std::string &name) {
     this->name = name;
 }
 void Item::set_description(const std::string &desc) {
     this->description = desc;
+}
+void Item::set_is_static(bool value) {
+    this->is_static = value;
 }
 
 void Item::s_set_description(const char *desc) {

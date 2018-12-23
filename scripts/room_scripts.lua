@@ -1,4 +1,4 @@
---[[ITEM_ID_SCRIPTS = {
+--[[ROOM_ID_SCRIPTS = {
 	OnEnter = function() end,
 	OnExit = function() return true end,
 	OnItemPickup = function(item) end,
@@ -7,16 +7,28 @@
 }]]--
 
 -- Room Scripts
-HH_LIVING_ROOM_SCRIPTS = {
-	OnEnter = function() end,
+
+function imprison_player()
+	Manager:SetCurrentRoom("DUNG_CELL")
+end
+
+CITY_GATE_SCRIPTS = {
+	OnEnter = function() 
+		if not Manager:PlayerHasItem("DISGUISE") then
+			imprison_player()
+		end
+	end,
 	OnExit = function() return true end,
 	OnItemPickup = function(item) end,
 	OnItemDrop = function(item) end,
 	OnLook = function(item) end
 }
-
-HH_KITCHEN_SCRIPTS = {
-	OnEnter = function() end,
+CASTLE_SCRIPTS = {
+	OnEnter = function() 
+		if not Manager:PlayerHasItem("DISGUISE") then
+			imprison_player()
+		end
+	end,
 	OnExit = function() return true end,
 	OnItemPickup = function(item) end,
 	OnItemDrop = function(item) end,
@@ -36,23 +48,5 @@ HH_PANTRY_SCRIPTS = {
 			HH_SECRET_ROOM:AttachRoom("HH_PANTRY", "East")
 		end
 	end,
-	OnLook = function(item) end
-}
-
-HH_LAWN_SCRIPTS = {
-	OnEnter = function() end,
-	OnExit = function() return true end,
-	OnItemPickup = function(item) end,
-	OnItemDrop = function(item) end,
-	OnLook = function(item) end
-}
-
-HH_SECRET_ROOM_SCRIPTS = {
-	OnEnter = function() end,
-	OnExit = function() 
-		return Manager:PlayerHasItem("THE_LIAR")
-	end,
-	OnItemPickup = function(item) end,
-	OnItemDrop = function(item) end,
 	OnLook = function(item) end
 }

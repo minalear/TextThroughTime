@@ -72,11 +72,13 @@ Manager:SetCurrentRoom("DUNG_CELL")
 
 	
 -- Items for the Hobbit Hole
-Manager:CreateItem("SMOKE_PIPE", "Pipe", "A luxuriously crafted wooden pipe, carved with various designs from the Ancient Kingdom.  It is loaded with some Deborah's famous Kush.")
-Manager:CreateItem("CHEESE_WHEEL", "Cheese Wheel", "A very rotund piece of cheddar cheese.")
-Manager:CreateItem("JOURNAL", "Journal", "Your personal journal where you keep notes about that one book you're writing about the Dark Lord and stuff.")
-Manager:CreateItem("THE_RING", "Ring", "A small golden ring.")
-Manager:CreateItem("THE_LIAR", "Khajiit Statue", "A strange looking statue of a Khajiit.  Inscribed on the bottom is the name \"M'aiq the Liar.\"")
+Manager:CreateItem("DISGUISE", "Disguise", "A set of clothing designed to conceal your identity discreetly.", false)
+Manager:CreateItem("CELL_DOOR", 
+	"Cell Door", "A wrought iron fence that has degraded slightly due to the moist environment of the dungeon.  "..
+	"It looks very heavy and is locked with a fairly primitive locking mechanism.", true)
+
+CITY_CLOTHING:AddItem("DISGUISE")
+DUNG_CELL:AddItem("CELL_DOOR")
 
 --[[HH_LIVING_ROOM:AddItem("JOURNAL")
 HH_LIVING_ROOM:AddItem("THE_RING")
