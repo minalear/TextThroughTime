@@ -19,11 +19,20 @@ Room::Room(const std::string &id, const std::string &name, const std::string &de
 Room::~Room() { }
 
 // Public functions
+/// Attach another room singly to this room
 void Room::s_attach_room(const char *room_id, const char *direction) {
     auto room = game_map->get_room(std::string(room_id));
     auto dir  = game_map->str_to_direction(std::string(direction));
 
     attach_room(room, dir);
+}
+/// Attach another room to this room and then attach this room to that room in the opposite direction
+void Room::s_connect_rooms(const char* room_id, const char* direction) {
+    auto room = game_map->get_room(std::string(room_id));
+    auto dir  = game_map->str_to_direction(std::string(direction));
+
+    attach_room(room, dir);
+    room->attach_room(this, game_map->get_opposite_direction(dir));
 }
 void Room::s_set_description(const char* desc) {
     set_description(std::string(desc));

@@ -5,7 +5,7 @@
 #include <lua.hpp>
 #include <LuaBridge.h>
 #include "game_manager.h"
-#include "../core/file_handler.h"
+#include "../core/math_utils.h"
 
 using namespace luabridge;
 
@@ -16,6 +16,7 @@ GameManager::GameManager(WindowManager *window_manager) {
     luaL_openlibs(L);
 
     getGlobalNamespace(L)
+        .addFunction("Rand", minalear::rand_int)
     .beginClass<GameManager>("GameManager")
         .addFunction("AddRoom", &GameManager::s_add_room)
         .addFunction("SetCurrentRoom", &GameManager::s_set_current_room)
@@ -26,6 +27,7 @@ GameManager::GameManager(WindowManager *window_manager) {
     .endClass()
     .beginClass<Room>("Room")
         .addFunction("AttachRoom", &Room::s_attach_room)
+        .addFunction("ConnectRooms", &Room::s_connect_rooms)
         .addFunction("SetDescription", &Room::s_set_description)
         .addFunction("AppendDescription", &Room::s_append_description)
         .addFunction("AddItem", &Room::s_add_item)
@@ -141,6 +143,16 @@ void GameManager::c_debug(const TokenGroup &tokens) {
         window_manager->print_to_log(player_inventory.get_item_list(false));
         window_manager->print_to_log("\n== Current Room Inventory (Debug) ==");
         window_manager->print_to_log(current_room->get_inventory()->get_item_list(false));
+    }
+    else if (tokens[0] == "move") {
+        auto next_room = game_map.get_room(tokens[1]);
+        set_current_room(next_room);
+    }
+    else if (tokens[0] == "additem") {
+        Item *item = nullptr;
+        if (game_map.get_inventory()->get_item(tokens[1], item)) {
+            player_inventory.add_item(item);
+        }
     }
 }
 void GameManager::c_clear() {

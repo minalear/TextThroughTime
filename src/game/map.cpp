@@ -23,6 +23,14 @@ Directions Map::str_to_direction(const std::string &text) {
 
     return Directions::None;
 }
+Directions Map::get_opposite_direction(Directions direction) {
+    if (direction == Directions::North) return Directions::South;
+    if (direction == Directions::South) return Directions::North;
+    if (direction == Directions::East)  return Directions::West;
+    if (direction == Directions::West)  return Directions::East;
+
+    return Directions::None;
+}
 
 Room* Map::add_room(const std::string &unique_id, const std::string &name, const std::string &description) {
     // Ensure that there is only one room with that unique id

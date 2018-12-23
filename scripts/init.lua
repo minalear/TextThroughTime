@@ -26,52 +26,34 @@ Manager:AddRoom("CITY_GATE", "Main Gate", "")
 Manager:AddRoom("VICTORY", "Outside", "")
 
 -- Room Attachments --
---DUNG_CELL:AttachRoom("DUNG_SECRET_PASSAGE", "East")
---DUNG_CELL:AttachRoom("DUNG_HALLWAY", "North")
---UNG_HALLWAY:AttachRoom("DUNG_CELL", "South")
-DUNG_HALLWAY:AttachRoom("DUNG_ENTRANCE", "North")
-DUNG_ENTRANCE:AttachRoom("DUNG_HALLWAY", "South")
-DUNG_ENTRANCE:AttachRoom("CASTLE", "East")
---DUNG_SECRET_PASSAGE:AttachRoom("DUNG_CELL", "West")
-DUNG_SECRET_PASSAGE:AttachRoom("SEWER_SW", "East")
-
-CASTLE:AttachRoom("DUNG_ENTRANCE", "West")
-CASTLE:AttachRoom("CITY_MERCHANT", "East")
-
-SEWER_SW:AttachRoom("DUNG_SECRET_PASSAGE", "West")
-SEWER_SW:AttachRoom("SEWER_NW", "North")
-SEWER_NW:AttachRoom("SEWER_SW", "South")
-SEWER_NW:AttachRoom("SEWER_NE", "East")
-SEWER_NE:AttachRoom("SEWER_NW", "West")
-SEWER_NE:AttachRoom("CITY_STREET", "North")
-SEWER_NE:AttachRoom("SEWER_SE", "South")
-SEWER_SE:AttachRoom("SEWER_NE", "North")
-SEWER_SE:AttachRoom("SEWER_HIDEOUT", "South")
-SEWER_HIDEOUT:AttachRoom("SEWER_SE", "North")
-
-CITY_STREET:AttachRoom("CITY_STREET_NORTH", "North")
-CITY_STREET:AttachRoom("SEWER_NW", "South")
-CITY_STREET:AttachRoom("CITY_GARDEN", "East")
-CITY_STREET:AttachRoom("CITY_MERCHANT", "West")
-CITY_STREET_NORTH:AttachRoom("CITY_GATE", "North")
-CITY_STREET_NORTH:AttachRoom("CITY_STREET", "South")
-CITY_MERCHANT:AttachRoom("CITY_CLOTHING", "North")
-CITY_MERCHANT:AttachRoom("CITY_STREET", "East")
-CITY_MERCHANT:AttachRoom("CASTLE", "West")
-CITY_GARDEN:AttachRoom("CITY_STREET", "West")
-CITY_CLOTHING:AttachRoom("CITY_MERCHANT", "South")
-CITY_GATE:AttachRoom("VICTORY", "North")
-CITY_GATE:AttachRoom("CITY_STREET_NORTH", "South")
-
-VICTORY:AttachRoom("CITY_GATE", "South")
+DUNG_HALLWAY:ConnectRooms("DUNG_ENTRANCE", "North")
+DUNG_ENTRANCE:ConnectRooms("CASTLE", "East")
+CASTLE:ConnectRooms("CITY_MERCHANT", "East")
+CITY_MERCHANT:ConnectRooms("CITY_CLOTHING", "North")
+CITY_MERCHANT:ConnectRooms("CITY_STREET", "East")
+CITY_STREET:ConnectRooms("CITY_STREET_NORTH", "North")
+--CITY_STREET:ConnectRooms("SEWER_NE", "South")
+CITY_STREET:ConnectRooms("CITY_GARDEN", "East")
+CITY_STREET_NORTH:ConnectRooms("CITY_GATE", "North")
+CITY_GATE:ConnectRooms("VICTORY", "North")
+DUNG_SECRET_PASSAGE:ConnectRooms("SEWER_SW", "East")
+SEWER_SW:ConnectRooms("SEWER_NW", "North")
+SEWER_NW:ConnectRooms("SEWER_NE", "East")
+SEWER_NE:ConnectRooms("SEWER_SE", "South")
+--SEWER_SE:ConnectRooms("SEWER_HIDEOUT", "South")
 
 -- Starting Room --
 Manager:SetCurrentRoom("DUNG_CELL")
 
 -- Room Descriptions --
-DUNG_CELL:SetDescription("")
-DUNG_HALLWAY:SetDescription("")
-DUNG_ENTRANCE:SetDescription("")
+DUNG_CELL:SetDescription("A cramped, damp dungeon cell surrounds you.  The cell seems to be carved out of natural stone, "..
+						 "however a seemingly out of place brick wall makes up the right hand side of the cell.  "..
+						 "A small bed sits in the corner while a smelly shit bucket resides next to it.  "..
+						 "It is very dark in the cell, with whatever light present illuminating from the distant hallway through the cell door.  "..
+						 "Trying to make out details is impossible, however, on the brick wall, there seems to be a single brick standing out from the rest.")
+DUNG_HALLWAY:SetDescription("The hallway leads down towards a number of cells, all currently vacant.  The door that attracts your attention the most is "..
+							"the solid iron door of your cell.  Nothing much else catches your attention.")
+--[[DUNG_ENTRANCE:SetDescription("")
 DUNG_SECRET_PASSAGE:SetDescription("")
 CASTLE:SetDescription("")
 SEWER_NW:SetDescription("")
@@ -85,29 +67,37 @@ CITY_MERCHANT:SetDescription("")
 CITY_GARDEN:SetDescription("")
 CITY_CLOTHING:SetDescription("")
 CITY_GATE:SetDescription("")
-VICTORY:SetDescription("")
+VICTORY:SetDescription("")]]--
 	
--- Items for the Hobbit Hole
+-- Items for the game
+-- Dungeon Cell --
+Manager:CreateItem("DUNG_BED", "Bed", "A flat of wood with hay strewn about can hardly be called a bed, but this is all that you have.", true)
+Manager:CreateItem("DUNG_BUCKET", "Shit Bucket", "A bucket that you use to defecate into.  You're lucky if the guard changes it out weekly.", true)
+Manager:CreateItem("CELL_DOOR", "Cell Door", "A wrought iron fence that has degraded slightly due to the moist environment of the dungeon.  "..
+								"It looks very heavy and is locked with a fairly primitive locking mechanism.", true)
+Manager:CreateItem("CELL_KEYS", "Keys", "Set of bronze keys that look like they could unlock a certain cell door.", false)
+Manager:CreateItem("CELL_BRICK", "False Brick", "A peculiar looking brick that seems to be offset from the rest.  Perhaps I should press it?", true)
+
+-- Sewer --
+Manager:CreateItem("SEWER_ROCK_SLIDE", "Rockslide", "A pile of rocks seems to have slipped over a former passageway.  I wonder what lies on the otherside?", true)
+Manager:CreateItem("SEWER_GRATE_BOTTOM", "Sewer Grate", "A loose sewer grate that seems to lead to the city streets above.", true)
+Manager:CreateItem("SEWER_GRATE_TOP", "Sewer Grate", "The sewer grate that leads down into the sewer.", true)
+Manager:CreateItem("SEWER_CHEST", "Chest", "An old, beaten up chest that seems to not have been opened in awhile.", true)
+
+-- City --
+Manager:CreateItem("CITY_GARDEN_TREE", "Old Tree", "A large oak tree sits majestically at the center of the city's garden.  Its roots dig deep and its branches reach far.  A knot in the tree seems to hide a nook.  What could it be hinding?", true)
+Manager:CreateItem("CITY_FOUNTAIN", "Water Fountain", "A large, overpowering water fountain resides in the center of the merchant district.  "..
+									"It has large oppulent statues depicting a local legend and one of their many adventures.  "..
+									"Shiny coins can be seen at the bottom where locals throw in copper pieces hoping for their wishes to come true.", true)
+
+
 Manager:CreateItem("DISGUISE", "Disguise", "A set of clothing designed to conceal your identity discreetly.", false)
-Manager:CreateItem("CELL_DOOR", 
-	"Cell Door", "A wrought iron fence that has degraded slightly due to the moist environment of the dungeon.  "..
-	"It looks very heavy and is locked with a fairly primitive locking mechanism.", true)
-Manager:CreateItem("CELL_KEYS",
-	"Keys", "Set of bronze keys that look like they could unlock a certain cell door.", false)
-Manager:CreateItem("CELL_BRICK",
-	"False Brick", "A peculiar looking brick that seems to be offset from the rest.  Perhaps I should press it?", true)
 
 CITY_CLOTHING:AddItem("DISGUISE")
 DUNG_CELL:AddItem("CELL_DOOR")
 DUNG_CELL:AddItem("CELL_KEYS")
 DUNG_CELL:AddItem("CELL_BRICK")
 DUNG_HALLWAY:AddItem("CELL_DOOR")
-
---[[HH_LIVING_ROOM:AddItem("JOURNAL")
-HH_LIVING_ROOM:AddItem("THE_RING")
-HH_KITCHEN:AddItem("SMOKE_PIPE")
-HH_PANTRY:AddItem("CHEESE_WHEEL")
-HH_SECRET_ROOM:AddItem("THE_LIAR")]]--
 
 require("scripts.room_scripts")
 require("scripts.item_scripts")

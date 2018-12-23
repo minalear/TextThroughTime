@@ -19,6 +19,7 @@ CELL_BRICK_SCRIPTS = {
 						  "A small doorway opens up hidden away revealing a secret passage!")
 			DUNG_CELL:AttachRoom("DUNG_SECRET_PASSAGE", "East")
 			DUNG_SECRET_PASSAGE:AttachRoom("DUNG_CELL", "West")
+			DUNG_CELL:AppendDescription("A secret passage way out of sight of the guards leads into darkness.")
 		end
 	end
 }
