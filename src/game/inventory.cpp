@@ -42,9 +42,8 @@ bool Inventory::get_item(const std::string &unique_id, Item *&item) {
 }
 bool Inventory::get_item_by_name(const std::string &name, Item *&item) {
     // Convert name to all caps
-    std::string name_caps = to_caps(name);
     for (const auto &x : items) {
-        if (to_caps(x->get_name()) == name_caps) {
+        if (x->check_name(name)) {
             item = x;
             return true;
         }

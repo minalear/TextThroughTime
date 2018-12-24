@@ -40,6 +40,7 @@ GameManager::GameManager(WindowManager *window_manager) {
         .addFunction("GetName", &Item::s_get_name)
         .addFunction("IsStatic", &Item::get_is_static)
         .addFunction("SetIsStatic", &Item::set_is_static)
+        .addFunction("AddAlias", &Item::s_add_alias)
     .endClass();
 
     push(L, this);

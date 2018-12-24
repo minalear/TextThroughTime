@@ -14,7 +14,7 @@ CELL_DOOR_SCRIPTS = {
 
 CELL_BRICK_SCRIPTS = {
 	OnInteract = function(action)
-		if action == "press" then 
+		if Contains({"press", "push"}, action) then 
 			Manager:Print("You press the brick, pushing it inwards into the wall.  "..
 						  "A small doorway opens up hidden away revealing a secret passage!")
 			DUNG_CELL:ConnectRooms("DUNG_SECRET_PASSAGE", "East")
@@ -25,7 +25,7 @@ CELL_BRICK_SCRIPTS = {
 
 SEWER_ROCK_SLIDE_SCRIPTS = {
 	OnInteract = function(action)
-		if action == "clear" then
+		if Contains({"clear", "clean", "remove"}, action) then 
 			Manager:Print("After an extended period of effort, you manage to clear a passage through the rocks.")
 			SEWER_SE:ConnectRooms("SEWER_HIDEOUT", "South")
 			SEWER_ROCK_SLIDE:SetDescription("A pile of rocks with a passageway cleared through it.")
@@ -35,7 +35,7 @@ SEWER_ROCK_SLIDE_SCRIPTS = {
 
 SEWER_GRATE_BOTTOM_SCRIPTS = {
 	OnInteract = function(action)
-		if action == "open" then
+		if Contains({"open", "enter"}, action) then 
 			Manager:Print("You wait until there is no one around and slip through the grate to the city above.")
 			Manager:SetCurrentRoom("CITY_STREET")
 		end
@@ -44,7 +44,7 @@ SEWER_GRATE_BOTTOM_SCRIPTS = {
 
 SEWER_GRATE_TOP_SCRIPTS = {
 	OnInteract = function(action)
-		if action == "open" then
+		if Contains({"open", "enter"}, action) then 
 			Manager:Print("You wait until there is no one around and slip through the grate to the sewers beneath.")
 			Manager:SetCurrentRoom("SEWER_NE")
 		end

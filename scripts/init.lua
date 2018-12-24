@@ -1,3 +1,5 @@
+require("scripts.utils") -- Utility script functions
+
 -- To add rooms use Manager::AddRoom("UNIQUE_ID", "Room Name", "Room description")
 -- Adding a room makes a global variable under UNIQUE_ID
 -- To attach rooms to other rooms use BASE_ID:AttachRoom("OTHER_ROOM_ID", "Direction")
@@ -72,23 +74,32 @@ VICTORY:SetDescription("")]]--
 -- Items for the game
 -- Dungeon Cell --
 Manager:CreateItem("DUNG_BED", "Bed", "A flat of wood with hay strewn about can hardly be called a bed, but this is all that you have.", true)
-Manager:CreateItem("DUNG_BUCKET", "Shit Bucket", "A bucket that you use to defecate into.  You're lucky if the guard changes it out weekly.", true)
+AppendItemAlias(DUNG_BED, {"bunk", "cot", "hay"})
+Manager:CreateItem("DUNG_BUCKET", "Shit Bucket", "A bucket that you use to defecate into.  You're lucky if the guard changes it out weekly.", false)
+AppendItemAlias(DUNG_BUCKET, {"bucket", "pale"})
 Manager:CreateItem("CELL_DOOR", "Cell Door", "A wrought iron fence that has degraded slightly due to the moist environment of the dungeon.  "..
 								"It looks very heavy and is locked with a fairly primitive locking mechanism.", true)
+AppendItemAlias(CELL_DOOR, {"door", "gate"})
 Manager:CreateItem("CELL_KEYS", "Keys", "Set of bronze keys that look like they could unlock a certain cell door.", false)
 Manager:CreateItem("CELL_BRICK", "False Brick", "A peculiar looking brick that seems to be offset from the rest.  Perhaps I should press it?", true)
+AppendItemAlias(CELL_BRICK, {"brick", "stone", "slab"})
 
 -- Sewer --
-Manager:CreateItem("SEWER_ROCK_SLIDE", "Rockslide", "A pile of rocks seems to have slipped over a former passageway.  I wonder what lies on the otherside?", true)
+Manager:CreateItem("SEWER_ROCK_SLIDE", "Rock Slide", "A pile of rocks seems to have slipped over a former passageway.  I wonder what lies on the otherside?", true)
+AppendItemAlias(SEWER_ROCK_SLIDE, {"rockslide", "rocks", "rubble", "debris"})
 Manager:CreateItem("SEWER_GRATE_BOTTOM", "Sewer Grate", "A loose sewer grate that seems to lead to the city streets above.", true)
+AppendItemAlias(SEWER_GRATE_BOTTOM, {"grate"})
 Manager:CreateItem("SEWER_CHEST", "Chest", "An old, beaten up chest that seems to not have been opened in awhile.", true)
 
 -- City --
 Manager:CreateItem("SEWER_GRATE_TOP", "Sewer Grate", "The sewer grate that leads down into the sewer.", true)
+AppendItemAlias(SEWER_GRATE_BOTTOM, {"grate"})
 Manager:CreateItem("CITY_GARDEN_TREE", "Old Tree", "A large oak tree sits majestically at the center of the city's garden.  Its roots dig deep and its branches reach far.  A knot in the tree seems to hide a nook.  What could it be hinding?", true)
+AppendItemAlias(SEWER_GRATE_BOTTOM, {"tree"})
 Manager:CreateItem("CITY_FOUNTAIN", "Water Fountain", "A large, overpowering water fountain resides in the center of the merchant district.  "..
 									"It has large oppulent statues depicting a local legend and one of their many adventures.  "..
 									"Shiny coins can be seen at the bottom where locals throw in copper pieces hoping for their wishes to come true.", true)
+AppendItemAlias(SEWER_GRATE_BOTTOM, {"fountain"})
 Manager:CreateItem("DISGUISE", "Disguise", "A set of clothing designed to conceal your identity discreetly.", false)
 
 DUNG_CELL:AddItem("DUNG_BED")

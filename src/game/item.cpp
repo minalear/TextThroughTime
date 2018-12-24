@@ -3,6 +3,7 @@
 //
 
 #include "item.h"
+#include "../tokenizer.h"
 
 Item::Item(const std::string &id) {
     this->id = id;
@@ -38,7 +39,17 @@ void Item::set_description(const std::string &desc) {
 void Item::set_is_static(bool value) {
     this->is_static = value;
 }
+bool Item::check_name(const std::string &test) {
+    const std::string caps_test = to_caps(test);
+    if (to_caps(name) == caps_test) return true;
+    for (const auto &x : aliases) {
+        if (to_caps(x) == caps_test) return true;
+    }
 
+    return false;
+}
+
+// Scripting specific functions
 void Item::s_set_description(const char *desc) {
     set_description(std::string(desc));
 }
@@ -47,4 +58,7 @@ const char* Item::s_get_id() {
 }
 const char* Item::s_get_name() {
     return name.c_str();
+}
+void Item::s_add_alias(const char *alias) {
+    aliases.push_back(std::string(alias));
 }
