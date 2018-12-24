@@ -11,6 +11,7 @@ using namespace luabridge;
 
 GameManager::GameManager(WindowManager *window_manager) {
     this->window_manager = window_manager;
+    current_room = nullptr;
 
     L = luaL_newstate();
     luaL_openlibs(L);
@@ -67,7 +68,7 @@ void GameManager::process_input(const std::string &input) {
     else if (tokenized_input.command == "debug") {
         c_debug(tokenized_input);
     }
-    else if (tokenized_input.command == "clear") {
+    else if (tokenized_input.command == "clear" && tokenized_input.n_tokens == 0) {
         c_clear();
     }
     else if (tokenized_input.command == "move") {
@@ -100,7 +101,7 @@ void GameManager::process_input(const std::string &input) {
 
 // Scripting Functions
 void GameManager::s_set_current_room(const char *id) {
-    current_room = game_map.get_room(std::string(id));
+    set_current_room(game_map.get_room(std::string(id)));
 }
 void GameManager::s_add_room(const char *unique_id, const char *name, const char *desc) {
     // Add the room to the game map

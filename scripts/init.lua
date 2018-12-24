@@ -81,23 +81,28 @@ Manager:CreateItem("CELL_BRICK", "False Brick", "A peculiar looking brick that s
 -- Sewer --
 Manager:CreateItem("SEWER_ROCK_SLIDE", "Rockslide", "A pile of rocks seems to have slipped over a former passageway.  I wonder what lies on the otherside?", true)
 Manager:CreateItem("SEWER_GRATE_BOTTOM", "Sewer Grate", "A loose sewer grate that seems to lead to the city streets above.", true)
-Manager:CreateItem("SEWER_GRATE_TOP", "Sewer Grate", "The sewer grate that leads down into the sewer.", true)
 Manager:CreateItem("SEWER_CHEST", "Chest", "An old, beaten up chest that seems to not have been opened in awhile.", true)
 
 -- City --
+Manager:CreateItem("SEWER_GRATE_TOP", "Sewer Grate", "The sewer grate that leads down into the sewer.", true)
 Manager:CreateItem("CITY_GARDEN_TREE", "Old Tree", "A large oak tree sits majestically at the center of the city's garden.  Its roots dig deep and its branches reach far.  A knot in the tree seems to hide a nook.  What could it be hinding?", true)
 Manager:CreateItem("CITY_FOUNTAIN", "Water Fountain", "A large, overpowering water fountain resides in the center of the merchant district.  "..
 									"It has large oppulent statues depicting a local legend and one of their many adventures.  "..
 									"Shiny coins can be seen at the bottom where locals throw in copper pieces hoping for their wishes to come true.", true)
-
-
 Manager:CreateItem("DISGUISE", "Disguise", "A set of clothing designed to conceal your identity discreetly.", false)
 
-CITY_CLOTHING:AddItem("DISGUISE")
+DUNG_CELL:AddItem("DUNG_BED")
+DUNG_CELL:AddItem("DUNG_BUCKET")
 DUNG_CELL:AddItem("CELL_DOOR")
-DUNG_CELL:AddItem("CELL_KEYS")
 DUNG_CELL:AddItem("CELL_BRICK")
 DUNG_HALLWAY:AddItem("CELL_DOOR")
+SEWER_SE:AddItem("SEWER_ROCK_SLIDE")
+SEWER_NE:AddItem("SEWER_GRATE_BOTTOM")
+SEWER_HIDEOUT:AddItem("SEWER_CHEST")
+CITY_STREET:AddItem("SEWER_GRATE_TOP")
+CITY_GARDEN:AddItem("CITY_GARDEN_TREE")
+CITY_MERCHANT:AddItem("CITY_FOUNTAIN")
+CITY_CLOTHING:AddItem("DISGUISE")
 
 require("scripts.room_scripts")
 require("scripts.item_scripts")
