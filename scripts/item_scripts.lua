@@ -14,11 +14,12 @@ CELL_DOOR_SCRIPTS = {
 
 CELL_BRICK_SCRIPTS = {
 	OnInteract = function(action)
-		if Contains({"press", "push"}, action) then 
+		if Contains({"press", "push"}, action) then
 			Manager:Print("You press the brick, pushing it inwards into the wall.  "..
 						  "A small doorway opens up hidden away revealing a secret passage!")
 			DUNG_CELL:ConnectRooms("DUNG_SECRET_PASSAGE", "East")
 			DUNG_CELL:AppendDescription("A secret passage way out of sight of the guards leads into darkness.")
+			DUNG_CELL:RemoveItem("CELL_BRICK")
 		end
 	end
 }
@@ -29,6 +30,7 @@ SEWER_ROCK_SLIDE_SCRIPTS = {
 			Manager:Print("After an extended period of effort, you manage to clear a passage through the rocks.")
 			SEWER_SE:ConnectRooms("SEWER_HIDEOUT", "South")
 			SEWER_ROCK_SLIDE:SetDescription("A pile of rocks with a passageway cleared through it.")
+			SEWER_SE:RemoveItem("SEWER_ROCK_SLIDE")
 		end
 	end
 }

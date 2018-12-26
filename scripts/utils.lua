@@ -3,6 +3,11 @@ function AppendItemAlias(item, aliases)
 		item:AddAlias(aliases[i])
 	end
 end
-function Contains(list, test)
-	return list[test] ~= nil
+function Contains(list, test_value)
+	for key,value in ipairs(list) do
+		if value == test_value then
+			return true
+		end
+	end
+	return false
 end
