@@ -37,7 +37,6 @@ class GameManager {
     void c_clear();
     void c_move(const TokenGroup &tokens);
     void c_look(const TokenGroup &tokens);
-    void c_suicide(const TokenGroup &tokens);
     void c_pickup(const TokenGroup &tokens);
     void c_drop(const TokenGroup &tokens);
     void c_inventory(const TokenGroup &tokens);

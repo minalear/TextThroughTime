@@ -26,13 +26,13 @@ TokenGroup tokenize(const std::string &str) {
 
     // Parse insput string and split it up via spaces
     for (auto& x : str) {
-        if (x == ' ' && !ignore_spaces) {
+        if (x == ' ' && !ignore_spaces && !buffer.empty()) {
             temp_tokens[token_group.n_tokens] = buffer;
             token_group.n_tokens++;
             buffer.clear();
         } else if (x == '"') {
             ignore_spaces = !ignore_spaces;
-        } else {
+        } else if (x != ' ') {
             buffer += x;
         }
     }

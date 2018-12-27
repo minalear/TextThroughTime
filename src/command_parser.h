@@ -5,6 +5,10 @@
 #ifndef TEXTTHROUGHTIME_COMMAND_PARSER_H
 #define TEXTTHROUGHTIME_COMMAND_PARSER_H
 
+enum struct COMMAND_TYPES {
+    HELP, CLEAR, MOVE, EXAMINE,
+};
+
 class command_parser {
 
 };

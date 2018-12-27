@@ -78,9 +78,6 @@ void GameManager::process_input(const std::string &input) {
     else if (tokenized_input.command == "look") {
         c_look(tokenized_input);
     }
-    else if (tokenized_input.command == "go") {
-        c_suicide(tokenized_input);
-    }
     else if (tokenized_input.command == "pickup") {
         c_pickup(tokenized_input);
     }
@@ -217,11 +214,6 @@ void GameManager::c_look(const TokenGroup &tokens) {
         else if (current_room->get_inventory()->get_item_by_name(tokens[0], item)) {
             window_manager->print_to_log(item->get_description() + "\n\n");
         }
-    }
-}
-void GameManager::c_suicide(const TokenGroup &tokens) {
-    if (tokens[0] == "commit" && tokens[1] == "die") {
-        window_manager->print_to_log("You can't do that yet boi.\n");
     }
 }
 void GameManager::c_pickup(const TokenGroup &tokens) {
