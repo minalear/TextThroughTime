@@ -16,7 +16,7 @@ Command::~Command() {
 Command process_input(const TokenGroup &tokens) {
     typedef const std::vector<std::string> word_list; // Typedef for cleaner code
     word_list superfluous_words = {"THE", "IN", "INTO", "A", "AN", "AT"};
-    word_list move_words        = {"MOVE", "GO", "TRAVEL"};
+    word_list move_words        = {"MOVE", "GO", "TRAVEL", "ENTER"};
     word_list drop_words        = {"DROP", "REMOVE"};
     word_list pickup_words      = {"PICKUP", "TAKE", "GRAB"};
     word_list place_words       = {"PLACE", "PUT", "SET"};

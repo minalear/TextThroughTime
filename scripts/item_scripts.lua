@@ -1,6 +1,6 @@
 CELL_DOOR_SCRIPTS = {
 	OnInteract = function(action)
-		if action == "open" then
+		if action == "OPEN" then
 			if Manager:PlayerHasItem("CELL_KEYS") then
 				DUNG_CELL:AttachRoom("DUNG_HALLWAY", "North")
 				DUNG_HALLWAY:AttachRoom("DUNG_CELL", "South")
@@ -14,7 +14,7 @@ CELL_DOOR_SCRIPTS = {
 
 CELL_BRICK_SCRIPTS = {
 	OnInteract = function(action)
-		if Contains({"press", "push"}, action) then
+		if Contains({"PRESS", "PUSH"}, action) then
 			Manager:Print("You press the brick, pushing it inwards into the wall.  "..
 						  "A small doorway opens up hidden away revealing a secret passage!")
 			DUNG_CELL:ConnectRooms("DUNG_SECRET_PASSAGE", "East")
@@ -26,7 +26,7 @@ CELL_BRICK_SCRIPTS = {
 
 SEWER_ROCK_SLIDE_SCRIPTS = {
 	OnInteract = function(action)
-		if Contains({"clear", "clean", "remove"}, action) then 
+		if Contains({"CLEAR", "CLEAN", "REMOVE"}, action) then 
 			Manager:Print("After an extended period of effort, you manage to clear a passage through the rocks.")
 			SEWER_SE:ConnectRooms("SEWER_HIDEOUT", "South")
 			SEWER_ROCK_SLIDE:SetDescription("A pile of rocks with a passageway cleared through it.")
@@ -37,7 +37,7 @@ SEWER_ROCK_SLIDE_SCRIPTS = {
 
 SEWER_GRATE_BOTTOM_SCRIPTS = {
 	OnInteract = function(action)
-		if Contains({"open", "enter"}, action) then 
+		if Contains({"OPEN", "ENTER"}, action) then 
 			Manager:Print("You wait until there is no one around and slip through the grate to the city above.")
 			Manager:SetCurrentRoom("CITY_STREET")
 		end
@@ -46,7 +46,7 @@ SEWER_GRATE_BOTTOM_SCRIPTS = {
 
 SEWER_GRATE_TOP_SCRIPTS = {
 	OnInteract = function(action)
-		if Contains({"open", "enter"}, action) then 
+		if Contains({"OPEN", "ENTER"}, action) then 
 			Manager:Print("You wait until there is no one around and slip through the grate to the sewers beneath.")
 			Manager:SetCurrentRoom("SEWER_NE")
 		end
@@ -55,7 +55,7 @@ SEWER_GRATE_TOP_SCRIPTS = {
 
 SEWER_CHEST_SCRIPTS = {
 	OnInteract = function(action)
-		if action == "open" then
+		if action == "OPEN" then
 			Manager:Print("The chest is locked tight and you cannot open it.")
 		end
 	end
@@ -63,7 +63,7 @@ SEWER_CHEST_SCRIPTS = {
 
 CITY_GARDEN_TREE_SCRIPTS = {
 	OnInteract = function(action)
-		if action == "search" then
+		if action == "SEARCH" then
 			Manager:Print("You find a small satchel of gold pieces (not yet implemented.")
 		end
 	end
