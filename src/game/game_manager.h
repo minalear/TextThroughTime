@@ -10,8 +10,8 @@
 #include "map.h"
 #include "room.h"
 #include "../window_manager.h"
-#include "../tokenizer.h"
 #include "inventory.h"
+#include "command_parser.h"
 
 class lua_State;
 
@@ -32,16 +32,15 @@ class GameManager {
     void s_print(const char* line);
 
     // Command functions
-    void c_help();
-    void c_debug(const TokenGroup &tokens);
-    void c_clear();
-    void c_move(const TokenGroup &tokens);
-    void c_look(const TokenGroup &tokens);
-    void c_pickup(const TokenGroup &tokens);
-    void c_drop(const TokenGroup &tokens);
-    void c_inventory(const TokenGroup &tokens);
-
-    void item_interact(const TokenGroup &tokens);
+    void c_help(const Command &command);
+    void c_debug(const Command &command);
+    void c_clear(const Command &command);
+    void c_move(const Command &command);
+    void c_examine(const Command &command);
+    void c_pickup(const Command &command);
+    void c_drop(const Command &command);
+    void c_inventory(const Command &command);
+    void c_interaction(const Command &command);
 
     void display_room();
     void set_current_room(Room* new_room);
@@ -51,7 +50,7 @@ public:
     ~GameManager();
 
     void initialize_game();
-    void process_input(const std::string &input);
+    void handle_input(const std::string &input);
 };
 
 

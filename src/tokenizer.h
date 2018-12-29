@@ -6,9 +6,9 @@
 #define TEXTTHROUGHTIME_TOKENIZER_H
 
 #include <iostream>
+#include <vector>
 
 struct TokenGroup {
-    std::string command;
     std::string *tokens;
     int n_tokens;
 
@@ -20,5 +20,13 @@ struct TokenGroup {
 
 TokenGroup tokenize(const std::string &str);
 std::string to_caps(const std::string &str);
+
+template <class T>
+bool contains(const T &item, const std::vector<T> &item_list) {
+    for (const auto &x : item_list) {
+        if (item == x) return true;
+    }
+    return false;
+}
 
 #endif //TEXTTHROUGHTIME_TOKENIZER_H

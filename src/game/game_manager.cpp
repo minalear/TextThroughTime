@@ -58,42 +58,39 @@ void GameManager::initialize_game() {
     display_room();
 }
 
-void GameManager::process_input(const std::string &input) {
-    // Tokenize player input
-    auto tokenized_input = tokenize(input);
+void GameManager::handle_input(const std::string &input) {
+    // Process player input into a Command
+    auto command = process_input(tokenize(input));
 
-    // Commands
-    if (tokenized_input.command == "help") {
-        c_help();
+    if (command.type == COMMAND_TYPES::NONE) {
+        window_manager->print_to_log("The input does not appear to be valid.  Double check your spelling.  Type 'help' for a complete list.");
     }
-    else if (tokenized_input.command == "debug") {
-        c_debug(tokenized_input);
+    else if (command.type == COMMAND_TYPES::DEBUG) {
+        c_debug(command);
     }
-    else if (tokenized_input.command == "clear" && tokenized_input.n_tokens == 0) {
-        c_clear();
+    else if (command.type == COMMAND_TYPES::HELP) {
+        c_help(command);
     }
-    else if (tokenized_input.command == "move") {
-        c_move(tokenized_input);
+    else if (command.type == COMMAND_TYPES::CLEAR_SCREEN) {
+        c_clear(command);
     }
-    else if (tokenized_input.command == "look") {
-        c_look(tokenized_input);
+    else if (command.type == COMMAND_TYPES::MOVE) {
+        c_move(command);
     }
-    else if (tokenized_input.command == "pickup") {
-        c_pickup(tokenized_input);
+    else if (command.type == COMMAND_TYPES::DROP) {
+        c_drop(command);
     }
-    else if (tokenized_input.command == "drop") {
-        c_drop(tokenized_input);
+    else if (command.type == COMMAND_TYPES::PICKUP) {
+        c_pickup(command);
     }
-    else if (tokenized_input.command == "inventory") {
-        c_inventory(tokenized_input);
+    else if (command.type == COMMAND_TYPES::PLACE) {
+        // c_place(command);
     }
-
-    // No valid input
-    // TODO: Rewrite command input processing
-    // Assume a non-valid input as an action on an item until we redo the rewrite
-    else {
-        item_interact(tokenized_input);
-        //window_manager->print_to_log("Please input a valid command.  Type 'help' for a complete list.");
+    else if (command.type == COMMAND_TYPES::EXAMINE) {
+        c_examine(command);
+    }
+    else if (command.type == COMMAND_TYPES::INTERACTION) {
+        c_interaction(command);
     }
 }
 
@@ -133,40 +130,40 @@ void GameManager::s_print(const char *line) {
 }
 
 // Command Functions
-void GameManager::c_help() {
+void GameManager::c_help(const Command &command) {
     window_manager->print_to_log("This is a helpful response.");
 }
-void GameManager::c_debug(const TokenGroup &tokens) {
-    if (tokens[0] == "inventory") {
+void GameManager::c_debug(const Command &command) {
+    if (command.args[0] == "inventory") {
         window_manager->print_to_log("== Current Player Inventory (Debug) ==");
         window_manager->print_to_log(player_inventory.get_item_list(false));
         window_manager->print_to_log("\n== Current Room Inventory (Debug) ==");
         window_manager->print_to_log(current_room->get_inventory()->get_item_list(false));
     }
-    else if (tokens[0] == "move") {
-        auto next_room = game_map.get_room(tokens[1]);
+    else if (command.args[0] == "move") {
+        auto next_room = game_map.get_room(command.args[1]);
         set_current_room(next_room);
     }
-    else if (tokens[0] == "additem") {
+    else if (command.args[0] == "additem") {
         Item *item = nullptr;
-        if (game_map.get_inventory()->get_item(tokens[1], item)) {
+        if (game_map.get_inventory()->get_item(command.args[1], item)) {
             player_inventory.add_item(item);
         }
     }
 }
-void GameManager::c_clear() {
+void GameManager::c_clear(const Command &command) {
     window_manager->clear_log();
 }
-void GameManager::c_move(const TokenGroup &tokens) {
+void GameManager::c_move(const Command &command) {
     // Test for valid number of args
-    if (tokens.n_tokens != 1) {
+    if (command.n_args != 1) {
         window_manager->print_to_log("Please input the correct number of arguments (move [direction]).");
         return;
     }
 
     // Check for valid direction
     Directions direction = Directions::None;
-    if (!current_room->can_move(tokens[0], direction)) {
+    if (!current_room->can_move(command.args[0], direction)) {
         window_manager->print_to_log("You cannot travel in that direction!");
         return;
     }
@@ -195,8 +192,8 @@ void GameManager::c_move(const TokenGroup &tokens) {
 
     display_room();
 }
-void GameManager::c_look(const TokenGroup &tokens) {
-    if (tokens.n_tokens == 0) {
+void GameManager::c_examine(const Command &command) {
+    if (command.n_args == 0) {
         display_room();
 
         // Execute the OnLook trigger
@@ -206,19 +203,19 @@ void GameManager::c_look(const TokenGroup &tokens) {
             room_scripts["OnLook"]();
         }
     }
-    else if (tokens.n_tokens == 1) {
+    else if (command.n_args == 1) {
         Item *item = nullptr;
-        if (player_inventory.get_item_by_name(tokens[0], item)) {
+        if (player_inventory.get_item_by_name(command.args[0], item)) {
             window_manager->print_to_log(item->get_description() + "\n\n");
         }
-        else if (current_room->get_inventory()->get_item_by_name(tokens[0], item)) {
+        else if (current_room->get_inventory()->get_item_by_name(command.args[0], item)) {
             window_manager->print_to_log(item->get_description() + "\n\n");
         }
     }
 }
-void GameManager::c_pickup(const TokenGroup &tokens) {
+void GameManager::c_pickup(const Command &command) {
     Item *item = nullptr;
-    if (current_room->get_inventory()->get_item_by_name(tokens[0], item)) {
+    if (current_room->get_inventory()->get_item_by_name(command.args[0], item)) {
         if (item->get_is_static()) {
             // We cannot pickup static items.
             window_manager->print_to_log("You cannot pick that up!");
@@ -241,9 +238,9 @@ void GameManager::c_pickup(const TokenGroup &tokens) {
         window_manager->print_to_log("There is no item to pickup by that name.\n");
     }
 }
-void GameManager::c_drop(const TokenGroup &tokens) {
+void GameManager::c_drop(const Command &command) {
     Item *item = nullptr;
-    if (player_inventory.get_item_by_name(tokens[0], item)) {
+    if (player_inventory.get_item_by_name(command.args[0], item)) {
         player_inventory.remove_item(item->get_id());
         current_room->get_inventory()->add_item(item);
         window_manager->print_to_log("You remove " + item->get_name() + " from your knapsack and place it on the floor.\n");
@@ -259,19 +256,19 @@ void GameManager::c_drop(const TokenGroup &tokens) {
         window_manager->print_to_log("There is no item to drop by that name.\n");
     }
 }
-void GameManager::c_inventory(const TokenGroup &tokens) {
+void GameManager::c_inventory(const Command &command) {
     window_manager->print_to_log("== Current Inventory ==");
     window_manager->print_to_log(player_inventory.get_item_list());
 }
 
-void GameManager::item_interact(const TokenGroup &tokens) {
+void GameManager::c_interaction(const Command &command) {
     Item *item = nullptr;
-    if (current_room->get_inventory()->get_item_by_name(tokens[0], item)) {
+    if (current_room->get_inventory()->get_item_by_name(command.args[0], item)) {
         // Execute the OnInteract item trigger
         std::string script_table_name = item->get_id() + "_SCRIPTS";
         LuaRef item_scripts = getGlobal(L, script_table_name.c_str());
         if (!item_scripts.isNil()) {
-            item_scripts["OnInteract"](tokens.command);
+            item_scripts["OnInteract"](command.primary);
         }
     }
 }

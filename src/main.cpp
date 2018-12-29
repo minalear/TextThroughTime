@@ -14,7 +14,7 @@ GameManager *game_manager;
 //TODO: Find a more elegant solution than putting these in the global namespace
 
 void callback(const std::string &str) {
-    game_manager->process_input(str);
+    game_manager->handle_input(str);
 }
 
 int main(int argc, char* argv[]) {
