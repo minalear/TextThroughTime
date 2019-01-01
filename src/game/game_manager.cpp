@@ -25,6 +25,9 @@ GameManager::GameManager(WindowManager *window_manager) {
         .addFunction("CreateItem", &GameManager::s_create_item)
         .addFunction("PlayerHasItem", &GameManager::s_player_has_item)
         .addFunction("RemoveItem", &GameManager::s_remove_item)
+        .addFunction("CreatePrompt", &GameManager::s_create_prompt)
+        .addFunction("AddPromptResponse", &GameManager::s_add_prompt_response)
+        .addFunction("DisplayPrompt", &GameManager::s_display_prompt)
     .endClass()
     .beginClass<Room>("Room")
         .addFunction("AttachRoom", &Room::s_attach_room)
@@ -54,7 +57,7 @@ GameManager::GameManager(WindowManager *window_manager) {
 GameManager::~GameManager() { }
 
 void GameManager::initialize_game() {
-    //current_room = &rooms[0];
+    current_state = GAME_STATES::TRAVEL;
     display_room();
 }
 
@@ -62,38 +65,43 @@ void GameManager::handle_input(const std::string &input) {
     // Process player input into a Command
     auto command = process_input(tokenize(input));
 
-    if (command.type == COMMAND_TYPES::NONE) {
-        window_manager->print_to_log("The input does not appear to be valid.  Double check your spelling.  Type 'help' for a complete list.");
-    }
-    else if (command.type == COMMAND_TYPES::DEBUG) {
-        c_debug(command);
-    }
-    else if (command.type == COMMAND_TYPES::HELP) {
-        c_help(command);
-    }
-    else if (command.type == COMMAND_TYPES::CLEAR_SCREEN) {
-        c_clear(command);
-    }
-    else if (command.type == COMMAND_TYPES::MOVE) {
-        c_move(command);
-    }
-    else if (command.type == COMMAND_TYPES::DROP) {
-        c_drop(command);
-    }
-    else if (command.type == COMMAND_TYPES::PICKUP) {
-        c_pickup(command);
-    }
-    else if (command.type == COMMAND_TYPES::PLACE) {
-        // c_place(command);
-    }
-    else if (command.type == COMMAND_TYPES::EXAMINE_ROOM) {
-        c_examine_room(command);
-    }
-    else if (command.type == COMMAND_TYPES::EXAMINE_ITEM) {
-        c_examine_item(command);
-    }
-    else if (command.type == COMMAND_TYPES::INTERACTION) {
-        c_interaction(command);
+    if (current_state == GAME_STATES::TRAVEL) {
+        if (command.type == COMMAND_TYPES::NONE) {
+            window_manager->print_to_log("The input does not appear to be valid.  Double check your spelling.  Type 'help' for a complete list.");
+        } else if (command.type == COMMAND_TYPES::DEBUG) {
+            c_debug(command);
+        } else if (command.type == COMMAND_TYPES::HELP) {
+            c_help(command);
+        } else if (command.type == COMMAND_TYPES::CLEAR_SCREEN) {
+            c_clear(command);
+        } else if (command.type == COMMAND_TYPES::MOVE) {
+            c_move(command);
+        } else if (command.type == COMMAND_TYPES::DROP) {
+            c_drop(command);
+        } else if (command.type == COMMAND_TYPES::PICKUP) {
+            c_pickup(command);
+        } else if (command.type == COMMAND_TYPES::PLACE) {
+            // c_place(command);
+        } else if (command.type == COMMAND_TYPES::EXAMINE_ROOM) {
+            c_examine_room(command);
+        } else if (command.type == COMMAND_TYPES::EXAMINE_ITEM) {
+            c_examine_item(command);
+        } else if (command.type == COMMAND_TYPES::INTERACTION) {
+            c_interaction(command);
+        }
+    } else if (current_state == GAME_STATES::PROMPT) {
+        LuaRef prompt_callback = getGlobal(L, current_prompt.table_name)[current_prompt.callback_function];
+        if (prompt_callback(command.primary)) {
+            current_state = GAME_STATES::TRAVEL;
+            window_manager->print_to_log("\n\n");
+            display_room();
+        } else {
+            window_manager->print_to_log("Invalid response.\n\n");
+            display_prompt();
+        }
+
+        // TODO: Do better error checking
+        // just calling prompt_callback could be an error if the script isn't function correctly
     }
 }
 
@@ -130,6 +138,18 @@ bool GameManager::s_remove_item(const char* item_id) {
 }
 void GameManager::s_print(const char *line) {
     window_manager->print_to_log(std::string(line));
+}
+void GameManager::s_create_prompt(const char *message, const char *table_name, const char* callback_function) {
+    current_prompt.message = std::string(message);
+    current_prompt.table_name = table_name;
+    current_prompt.callback_function = callback_function;
+    current_prompt.responses.clear();
+}
+void GameManager::s_add_prompt_response(const char* response) {
+    current_prompt.responses.emplace_back(std::string(response));
+}
+void GameManager::s_display_prompt() {
+    display_prompt();
 }
 
 // Command Functions
@@ -201,7 +221,7 @@ void GameManager::c_examine_room(const Command &command) {
     // Execute the OnLook trigger
     std::string script_table_name = current_room->get_id() + "_SCRIPTS";
     LuaRef room_scripts = getGlobal(L, script_table_name.c_str());
-    if (!room_scripts.isNil()) {
+    if (!room_scripts.isNil() && !room_scripts["OnLook"].isNil()) {
         room_scripts["OnLook"]();
     }
 }
@@ -227,11 +247,18 @@ void GameManager::c_pickup(const Command &command) {
             player_inventory.add_item(item);
             window_manager->print_to_log("You pick up " + item->get_name() + " and add it to your knapsack.\n");
 
-            // Execute the OnItemPickup trigger
+            // Execute the room's OnItemPickup trigger
             std::string script_table_name = current_room->get_id() + "_SCRIPTS";
             LuaRef room_scripts = getGlobal(L, script_table_name.c_str());
-            if (!room_scripts.isNil()) {
+            if (!room_scripts.isNil() && !room_scripts["OnItemPickup"].isNil()) {
                 room_scripts["OnItemPickup"](item);
+            }
+
+            // Execute the items's OnPickup trigger
+            script_table_name = "DEBUG_001_SCRIPTS";
+            LuaRef item_scripts = getGlobal(L, script_table_name.c_str());
+            if (!item_scripts.isNil() && !item_scripts["OnPickup"].isNil()) {
+                item_scripts["OnPickup"]();
             }
         }
     }
@@ -246,11 +273,18 @@ void GameManager::c_drop(const Command &command) {
         current_room->get_inventory()->add_item(item);
         window_manager->print_to_log("You remove " + item->get_name() + " from your knapsack and place it on the floor.\n");
 
-        // Execute the OnItemDrop trigger
+        // Execute the room's OnItemDrop trigger
         std::string script_table_name = current_room->get_id() + "_SCRIPTS";
         LuaRef room_scripts = getGlobal(L, script_table_name.c_str());
-        if (!room_scripts.isNil()) {
+        if (!room_scripts.isNil() && !room_scripts["OnItemDrop"].isNil()) {
             room_scripts["OnItemDrop"](item);
+        }
+
+        // Execute the items's OnDrop trigger
+        script_table_name = item->get_id() + "_SCRIPTS";
+        LuaRef item_scripts = getGlobal(L, script_table_name.c_str());
+        if (!item_scripts.isNil() && !item_scripts["OnDrop"].isNil()) {
+            item_scripts["OnDrop"]();
         }
     }
     else {
@@ -268,7 +302,7 @@ void GameManager::c_interaction(const Command &command) {
         // Execute the OnInteract item trigger
         std::string script_table_name = item->get_id() + "_SCRIPTS";
         LuaRef item_scripts = getGlobal(L, script_table_name.c_str());
-        if (!item_scripts.isNil()) {
+        if (!item_scripts.isNil() && !item_scripts["OnInteract"].isNil()) {
             item_scripts["OnInteract"](command.primary);
         }
     }
@@ -286,6 +320,15 @@ void GameManager::display_room() {
     if (current_room->can_move(Directions::West))  window_manager->print_to_log("- West (" + current_room->get_room(Directions::West)->get_name() + ")");
     window_manager->print_to_log(" ");
 }
+void GameManager::display_prompt() {
+    current_state = GAME_STATES::PROMPT;
+
+    window_manager->print_to_log(current_prompt.message);
+    int i = 1;
+    for (const auto &x : current_prompt.responses) {
+        window_manager->print_to_log(std::to_string(i++) + ") " + x);
+    }
+}
 void GameManager::set_current_room(Room *new_room){
     bool canMove = true; // Set this to the OnExit script function which either allows or disallows the movement of the player
 
@@ -293,7 +336,7 @@ void GameManager::set_current_room(Room *new_room){
     if (current_room != nullptr) {
         std::string old_room_table = current_room->get_id() + "_SCRIPTS";
         LuaRef old_room_scripts = getGlobal(L, old_room_table.c_str());
-        if (!old_room_scripts.isNil()) {
+        if (!old_room_scripts.isNil() && !old_room_scripts["OnExit"].isNil()) {
             canMove = old_room_scripts["OnExit"]();
         }
     }
@@ -303,7 +346,7 @@ void GameManager::set_current_room(Room *new_room){
 
         std::string script_table_name = current_room->get_id() + "_SCRIPTS";
         LuaRef room_scripts = getGlobal(L, script_table_name.c_str());
-        if (!room_scripts.isNil()) {
+        if (!room_scripts.isNil() && !room_scripts["OnEnter"].isNil()) {
             room_scripts["OnEnter"]();
         }
         window_manager->print_to_log("You enter " + current_room->get_name());

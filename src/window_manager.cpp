@@ -72,7 +72,7 @@ void WindowManager::keydown(SDL_Keysym key) {
         input_window.clear();
         input_window.print(">> ");
     }
-    else if ((key.mod | MOD_CONTROL) && keycode == SDLK_c) {
+    else if (keycode == SDLK_c && ((key.mod & KMOD_LCTRL) || (key.mod & KMOD_RCTRL))) {
         input_text = "";
         input_window.clear();
         input_window.print(">> ");

@@ -4,21 +4,22 @@
 
 #include "command_parser.h"
 
-std::vector<std::string> superfluous_list, move_list, drop_list, pickup_list, place_list, examine_list, direction_list, room_list;
+std::vector<std::string> superfluous_list, move_list, drop_list, pickup_list, place_list, examine_list, direction_list, room_list, inventory_list;
 
 Command::Command() {
     type = COMMAND_TYPES::NONE;
     args = nullptr;
     n_args = 0;
 
-    superfluous_list = {"THE", "IN", "INTO", "A", "AN", "AT"};
-    move_list        = {"MOVE", "GO", "TRAVEL", "ENTER"};
-    drop_list        = {"DROP", "REMOVE"};
-    pickup_list      = {"PICKUP", "TAKE", "GRAB"};
-    place_list       = {"PLACE", "PUT", "SET"};
-    examine_list     = {"LOOK", "EXAMINE", "INSPECT", "VIEW"};
-    direction_list   = {"NORTH", "SOUTH", "EAST", "WEST"};
-    room_list        = {"ROOM", "LOCATION", "AREA"};
+    superfluous_list    = {"THE", "IN", "INTO", "A", "AN", "AT"};
+    move_list           = {"MOVE", "GO", "TRAVEL", "ENTER"};
+    drop_list           = {"DROP", "REMOVE"};
+    pickup_list         = {"PICKUP", "TAKE", "GRAB"};
+    place_list          = {"PLACE", "PUT", "SET"};
+    examine_list        = {"LOOK", "EXAMINE", "INSPECT", "VIEW", "CHECK"};
+    direction_list      = {"NORTH", "SOUTH", "EAST", "WEST"};
+    room_list           = {"ROOM", "LOCATION", "AREA"};
+    inventory_list      = {"INVENTORY"};
 }
 Command::~Command() {
     delete [] args;
@@ -60,12 +61,20 @@ Command process_input(const TokenGroup &tokens) {
         command.type = COMMAND_TYPES::PLACE;
     }
     else if (contains(command.primary, examine_list)) {
+        // If the player just types "look" or types "inspect area"
         if (command.n_args == 0 || contains<std::string>(command.args[0], room_list)) {
             command.type = COMMAND_TYPES::EXAMINE_ROOM;
+        }
+        // if the player types something like "inspect inventory"
+        else if (contains<std::string>(command.args[0], inventory_list)) {
+            command.type = COMMAND_TYPES::INVENTORY;
         }
         else {
             command.type = COMMAND_TYPES::EXAMINE_ITEM;
         }
+    }
+    else if (contains(command.primary, inventory_list)) {
+        command.type = COMMAND_TYPES::INVENTORY;
     }
     else if (command.primary == "CLEAR") {
         command.type = COMMAND_TYPES::CLEAR_SCREEN;

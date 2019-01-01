@@ -16,6 +16,7 @@ CITY_GATE_SCRIPTS = {
 	OnEnter = function() 
 		if not Manager:PlayerHasItem("DISGUISE") then
 			imprison_player()
+			
 		end
 	end,
 	OnExit = function() return true end,

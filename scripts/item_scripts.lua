@@ -1,3 +1,33 @@
+DEBUG_001_SCRIPTS = {
+	OnPickup = function()
+		Manager:CreatePrompt("What is your favorite color?", "DEBUG_001_SCRIPTS", "PickupPromptCallback")
+		AppendPromptResponses({"Red", "Blue", "Purple", "Green"})
+		Manager:DisplayPrompt()
+	end,
+	OnDrop = function() end,
+	PickupPromptCallback = function(reply)
+		if (Contains({"1", "2", "3", "4"}, reply)) then
+			return true
+		else
+			Manager:CreatePrompt("How dare you pick such a foul color!  Have at you!!", "DEBUG_001_SCRIPTS", "FailedPromptCallback")
+			AppendPromptResponses({"Sorry for picking such a foul color", "Fuck you, bitch"})
+			--Manager:DisplayPrompt()
+			return false
+		end
+	end,
+	FailedPromptCallback = function(reply)
+		if reply == "1" then
+			Manager:Print("Sensible decision.  Off you go!")
+			return true
+		elseif reply == "2" then 
+			Manager:Print("Buffer off you!")
+			return true
+		else
+			return false
+		end
+	end
+}
+
 CELL_DOOR_SCRIPTS = {
 	OnInteract = function(action)
 		if action == "OPEN" then
