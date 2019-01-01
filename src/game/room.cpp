@@ -19,20 +19,35 @@ Room::Room(const std::string &id, const std::string &name, const std::string &de
 Room::~Room() { }
 
 // Public functions
+/// Attach another room singly to this room
 void Room::s_attach_room(const char *room_id, const char *direction) {
     auto room = game_map->get_room(std::string(room_id));
     auto dir  = game_map->str_to_direction(std::string(direction));
 
     attach_room(room, dir);
 }
+/// Attach another room to this room and then attach this room to that room in the opposite direction
+void Room::s_connect_rooms(const char* room_id, const char* direction) {
+    auto room = game_map->get_room(std::string(room_id));
+    auto dir  = game_map->str_to_direction(std::string(direction));
+
+    attach_room(room, dir);
+    room->attach_room(this, game_map->get_opposite_direction(dir));
+}
 void Room::s_set_description(const char* desc) {
     set_description(std::string(desc));
+}
+void Room::s_append_description(const char* desc) {
+    set_description(description + "\n" + std::string(desc));
 }
 void Room::s_add_item(const char *item_id) {
     Item *item = nullptr;
     if (game_map->get_inventory()->get_item(std::string(item_id), item)) {
         room_inventory.add_item(item);
     }
+}
+void Room::s_remove_item(const char* item_id) {
+    room_inventory.remove_item(item_id);
 }
 void Room::attach_room(Room *room, Directions direction) {
     if (connected_rooms.count(direction) == 0) {

@@ -26,6 +26,7 @@ public:
     ~Map();
 
     Directions str_to_direction(const std::string &text);
+    Directions get_opposite_direction(Directions direction);
     Room* add_room(
             const std::string &unique_id,
             const std::string &name,

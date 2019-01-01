@@ -55,7 +55,8 @@ void WindowManager::text_input(wchar_t ch) {
     input_window.put(ch);
     console.update_buffer();
 }
-void WindowManager::keydown(SDL_Keycode keycode) {
+void WindowManager::keydown(SDL_Keysym key) {
+    auto keycode = key.sym;
     if (keycode == SDLK_BACKSPACE) {
         input_text = input_text.substr(0, input_text.size() - 1);
         input_window.clear();
@@ -67,6 +68,11 @@ void WindowManager::keydown(SDL_Keycode keycode) {
         print_to_log("\n\n\n");
         print_to_log(">> " + input_text);
         callback(input_text);
+        input_text = "";
+        input_window.clear();
+        input_window.print(">> ");
+    }
+    else if (keycode == SDLK_c && ((key.mod & KMOD_LCTRL) || (key.mod & KMOD_RCTRL))) {
         input_text = "";
         input_window.clear();
         input_window.print(">> ");

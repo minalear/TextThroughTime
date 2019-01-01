@@ -14,7 +14,7 @@ GameManager *game_manager;
 //TODO: Find a more elegant solution than putting these in the global namespace
 
 void callback(const std::string &str) {
-    game_manager->process_input(str);
+    game_manager->handle_input(str);
 }
 
 int main(int argc, char* argv[]) {
@@ -26,9 +26,10 @@ int main(int argc, char* argv[]) {
 	glClearColor(0.f, 0.f, 0.f, 1.f);
 
 	window_manager = new WindowManager(&game_window);
-	game_manager = new GameManager(window_manager);
 	window_manager->set_title("A Text Through Time");
 	window_manager->set_callback(callback);
+
+	game_manager = new GameManager(window_manager);
 	
 	SDL_Event windowEvent;
 	while (true) {
@@ -39,7 +40,7 @@ int main(int argc, char* argv[]) {
 			    window_manager->text_input(windowEvent.text.text[0]);
 			}
 			else if (windowEvent.type == SDL_KEYDOWN) {
-			    window_manager->keydown(windowEvent.key.keysym.sym);
+			    window_manager->keydown(windowEvent.key.keysym);
 			}
 		}
 		

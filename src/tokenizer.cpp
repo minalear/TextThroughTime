@@ -26,14 +26,14 @@ TokenGroup tokenize(const std::string &str) {
 
     // Parse insput string and split it up via spaces
     for (auto& x : str) {
-        if (x == ' ' && !ignore_spaces) {
+        if (x == ' ' && !ignore_spaces && !buffer.empty()) {
             temp_tokens[token_group.n_tokens] = buffer;
             token_group.n_tokens++;
             buffer.clear();
         } else if (x == '"') {
             ignore_spaces = !ignore_spaces;
-        } else {
-            buffer += x;
+        } else if (x != ' ') {
+            buffer += (char)std::toupper(x);
         }
     }
     if (!buffer.empty()) {
@@ -42,12 +42,10 @@ TokenGroup tokenize(const std::string &str) {
     }
 
     // Place tokenized input into a TokenGroup and return it
-    token_group.tokens = new std::string[token_group.n_tokens-1];
-    token_group.command = temp_tokens[0];
-    for (int i = 1; i < token_group.n_tokens; i++) {
-        token_group.tokens[i-1] = temp_tokens[i];
+    token_group.tokens = new std::string[token_group.n_tokens];
+    for (int i = 0; i < token_group.n_tokens; i++) {
+        token_group.tokens[i] = temp_tokens[i];
     }
-    token_group.n_tokens -= 1; // Don't count the command as a token
 
     return token_group;
 }

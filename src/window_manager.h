@@ -31,7 +31,7 @@ public:
     void set_title(std::string title);
     void render_to_screen();
     void text_input(wchar_t ch);
-    void keydown(SDL_Keycode keycode);
+    void keydown(SDL_Keysym key);
     void print_to_log(const std::string &str);
     void clear_log();
     void set_callback(InputCallback callback);

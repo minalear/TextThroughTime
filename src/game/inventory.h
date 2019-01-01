@@ -19,7 +19,7 @@ public:
     bool get_item(const std::string &unique_id, Item *&item);
     bool get_item_by_name(const std::string &name, Item *&item);
 
-    std::string get_item_list();
+    std::string get_item_list(bool ignore_static = true);
     void delete_items();
 };
 
