@@ -86,8 +86,11 @@ void GameManager::handle_input(const std::string &input) {
     else if (command.type == COMMAND_TYPES::PLACE) {
         // c_place(command);
     }
-    else if (command.type == COMMAND_TYPES::EXAMINE) {
-        c_examine(command);
+    else if (command.type == COMMAND_TYPES::EXAMINE_ROOM) {
+        c_examine_room(command);
+    }
+    else if (command.type == COMMAND_TYPES::EXAMINE_ITEM) {
+        c_examine_item(command);
     }
     else if (command.type == COMMAND_TYPES::INTERACTION) {
         c_interaction(command);
@@ -192,25 +195,23 @@ void GameManager::c_move(const Command &command) {
 
     display_room();
 }
-void GameManager::c_examine(const Command &command) {
-    if (command.n_args == 0) {
-        display_room();
+void GameManager::c_examine_room(const Command &command) {
+    display_room();
 
-        // Execute the OnLook trigger
-        std::string script_table_name = current_room->get_id() + "_SCRIPTS";
-        LuaRef room_scripts = getGlobal(L, script_table_name.c_str());
-        if (!room_scripts.isNil()) {
-            room_scripts["OnLook"]();
-        }
+    // Execute the OnLook trigger
+    std::string script_table_name = current_room->get_id() + "_SCRIPTS";
+    LuaRef room_scripts = getGlobal(L, script_table_name.c_str());
+    if (!room_scripts.isNil()) {
+        room_scripts["OnLook"]();
     }
-    else if (command.n_args == 1) {
-        Item *item = nullptr;
-        if (player_inventory.get_item_by_name(command.args[0], item)) {
-            window_manager->print_to_log(item->get_description() + "\n\n");
-        }
-        else if (current_room->get_inventory()->get_item_by_name(command.args[0], item)) {
-            window_manager->print_to_log(item->get_description() + "\n\n");
-        }
+}
+void GameManager::c_examine_item(const Command &command) {
+    Item *item = nullptr;
+    if (player_inventory.get_item_by_name(command.args[0], item)) {
+        window_manager->print_to_log(item->get_description() + "\n\n");
+    }
+    else if (current_room->get_inventory()->get_item_by_name(command.args[0], item)) {
+        window_manager->print_to_log(item->get_description() + "\n\n");
     }
 }
 void GameManager::c_pickup(const Command &command) {

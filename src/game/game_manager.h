@@ -36,7 +36,8 @@ class GameManager {
     void c_debug(const Command &command);
     void c_clear(const Command &command);
     void c_move(const Command &command);
-    void c_examine(const Command &command);
+    void c_examine_room(const Command &command);
+    void c_examine_item(const Command &command);
     void c_pickup(const Command &command);
     void c_drop(const Command &command);
     void c_inventory(const Command &command);

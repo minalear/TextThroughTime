@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
 			    window_manager->text_input(windowEvent.text.text[0]);
 			}
 			else if (windowEvent.type == SDL_KEYDOWN) {
-			    window_manager->keydown(windowEvent.key.keysym.sym);
+			    window_manager->keydown(windowEvent.key.keysym);
 			}
 		}
 		
