@@ -22,17 +22,14 @@ GameManager::GameManager(WindowManager *window_manager) {
         .addFunction("Print", &GameManager::s_print)
         .addFunction("ProgressTime", &GameManager::s_progress_time)
         .addFunction("SetCurrentRoom", &GameManager::s_set_current_room)
-
         .addFunction("CreateRoom", &GameManager::s_create_room)
         .addFunction("CreateItem", &GameManager::s_create_item)
         .addFunction("CreateStaticItem", &GameManager::s_create_static_item)
-
         .addFunction("PlayerAddItem", &GameManager::s_player_add_item)
         .addFunction("PlayerAddItems", &GameManager::s_player_add_items)
         .addFunction("PlayerRemoveItem", &GameManager::s_player_remove_item)
         .addFunction("PlayerRemoveItems", &GameManager::s_player_remove_items)
         .addFunction("PlayerHasItem", &GameManager::s_player_has_item)
-
         .addFunction("CreatePrompt", &GameManager::s_create_prompt)
         .addFunction("AddPromptResponse", &GameManager::s_add_prompt_response)
         .addFunction("DisplayPrompt", &GameManager::s_display_prompt)
@@ -288,7 +285,6 @@ void GameManager::c_pickup(const Command &command) {
             // We can pickup non-static items.
             current_room->get_inventory()->remove_item(item->get_id());
             player_inventory.add_item(item);
-            window_manager->print_to_log("You pick up " + item->get_name() + " and add it to your knapsack.\n");
 
             // Execute the room's OnItemPickup trigger
             std::string script_table_name = current_room->get_id() + "_SCRIPTS";
@@ -298,11 +294,13 @@ void GameManager::c_pickup(const Command &command) {
             }
 
             // Execute the items's OnPickup trigger
-            script_table_name = "DEBUG_001_SCRIPTS";
+            script_table_name = item->get_id() + "_SCRIPTS";
             LuaRef item_scripts = getGlobal(L, script_table_name.c_str());
             if (!item_scripts.isNil() && !item_scripts["OnPickup"].isNil()) {
                 item_scripts["OnPickup"]();
             }
+
+            window_manager->print_to_log(item->get_name() + " has been added to your inventory.\n");
         }
     }
     else {
