@@ -19,28 +19,43 @@ GameManager::GameManager(WindowManager *window_manager) {
     getGlobalNamespace(L)
         .addFunction("Rand", minalear::rand_int)
     .beginClass<GameManager>("GameManager")
-        .addFunction("AddRoom", &GameManager::s_add_room)
-        .addFunction("SetCurrentRoom", &GameManager::s_set_current_room)
         .addFunction("Print", &GameManager::s_print)
+        .addFunction("ProgressTime", &GameManager::s_progress_time)
+        .addFunction("SetCurrentRoom", &GameManager::s_set_current_room)
+
+        .addFunction("CreateRoom", &GameManager::s_create_room)
         .addFunction("CreateItem", &GameManager::s_create_item)
+        .addFunction("CreateStaticItem", &GameManager::s_create_static_item)
+
+        .addFunction("PlayerAddItem", &GameManager::s_player_add_item)
+        .addFunction("PlayerAddItems", &GameManager::s_player_add_items)
+        .addFunction("PlayerRemoveItem", &GameManager::s_player_remove_item)
+        .addFunction("PlayerRemoveItems", &GameManager::s_player_remove_items)
         .addFunction("PlayerHasItem", &GameManager::s_player_has_item)
-        .addFunction("RemoveItem", &GameManager::s_remove_item)
+
         .addFunction("CreatePrompt", &GameManager::s_create_prompt)
         .addFunction("AddPromptResponse", &GameManager::s_add_prompt_response)
         .addFunction("DisplayPrompt", &GameManager::s_display_prompt)
     .endClass()
     .beginClass<Room>("Room")
-        .addFunction("AttachRoom", &Room::s_attach_room)
-        .addFunction("ConnectRooms", &Room::s_connect_rooms)
+        .addFunction("GetID", &Room::s_get_id)
+        .addFunction("GetName", &Room::s_get_name)
+        .addFunction("SetName", &Room::s_set_name)
         .addFunction("SetDescription", &Room::s_set_description)
         .addFunction("AppendDescription", &Room::s_append_description)
+        .addFunction("AttachRoom", &Room::s_attach_room)
+        .addFunction("ConnectRooms", &Room::s_connect_rooms)
         .addFunction("AddItem", &Room::s_add_item)
+        .addFunction("AddItems", &Room::s_add_items)
         .addFunction("RemoveItem", &Room::s_remove_item)
+        .addFunction("RemoveItems", &Room::s_remove_items)
     .endClass()
     .beginClass<Item>("Item")
-        .addFunction("SetDescription", &Item::s_set_description)
         .addFunction("GetID", &Item::s_get_id)
         .addFunction("GetName", &Item::s_get_name)
+        .addFunction("SetName", &Item::s_set_name)
+        .addFunction("SetDescription", &Item::s_set_description)
+        .addFunction("AppendDescription", &Item::s_append_description)
         .addFunction("IsStatic", &Item::get_is_static)
         .addFunction("SetIsStatic", &Item::set_is_static)
         .addFunction("AddAlias", &Item::s_add_alias)
@@ -106,12 +121,18 @@ void GameManager::handle_input(const std::string &input) {
 }
 
 // Scripting Functions
+void GameManager::s_print(const char *line) {
+    window_manager->print_to_log(std::string(line));
+}
+void GameManager::s_progress_time(int amount, char type) {
+    // TODO: Implement TIME
+}
 void GameManager::s_set_current_room(const char *id) {
     set_current_room(game_map.get_room(std::string(id)));
 }
-void GameManager::s_add_room(const char *unique_id, const char *name, const char *desc) {
+void GameManager::s_create_room(const char *unique_id, const char *name) {
     // Add the room to the game map
-    auto new_room = game_map.add_room(std::string(unique_id), std::string(name), std::string(desc));
+    auto new_room = game_map.add_room(std::string(unique_id), std::string(name), "NULL DESCRIPTION");
 
     // Make the room available in the init script
     push(L, new_room);
@@ -119,26 +140,48 @@ void GameManager::s_add_room(const char *unique_id, const char *name, const char
 
     LuaRef room_table = getGlobal(L, unique_id);
 }
-void GameManager::s_create_item(const char *item_id, const char *name, const char *desc, bool is_static) {
+void GameManager::s_create_item(const char *item_id, const char *name) {
     // Create the item
-    auto new_item = new Item(std::string(item_id), std::string(name), std::string(desc));
-    new_item->set_is_static(is_static);
+    auto new_item = new Item(std::string(item_id), std::string(name), "NULL DESCRIPTION");
+    new_item->set_is_static(false);
     game_map.get_inventory()->add_item(new_item);
 
     // Make the item available in the init script
     push(L, new_item);
     lua_setglobal(L, item_id);
 }
-bool GameManager::s_player_has_item(const char* item_id) {
-    Item* item;
-    return player_inventory.get_item(item_id, item);
+void GameManager::s_create_static_item(const char *item_id, const char *name) {
+    // Create the item
+    auto new_item = new Item(std::string(item_id), std::string(name), "NULL DESCRIPTION");
+    new_item->set_is_static(true);
+    game_map.get_inventory()->add_item(new_item);
+
+    // Make the item available in the init script
+    push(L, new_item);
+    lua_setglobal(L, item_id);
 }
-bool GameManager::s_remove_item(const char* item_id) {
+void GameManager::s_player_add_item(const char *item_id) {
+    Item *item;
+    game_map.get_inventory()->get_item(item_id, item);
+    player_inventory.add_item(item);
+}
+void GameManager::s_player_add_items(const char *item_id, int quantity) {
+    Item *item;
+    game_map.get_inventory()->get_item(item_id, item);
+    player_inventory.add_item(item);
+    // TODO: Implement item quantities
+}
+bool GameManager::s_player_remove_item(const char *item_id) {
     return player_inventory.remove_item(item_id);
 }
-void GameManager::s_print(const char *line) {
-    window_manager->print_to_log(std::string(line));
+bool GameManager::s_player_remove_items(const char *item_id) {
+    return player_inventory.remove_item(item_id);
 }
+bool GameManager::s_player_has_item(const char *item_id) {
+    Item *item;
+    return player_inventory.get_item(item_id, item);
+}
+
 void GameManager::s_create_prompt(const char *message, const char *table_name, const char* callback_function) {
     current_prompt.message = std::string(message);
     current_prompt.table_name = table_name;

@@ -18,6 +18,13 @@ public:
     Item(const std::string &id, const std::string &name, const std::string &desc);
     ~Item();
 
+    const char* s_get_id();
+    const char* s_get_name();
+    void s_set_name(const char *name);
+    void s_set_description(const char *desc);
+    void s_append_description(const char *desc);
+    void s_add_alias(const char *alias);
+
     std::string get_id();
     std::string get_name();
     std::string get_description();
@@ -27,11 +34,6 @@ public:
     void set_description(const std::string &desc);
     void set_is_static(bool value);
     bool check_name(const std::string &name);
-
-    void s_set_description(const char* desc);
-    void s_add_alias(const char* alias);
-    const char* s_get_id();
-    const char* s_get_name();
 };
 
 #endif //TEXTTHROUGHTIME_ITEM_H

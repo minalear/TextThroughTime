@@ -21,12 +21,18 @@ public:
     Room(const std::string &id, const std::string &name, const std::string &description, Map *map);
     ~Room();
 
-    void s_attach_room(const char* room_id, const char* direction);
-    void s_connect_rooms(const char* room_id, const char* direction);
-    void s_set_description(const char* desc);
-    void s_append_description(const char* desc);
-    void s_add_item(const char* item_id);
-    void s_remove_item(const char* item_id);
+    const char* s_get_id();
+    const char* s_get_name();
+    void s_set_name(const char *name);
+    void s_set_description(const char *desc);
+    void s_append_description(const char *desc);
+    void s_attach_room(const char *room_id, const char *direction);
+    void s_connect_rooms(const char *room_id, const char *direction);
+    void s_add_item(const char *item_id);
+    void s_add_items(const char *item_id, int quantity);
+    void s_remove_item(const char *item_id);
+    void s_remove_items(const char *item_id, int quantity);
+
     void attach_room(Room* room, Directions direction);
 
     Room* get_room(Directions direction);

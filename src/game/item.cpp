@@ -17,6 +17,26 @@ Item::Item(const std::string &id, const std::string &name, const std::string &de
 }
 Item::~Item() { }
 
+// Scripting specific functions
+const char* Item::s_get_id() {
+    return id.c_str();
+}
+const char* Item::s_get_name() {
+    return name.c_str();
+}
+void Item::s_set_name(const char *name) {
+    set_name(std::string(name));
+}
+void Item::s_set_description(const char *desc) {
+    set_description(std::string(desc));
+}
+void Item::s_append_description(const char *desc) {
+    set_description(description + "\n" + std::string(desc));
+}
+void Item::s_add_alias(const char *alias) {
+    aliases.push_back(std::string(alias));
+}
+
 std::string Item::get_id() {
     return this->id;
 }
@@ -47,18 +67,4 @@ bool Item::check_name(const std::string &test) {
     }
 
     return false;
-}
-
-// Scripting specific functions
-void Item::s_set_description(const char *desc) {
-    set_description(std::string(desc));
-}
-const char* Item::s_get_id() {
-    return id.c_str();
-}
-const char* Item::s_get_name() {
-    return name.c_str();
-}
-void Item::s_add_alias(const char *alias) {
-    aliases.push_back(std::string(alias));
 }

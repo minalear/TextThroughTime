@@ -39,12 +39,17 @@ class GameManager {
     GAME_STATES current_state;
 
     // Scripting functions
-    void s_set_current_room(const char* id);
-    void s_add_room(const char* unique_id, const char* name, const char* desc);
-    void s_create_item(const char* item_id, const char* name, const char* desc, bool is_static);
+    void s_print(const char *msg);
+    void s_progress_time(int amount, char type);
+    void s_set_current_room(const char *id);
+    void s_create_room(const char *room_id, const char *name);
+    void s_create_item(const char *item_id, const char *name);
+    void s_create_static_item(const char *item_id, const char *name);
+    void s_player_add_item(const char *item_id);
+    void s_player_add_items(const char *item_id, int quantity);
+    bool s_player_remove_item(const char *item_id);
+    bool s_player_remove_items(const char *item_ids);
     bool s_player_has_item(const char* item_id);
-    bool s_remove_item(const char* item_id);
-    void s_print(const char* line);
     void s_create_prompt(const char *message, const char *table_name, const char* callback_function);
     void s_add_prompt_response(const char* response);
     void s_display_prompt();
