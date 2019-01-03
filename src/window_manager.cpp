@@ -82,25 +82,44 @@ void WindowManager::keydown(SDL_Keysym key) {
 }
 
 void WindowManager::print_to_log(const std::string &str) {
-    // We must break up long strings into multiple log entries
-    std::string buffer;
-    for (auto& x : str) {
-        if (x != '\n')
-            buffer += x;
+    // Word wrap longer strings into multiple lines in the log
+    const int buffer_width = log_window.get_width();
+    std::string word_buffer, line_buffer;
 
-        if (buffer.size() == log_window.get_width() - 1 || x == '\n') {
-            log_list.add(buffer);
-            buffer.clear();
+    for (auto& ch : str) {
+        // Words are delimited by spaces, when we hit one, check to ensure the total line_buffer length
+        // does not exceed the buffer width.  If it does, split it there, otherwise add the word.
+        if (ch == '\n') { // Split the line on newline characters
+            if (!word_buffer.empty()) {
+                line_buffer += word_buffer;
+            }
+            log_list.add(line_buffer);
+            line_buffer.clear();
+            word_buffer.clear();
+        }
+        else if (ch == ' ') {
+            if (line_buffer.size() + word_buffer.size() + 1 > buffer_width) { // Split the line
+                log_list.add(line_buffer);
+                line_buffer = word_buffer + " ";
+                word_buffer.clear();
+            } else {
+                line_buffer += word_buffer + " "; // Don't split the line
+                word_buffer.clear();
+            }
+        } else {
+            word_buffer += ch;
         }
     }
-    if (!buffer.empty()) {
-        log_list.add(buffer);
-        buffer.clear();
+    if (!word_buffer.empty()) {
+        line_buffer += word_buffer;
+    }
+    if (!line_buffer.empty()) {
+        log_list.add(line_buffer);
+        line_buffer.clear();
     }
 
-    //log_list.add(str);
+    // Move the lines up along the window so the lines rise up
     log_window.clear();
-
     for (int i = 0; i < log_window.get_height() && i < log_list.count(); i++) {
         log_window.set(0, log_window.get_height() - i - 1);
         log_window.print(log_list[i]);
