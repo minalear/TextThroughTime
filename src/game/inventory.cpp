@@ -71,3 +71,6 @@ void Inventory::delete_items() {
     }
     items.clear();
 }
+const std::vector<Item*>* Inventory::get_vector_pointer() {
+    return &items;
+}

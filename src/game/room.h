@@ -43,6 +43,7 @@ public:
     std::string get_id();
     std::string get_name();
     std::string get_description();
+    std::string get_full_description();
 
     void set_name(const std::string& name);
     void set_description(const std::string& desc);

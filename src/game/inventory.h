@@ -21,6 +21,8 @@ public:
 
     std::string get_item_list(bool ignore_static = true);
     void delete_items();
+
+    const std::vector<Item*>* get_vector_pointer();
 };
 
 #endif //TEXTTHROUGHTIME_INVENTORY_H

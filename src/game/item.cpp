@@ -33,6 +33,9 @@ void Item::s_set_description(const char *desc) {
 void Item::s_append_description(const char *desc) {
     set_description(description + "\n" + std::string(desc));
 }
+void Item::s_set_room_description(const char *desc) {
+    set_room_description(std::string(desc));
+}
 void Item::s_add_alias(const char *alias) {
     aliases.push_back(std::string(alias));
 }
@@ -46,6 +49,9 @@ std::string Item::get_name() {
 std::string Item::get_description() {
     return this->description;
 }
+std::string Item::get_room_description() {
+    return this->room_description;
+}
 bool Item::get_is_static() {
     return this->is_static;
 }
@@ -55,6 +61,9 @@ void Item::set_name(const std::string &name) {
 }
 void Item::set_description(const std::string &desc) {
     this->description = desc;
+}
+void Item::set_room_description(const std::string &desc) {
+    this->room_description = desc;
 }
 void Item::set_is_static(bool value) {
     this->is_static = value;

@@ -90,6 +90,20 @@ std::string Room::get_name() {
 std::string Room::get_description() {
     return description;
 }
+std::string Room::get_full_description() {
+    std::string desc_buffer = get_description();
+
+    auto inventory_ptr = room_inventory.get_vector_pointer();
+    for (const auto &x : (*inventory_ptr)) {
+        auto x_room_desc = x->get_room_description();
+
+        if (!x_room_desc.empty()) {
+            desc_buffer += "  " + x->get_room_description();
+        }
+    }
+
+    return desc_buffer;
+}
 void Room::set_name(const std::string& name) {
     this->name = name;
 }

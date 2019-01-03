@@ -54,6 +54,7 @@ GameManager::GameManager(WindowManager *window_manager) {
         .addFunction("SetName", &Item::s_set_name)
         .addFunction("SetDescription", &Item::s_set_description)
         .addFunction("AppendDescription", &Item::s_append_description)
+        .addFunction("SetRoomDescription", &Item::s_set_room_description)
         .addFunction("IsStatic", &Item::get_is_static)
         .addFunction("SetIsStatic", &Item::set_is_static)
         .addFunction("AddAlias", &Item::s_add_alias)
@@ -346,6 +347,7 @@ void GameManager::c_inventory(const Command &command) {
     window_manager->print_to_log(player_inventory.get_item_list());
 }
 
+// TODO: Implement item interactions with other items (ie dumping poo pale into city fountain)
 void GameManager::c_interaction(const Command &command) {
     Item *item = nullptr;
     if (current_room->get_inventory()->get_item_by_name(command.args[0], item)) {
@@ -359,8 +361,9 @@ void GameManager::c_interaction(const Command &command) {
 }
 
 void GameManager::display_room() {
+    // Set the title
     window_manager->set_title(current_room->get_name());
-    window_manager->print_to_log(current_room->get_description() + "\n\n");
+    window_manager->print_to_log(current_room->get_full_description() + "\n\n");
     window_manager->print_to_log("== Room Items ==");
     window_manager->print_to_log(current_room->get_inventory()->get_item_list() + "\n");
     window_manager->print_to_log("== Directions ==");

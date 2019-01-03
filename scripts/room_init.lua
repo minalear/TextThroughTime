@@ -6,11 +6,12 @@ end
 
 -- Dungeon Cell --
 Manager:CreateRoom("DUNG_CELL", "Dungeon Cell")
-DUNG_CELL:SetDescription("A cramped, damp dungeon cell surrounds you.  The cell seems to be carved out of natural stone, however a seemingly out of place brick wall makes up the right hand side of the cell.  A small bed sits in the corner while a smelly shit bucket resides next to it.  It is very dark in the cell, with whatever light present illuminating from the distant hallway through the cell door.  Trying to make out details is impossible, however, on the brick wall, there seems to be a single brick standing out from the rest.")
+DUNG_CELL:SetDescription("A damp dungeon cell surrounds you.  Most of the cell seems to be carved out of the mountain side, with the eastern wall being comprised of brick.  Due to the lack of illumination, it's hard to make out any details on anything.")
+
+DUNG_CELL:AddItem("CELL_BRICK")
+DUNG_CELL:AddItem("CELL_DOOR")
 DUNG_CELL:AddItem("CELL_BED")
 DUNG_CELL:AddItem("CELL_BUCKET")
-DUNG_CELL:AddItem("CELL_DOOR")
-DUNG_CELL:AddItem("CELL_BRICK")
 
 -- Dungeon Hallway --
 Manager:CreateRoom("DUNG_HALLWAY", "Dungeon Hallway")
