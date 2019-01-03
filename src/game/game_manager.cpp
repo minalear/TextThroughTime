@@ -4,6 +4,7 @@
 
 #include <lua.hpp>
 #include <LuaBridge.h>
+#include "../error_handling.h"
 #include "game_manager.h"
 #include "../core/math_utils.h"
 
@@ -98,6 +99,8 @@ void GameManager::handle_input(const std::string &input) {
             c_examine_room(command);
         } else if (command.type == COMMAND_TYPES::EXAMINE_ITEM) {
             c_examine_item(command);
+        } else if (command.type == COMMAND_TYPES::INVENTORY) {
+            c_inventory(command);
         } else if (command.type == COMMAND_TYPES::INTERACTION) {
             c_interaction(command);
         }
@@ -159,13 +162,19 @@ void GameManager::s_create_static_item(const char *item_id, const char *name) {
 }
 void GameManager::s_player_add_item(const char *item_id) {
     Item *item;
-    game_map.get_inventory()->get_item(item_id, item);
-    player_inventory.add_item(item);
+    if (game_map.get_inventory()->get_item(item_id, item)) {
+        player_inventory.add_item(item);
+    } else {
+        throw ItemNotFoundException(item_id);
+    }
 }
 void GameManager::s_player_add_items(const char *item_id, int quantity) {
     Item *item;
-    game_map.get_inventory()->get_item(item_id, item);
-    player_inventory.add_item(item);
+    if (game_map.get_inventory()->get_item(item_id, item)) {
+        player_inventory.add_item(item);
+    } else {
+        throw ItemNotFoundException(item_id);
+    }
     // TODO: Implement item quantities
 }
 bool GameManager::s_player_remove_item(const char *item_id) {

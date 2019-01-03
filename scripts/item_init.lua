@@ -137,4 +137,6 @@ CITY_FOUNTAIN_SCRIPTS = {
 	end
 }
 
+Manager:CreateItem("GOLD", "Gold Coin", "A small golden coin with the likeness of some King on it.")
+Manager:CreateItem("LOCKPICK", "Lockpick", "A small device used to pick locks.")
 Manager:CreateItem("DISGUISE", "Disguise", "A set of clothing designed to conceal your identity discreetly.")
