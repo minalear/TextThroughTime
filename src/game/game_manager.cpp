@@ -162,31 +162,30 @@ void GameManager::s_create_static_item(const char *item_id, const char *name) {
     lua_setglobal(L, item_id);
 }
 void GameManager::s_player_add_item(const char *item_id) {
-    Item *item;
-    if (game_map.get_inventory()->get_item(item_id, item)) {
-        player_inventory.add_item(item);
+    InventorySlot *item_slot = nullptr;
+    if (game_map.get_inventory()->get_item(item_id, item_slot)) {
+        player_inventory.add_item(item_slot->item, 1);
     } else {
         throw ItemNotFoundException(item_id);
     }
 }
 void GameManager::s_player_add_items(const char *item_id, int quantity) {
-    Item *item;
-    if (game_map.get_inventory()->get_item(item_id, item)) {
-        player_inventory.add_item(item);
+    InventorySlot *item_slot = nullptr;
+    if (game_map.get_inventory()->get_item(item_id, item_slot)) {
+        player_inventory.add_item(item_slot->item, quantity);
     } else {
         throw ItemNotFoundException(item_id);
     }
-    // TODO: Implement item quantities
 }
 bool GameManager::s_player_remove_item(const char *item_id) {
     return player_inventory.remove_item(item_id);
 }
-bool GameManager::s_player_remove_items(const char *item_id) {
-    return player_inventory.remove_item(item_id);
+bool GameManager::s_player_remove_items(const char *item_id, int quantity) {
+    return player_inventory.remove_item(item_id, quantity);
 }
 bool GameManager::s_player_has_item(const char *item_id) {
-    Item *item;
-    return player_inventory.get_item(item_id, item);
+    InventorySlot *item_slot;
+    return player_inventory.get_item(item_id, item_slot);
 }
 
 void GameManager::s_create_prompt(const char *message, const char *table_name, const char* callback_function) {
@@ -218,9 +217,10 @@ void GameManager::c_debug(const Command &command) {
         set_current_room(next_room);
     }
     else if (command.args[0] == "additem") {
-        Item *item = nullptr;
-        if (game_map.get_inventory()->get_item(command.args[1], item)) {
-            player_inventory.add_item(item);
+        InventorySlot *item_slot = nullptr;
+        if (game_map.get_inventory()->get_item(command.args[1], item_slot)) {
+            int quantity = (command.n_args > 1) ? std::stoi(command.args[1]) : 1;
+            player_inventory.add_item(item_slot->item, quantity);
         }
     }
 }
@@ -276,41 +276,41 @@ void GameManager::c_examine_room(const Command &command) {
     }
 }
 void GameManager::c_examine_item(const Command &command) {
-    Item *item = nullptr;
-    if (player_inventory.get_item_by_name(command.args[0], item)) {
-        window_manager->print_to_log(item->get_description() + "\n\n");
+    InventorySlot *item_slot = nullptr;
+    if (player_inventory.get_item_by_name(command.args[0], item_slot)) {
+        window_manager->print_to_log(item_slot->item->get_description() + "\n\n");
     }
-    else if (current_room->get_inventory()->get_item_by_name(command.args[0], item)) {
-        window_manager->print_to_log(item->get_description() + "\n\n");
+    else if (current_room->get_inventory()->get_item_by_name(command.args[0], item_slot)) {
+        window_manager->print_to_log(item_slot->item->get_description() + "\n\n");
     }
 }
 void GameManager::c_pickup(const Command &command) {
-    Item *item = nullptr;
-    if (current_room->get_inventory()->get_item_by_name(command.args[0], item)) {
-        if (item->get_is_static()) {
+    InventorySlot *item_slot = nullptr;
+    if (current_room->get_inventory()->get_item_by_name(command.args[0], item_slot)) {
+        if (item_slot->item->get_is_static()) {
             // We cannot pickup static items.
             window_manager->print_to_log("You cannot pick that up!");
         }
         else {
             // We can pickup non-static items.
-            current_room->get_inventory()->remove_item(item->get_id());
-            player_inventory.add_item(item);
-
+            player_inventory.add_item(item_slot->item, item_slot->quantity);
+            current_room->get_inventory()->remove_item(item_slot->item->get_id(), item_slot->quantity);
+            
             // Execute the room's OnItemPickup trigger
             std::string script_table_name = current_room->get_id() + "_SCRIPTS";
             LuaRef room_scripts = getGlobal(L, script_table_name.c_str());
             if (!room_scripts.isNil() && !room_scripts["OnItemPickup"].isNil()) {
-                room_scripts["OnItemPickup"](item);
+                room_scripts["OnItemPickup"](item_slot->item);
             }
 
             // Execute the items's OnPickup trigger
-            script_table_name = item->get_id() + "_SCRIPTS";
+            script_table_name = item_slot->item->get_id() + "_SCRIPTS";
             LuaRef item_scripts = getGlobal(L, script_table_name.c_str());
             if (!item_scripts.isNil() && !item_scripts["OnPickup"].isNil()) {
                 item_scripts["OnPickup"]();
             }
 
-            window_manager->print_to_log(item->get_name() + " has been added to your inventory.\n");
+            window_manager->print_to_log(item_slot->item->get_name() + " has been added to your inventory.\n");
         }
     }
     else {
@@ -318,21 +318,22 @@ void GameManager::c_pickup(const Command &command) {
     }
 }
 void GameManager::c_drop(const Command &command) {
-    Item *item = nullptr;
-    if (player_inventory.get_item_by_name(command.args[0], item)) {
-        player_inventory.remove_item(item->get_id());
-        current_room->get_inventory()->add_item(item);
-        window_manager->print_to_log("You remove " + item->get_name() + " from your knapsack and place it on the floor.\n");
+    InventorySlot *item_slot = nullptr;
+    if (player_inventory.get_item_by_name(command.args[0], item_slot)) {
+        current_room->get_inventory()->add_item(item_slot->item, item_slot->quantity);
+        player_inventory.remove_item(item_slot->item->get_id(), item_slot->quantity);
+
+        window_manager->print_to_log("You remove " + item_slot->item->get_name() + " from your knapsack and place it on the floor.\n");
 
         // Execute the room's OnItemDrop trigger
         std::string script_table_name = current_room->get_id() + "_SCRIPTS";
         LuaRef room_scripts = getGlobal(L, script_table_name.c_str());
         if (!room_scripts.isNil() && !room_scripts["OnItemDrop"].isNil()) {
-            room_scripts["OnItemDrop"](item);
+            room_scripts["OnItemDrop"](item_slot->item);
         }
 
         // Execute the items's OnDrop trigger
-        script_table_name = item->get_id() + "_SCRIPTS";
+        script_table_name = item_slot->item->get_id() + "_SCRIPTS";
         LuaRef item_scripts = getGlobal(L, script_table_name.c_str());
         if (!item_scripts.isNil() && !item_scripts["OnDrop"].isNil()) {
             item_scripts["OnDrop"]();
@@ -349,10 +350,10 @@ void GameManager::c_inventory(const Command &command) {
 
 // TODO: Implement item interactions with other items (ie dumping poo pale into city fountain)
 void GameManager::c_interaction(const Command &command) {
-    Item *item = nullptr;
-    if (current_room->get_inventory()->get_item_by_name(command.args[0], item)) {
+    InventorySlot *item_slot = nullptr;
+    if (current_room->get_inventory()->get_item_by_name(command.args[0], item_slot)) {
         // Execute the OnInteract item trigger
-        std::string script_table_name = item->get_id() + "_SCRIPTS";
+        std::string script_table_name = item_slot->item->get_id() + "_SCRIPTS";
         LuaRef item_scripts = getGlobal(L, script_table_name.c_str());
         if (!item_scripts.isNil() && !item_scripts["OnInteract"].isNil()) {
             item_scripts["OnInteract"](command.primary);

@@ -100,7 +100,7 @@ void WindowManager::print_to_log(const std::string &str) {
         else if (ch == ' ') {
             if (line_buffer.size() + word_buffer.size() + 1 > buffer_width) { // Split the line
                 log_list.add(line_buffer);
-                line_buffer = word_buffer + " ";
+                line_buffer = word_buffer + " "; // Resets the line buffer to the current word buffer + a space
                 word_buffer.clear();
             } else {
                 line_buffer += word_buffer + " "; // Don't split the line
@@ -111,7 +111,13 @@ void WindowManager::print_to_log(const std::string &str) {
         }
     }
     if (!word_buffer.empty()) {
-        line_buffer += word_buffer;
+        if (line_buffer.size() + word_buffer.size() > buffer_width) {
+            log_list.add(line_buffer);
+            log_list.add(word_buffer);
+            line_buffer.clear();
+        } else {
+            line_buffer += word_buffer;
+        }
     }
     if (!line_buffer.empty()) {
         log_list.add(line_buffer);

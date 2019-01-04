@@ -48,7 +48,7 @@ class GameManager {
     void s_player_add_item(const char *item_id);
     void s_player_add_items(const char *item_id, int quantity);
     bool s_player_remove_item(const char *item_id);
-    bool s_player_remove_items(const char *item_ids);
+    bool s_player_remove_items(const char *item_id, int quantity);
     bool s_player_has_item(const char* item_id);
     void s_create_prompt(const char *message, const char *table_name, const char* callback_function);
     void s_add_prompt_response(const char* response);

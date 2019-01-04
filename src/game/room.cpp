@@ -48,15 +48,15 @@ void Room::s_connect_rooms(const char *room_id, const char *direction) {
     room->attach_room(this, game_map->get_opposite_direction(dir));
 }
 void Room::s_add_item(const char *item_id) {
-    Item *item = nullptr;
-    if (game_map->get_inventory()->get_item(std::string(item_id), item)) {
-        room_inventory.add_item(item);
+    InventorySlot *item_slot = nullptr;
+    if (game_map->get_inventory()->get_item(std::string(item_id), item_slot)) {
+        room_inventory.add_item(item_slot->item, 1);
     }
 }
 void Room::s_add_items(const char *item_id, int quantity) {
-    Item *item = nullptr;
-    if (game_map->get_inventory()->get_item(std::string(item_id), item)) {
-        room_inventory.add_item(item);
+    InventorySlot *item_slot = nullptr;
+    if (game_map->get_inventory()->get_item(std::string(item_id), item_slot)) {
+        room_inventory.add_item(item_slot->item, quantity);
     }
 }
 void Room::s_remove_item(const char *item_id) {
@@ -91,18 +91,7 @@ std::string Room::get_description() {
     return description;
 }
 std::string Room::get_full_description() {
-    std::string desc_buffer = get_description();
-
-    auto inventory_ptr = room_inventory.get_vector_pointer();
-    for (const auto &x : (*inventory_ptr)) {
-        auto x_room_desc = x->get_room_description();
-
-        if (!x_room_desc.empty()) {
-            desc_buffer += "  " + x->get_room_description();
-        }
-    }
-
-    return desc_buffer;
+    return get_description() + room_inventory.get_room_descriptions();
 }
 void Room::set_name(const std::string& name) {
     this->name = name;
