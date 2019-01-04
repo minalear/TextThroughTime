@@ -7,6 +7,7 @@
 
 #include <string>
 #include <exception>
+#include <stdexcept>
 
 struct ItemNotFoundException : public std::exception {
     std::string message;

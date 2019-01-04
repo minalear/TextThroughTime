@@ -24,6 +24,9 @@ const char* Item::s_get_id() {
 const char* Item::s_get_name() {
     return name.c_str();
 }
+const char* Item::s_get_state() {
+    return current_state.c_str();
+}
 void Item::s_set_name(const char *name) {
     set_name(std::string(name));
 }
@@ -35,6 +38,9 @@ void Item::s_append_description(const char *desc) {
 }
 void Item::s_set_room_description(const char *desc) {
     set_room_description(std::string(desc));
+}
+void Item::s_set_state(const char *state) {
+    set_state(std::string(state));
 }
 void Item::s_add_alias(const char *alias) {
     aliases.push_back(std::string(alias));
@@ -52,6 +58,9 @@ std::string Item::get_description() {
 std::string Item::get_room_description() {
     return this->room_description;
 }
+std::string Item::get_state() {
+    return this->current_state;
+}
 bool Item::get_is_static() {
     return this->is_static;
 }
@@ -67,6 +76,9 @@ void Item::set_room_description(const std::string &desc) {
 }
 void Item::set_is_static(bool value) {
     this->is_static = value;
+}
+void Item::set_state(const std::string &state) {
+    this->current_state = state;
 }
 bool Item::check_name(const std::string &test) {
     const std::string caps_test = to_caps(test);

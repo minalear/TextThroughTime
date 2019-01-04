@@ -9,22 +9,41 @@ CELL_BED_SCRIPTS = {
 			Manager:Print("You sleep for a bit on the uncomfortable cot.")
 			Manager:ProgressTime(8, "H")
 		elseif action == "SEARCH" then
-			Manager:Print("Digging through the thin fabric, you find a single lockpick!  Perhaps you could pick the cell door?")
-			Manager:PlayerAddItems("LOCKPICK", 1)
+			if CELL_BED:GetState() == "SEARCHED" then
+				Manager:Print("You don't find much else.")
+			else
+				Manager:Print("Digging through the thin fabric, you find a single lockpick!  Perhaps you could pick the cell door?")
+				Manager:PlayerAddItems("LOCKPICK", 1)
+				CELL_BED:SetState("SEARCHED")
+			end
 		end
 	end
 }
 
 Manager:CreateItem("CELL_BUCKET", "Poo Pale")
-CELL_BUCKET:SetDescription("A bucket that prisoners defecate into.  You'll be lucky if the guard changes it out weekly.")
+CELL_BUCKET:SetDescription("A bucket that prisoners defecate into.  You'll be lucky if the guard changes it out weekly.  It is currently empty.")
 CELL_BUCKET:SetRoomDescription("A nasty looking, wooden bucket resides on the floor.  A horrendous stench wafts towards you that reminds you of excrement.")
+CELL_BUCKET:SetState("EMPTY")
 AppendItemAlias(CELL_BUCKET, {"bucket", "pale"})
 CELL_BUCKET_SCRIPTS = {
 	OnInteract = function(action)
+		current_state = CELL_BUCKET:GetState()
 		if Contains({"SNIFF", "SMELL"}, action) then
-			Manager:Print("It does not smell pleasant.  What do you expect?")
+			Manager:Print("It does not smell pleasant.  What did you expect?")
+		elseif Contains({"DUMP", "POUR"}, action) then -- Dumping the bucket out --
+			if current_state == "EMTY" then
+				Manager:Print("There isn't much in here to pour out.")
+			elseif current_state == "FULL" then
+				Manager:Print("You dump the contents of the poo pale onto the floor, splattering the excrement everywhere.  What the fuck is wrong with you?")
+				CELL_BUCKET:SetState("EMPTY")
+			end
 		elseif Contains({"USE", "POOP", "SHIT", "PISS", "PEE", "DEFECATE", "RELIEVE"}, action) then
-			Manager:Print("You relieve yourself into the pale.")
+			if current_state == "EMPTY" then
+				Manager:Print("You relieve yourself into the pale, filling the bucket.")
+				CELL_BUCKET:SetState("FULL")
+			elseif current_state == "FULL" then
+				Manager:Print("You attempt to relieve yourself into the pale, however it is already full.  It overflows a little... gross.")
+			end
 		end
 	end,
 	OnPickup = function()

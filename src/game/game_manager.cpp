@@ -52,9 +52,11 @@ GameManager::GameManager(WindowManager *window_manager) {
         .addFunction("GetID", &Item::s_get_id)
         .addFunction("GetName", &Item::s_get_name)
         .addFunction("SetName", &Item::s_set_name)
+        .addFunction("GetState", &Item::s_get_state)
         .addFunction("SetDescription", &Item::s_set_description)
         .addFunction("AppendDescription", &Item::s_append_description)
         .addFunction("SetRoomDescription", &Item::s_set_room_description)
+        .addFunction("SetState", &Item::s_set_state)
         .addFunction("IsStatic", &Item::get_is_static)
         .addFunction("SetIsStatic", &Item::set_is_static)
         .addFunction("AddAlias", &Item::s_add_alias)
@@ -145,6 +147,7 @@ void GameManager::s_create_item(const char *item_id, const char *name) {
     // Create the item
     auto new_item = new Item(std::string(item_id), std::string(name), "NULL DESCRIPTION");
     new_item->set_is_static(false);
+    new_item->set_state("BASE");
     game_map.get_inventory()->add_item(new_item);
 
     // Make the item available in the init script
@@ -155,6 +158,7 @@ void GameManager::s_create_static_item(const char *item_id, const char *name) {
     // Create the item
     auto new_item = new Item(std::string(item_id), std::string(name), "NULL DESCRIPTION");
     new_item->set_is_static(true);
+    new_item->set_state("BASE");
     game_map.get_inventory()->add_item(new_item);
 
     // Make the item available in the init script
@@ -206,22 +210,41 @@ void GameManager::c_help(const Command &command) {
     window_manager->print_to_log("This is a helpful response.");
 }
 void GameManager::c_debug(const Command &command) {
-    if (command.args[0] == "inventory") {
-        window_manager->print_to_log("== Current Player Inventory (Debug) ==");
-        window_manager->print_to_log(player_inventory.get_item_list(false));
-        window_manager->print_to_log("\n== Current Room Inventory (Debug) ==");
-        window_manager->print_to_log(current_room->get_inventory()->get_item_list(false));
-    }
-    else if (command.args[0] == "move") {
-        auto next_room = game_map.get_room(command.args[1]);
-        set_current_room(next_room);
-    }
-    else if (command.args[0] == "additem") {
-        InventorySlot *item_slot = nullptr;
-        if (game_map.get_inventory()->get_item(command.args[1], item_slot)) {
-            int quantity = (command.n_args > 1) ? std::stoi(command.args[1]) : 1;
-            player_inventory.add_item(item_slot->item, quantity);
+    try {
+        if (command.args[0] == "INVENTORY") {
+            window_manager->print_to_log("== Current Player Inventory (Debug) ==");
+            window_manager->print_to_log(player_inventory.get_item_list(false));
+            window_manager->print_to_log("\n== Current Room Inventory (Debug) ==");
+            window_manager->print_to_log(current_room->get_inventory()->get_item_list(false));
+        } else if (command.args[0] == "MOVE") {
+            auto next_room = game_map.get_room(command.args[1]);
+            set_current_room(next_room);
+        } else if (command.args[0] == "ADDITEM") {
+            InventorySlot *item_slot = nullptr;
+            if (game_map.get_inventory()->get_item(command.args[1], item_slot)) {
+                int quantity = (command.n_args > 1) ? std::stoi(command.args[1]) : 1;
+                player_inventory.add_item(item_slot->item, quantity);
+            }
+        } else if (command.args[0] == "ITEM") {
+            if (command.args[1] == "GETSTATE") { // Get the item's current state DEBUG ITEM GETSTATE [ITEM_ID]
+                InventorySlot *item_slot = nullptr;
+                if (game_map.get_inventory()->get_item(command.args[2], item_slot)) {
+                    window_manager->print_to_log(item_slot->item->get_id() + " state = " + item_slot->item->get_state());
+                } else {
+                    window_manager->print_to_log("DEBUG: Invalid item id");
+                }
+            } else if (command.args[1] == "SETSTATE") { // Set the item's current state DEBUG ITEM GETSTATE [ITEM_ID] [STATE]
+                InventorySlot *item_slot = nullptr;
+                if (game_map.get_inventory()->get_item(command.args[2], item_slot)) {
+                    item_slot->item->set_state(command.args[3]);
+                    window_manager->print_to_log(item_slot->item->get_id() + " state = " + item_slot->item->get_state());
+                } else {
+                    window_manager->print_to_log("DEBUG: Invalid item id");
+                }
+            }
         }
+    } catch (std::out_of_range &e) {
+        window_manager->print_to_log("DEBUG: Invalid number of arguments");
     }
 }
 void GameManager::c_clear(const Command &command) {
@@ -295,7 +318,7 @@ void GameManager::c_pickup(const Command &command) {
             // We can pickup non-static items.
             player_inventory.add_item(item_slot->item, item_slot->quantity);
             current_room->get_inventory()->remove_item(item_slot->item->get_id(), item_slot->quantity);
-            
+
             // Execute the room's OnItemPickup trigger
             std::string script_table_name = current_room->get_id() + "_SCRIPTS";
             LuaRef room_scripts = getGlobal(L, script_table_name.c_str());
@@ -351,8 +374,13 @@ void GameManager::c_inventory(const Command &command) {
 // TODO: Implement item interactions with other items (ie dumping poo pale into city fountain)
 void GameManager::c_interaction(const Command &command) {
     InventorySlot *item_slot = nullptr;
-    if (current_room->get_inventory()->get_item_by_name(command.args[0], item_slot)) {
-        // Execute the OnInteract item trigger
+    // Attempt to find the item by first searching the room and then the player's inventory
+    if (!current_room->get_inventory()->get_item_by_name(command.args[0], item_slot)) {
+        player_inventory.get_item_by_name(command.args[0], item_slot);
+    }
+
+    // If the item is found, execute the OnInteract script function
+    if (item_slot != nullptr) {
         std::string script_table_name = item_slot->item->get_id() + "_SCRIPTS";
         LuaRef item_scripts = getGlobal(L, script_table_name.c_str());
         if (!item_scripts.isNil() && !item_scripts["OnInteract"].isNil()) {

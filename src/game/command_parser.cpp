@@ -11,7 +11,7 @@ Command::Command() {
     args = nullptr;
     n_args = 0;
 
-    superfluous_list    = {"THE", "IN", "INTO", "A", "AN", "AT"};
+    superfluous_list    = {"THE", "IN", "INTO", "A", "AN", "AT", "OUT"};
     move_list           = {"MOVE", "GO", "TRAVEL", "ENTER"};
     drop_list           = {"DROP", "REMOVE"};
     pickup_list         = {"PICKUP", "TAKE", "GRAB"};
