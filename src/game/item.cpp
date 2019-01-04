@@ -27,6 +27,12 @@ const char* Item::s_get_name() {
 const char* Item::s_get_state() {
     return current_state.c_str();
 }
+const char* Item::s_get_str_variable(const char *key) {
+    return string_variables.get_variable(std::string(key)).c_str();
+}
+int Item::s_get_int_variable(const char *key) {
+    return int_variables.get_variable(std::string(key));
+}
 void Item::s_set_name(const char *name) {
     set_name(std::string(name));
 }
@@ -44,6 +50,12 @@ void Item::s_set_state(const char *state) {
 }
 void Item::s_add_alias(const char *alias) {
     aliases.push_back(std::string(alias));
+}
+void Item::s_set_str_variable(const char *key, const char *value) {
+    string_variables.set_variable(std::string(key), std::string(value));
+}
+void Item::s_set_int_variable(const char *key, int value) {
+    int_variables.set_variable(std::string(key), value);
 }
 
 std::string Item::get_id() {

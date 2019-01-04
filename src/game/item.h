@@ -7,6 +7,7 @@
 
 #include <string>
 #include <vector>
+#include "game_variable_map.h"
 
 class Item {
     std::string id; // The unique ID of the item
@@ -15,7 +16,11 @@ class Item {
     std::string room_description; // The description of the item while it's in the room.  Appears when the room is examined.
     std::string current_state; // Used to define different behaviors depending on the item's current state
 
-    std::vector<std::string> aliases;
+    std::vector<std::string> aliases; // Alternative short names that can be used to refer to this item
+
+    GameVariableMap<std::string> string_variables;
+    GameVariableMap<int>         int_variables;
+
     bool is_static = false;
 
 public:
@@ -26,6 +31,8 @@ public:
     const char* s_get_id();
     const char* s_get_name();
     const char* s_get_state();
+    const char* s_get_str_variable(const char *key);
+    int s_get_int_variable(const char *key);
 
     void s_set_name(const char *name);
     void s_set_description(const char *desc);
@@ -33,6 +40,8 @@ public:
     void s_set_room_description(const char *desc);
     void s_set_state(const char *state);
     void s_add_alias(const char *alias);
+    void s_set_str_variable(const char *key, const char *value);
+    void s_set_int_variable(const char *key, int value);
 
     std::string get_id();
     std::string get_name();

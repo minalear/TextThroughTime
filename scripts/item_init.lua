@@ -1,3 +1,22 @@
+-- Debug Items --
+Manager:CreateStaticItem("DEBUG_ITEM_001", "Debug")
+DEBUG_ITEM_001:SetIntVar("COUNTER", 0)
+DEBUG_ITEM_001:SetDescription("The counter on the object reads " .. tostring(DEBUG_ITEM_001:GetIntVar("COUNTER")))
+DEBUG_ITEM_001_SCRIPTS = {
+	OnInteract = function(action)
+		counter_value = DEBUG_ITEM_001:GetIntVar("COUNTER")
+		if action == "INCREMENT" then
+			DEBUG_ITEM_001:SetIntVar("COUNTER", counter_value+1)
+			Manager:Print("You increase the counter of the object by one.")
+			DEBUG_ITEM_001:SetDescription("The counter on the object reads " .. tostring(DEBUG_ITEM_001:GetIntVar("COUNTER")))
+		elseif action == "DECREMENT" then
+			DEBUG_ITEM_001:SetIntVar("COUNTER", counter_value-1)
+			Manager:Print("You decrease the counter of the object by one.")
+			DEBUG_ITEM_001:SetDescription("The counter on the object reads " .. tostring(DEBUG_ITEM_001:GetIntVar("COUNTER")))
+		end
+	end
+}
+
 -- Dungeon Cell --
 Manager:CreateStaticItem("CELL_BED", "Bed")
 CELL_BED:SetDescription("A flat of wood with hay strewn about can hardly be called a bed, but this is all that you have.")
