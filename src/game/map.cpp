@@ -56,3 +56,6 @@ Room *Map::get_room(const std::string &id) {
 Inventory* Map::get_inventory() {
     return &all_items;
 }
+NPCContainer *Map::get_npc_container() {
+    return &all_npcs;
+}

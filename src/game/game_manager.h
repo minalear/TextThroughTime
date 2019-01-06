@@ -10,9 +10,11 @@
 #include <vector>
 #include "map.h"
 #include "room.h"
+#include "npc.h"
 #include "../window_manager.h"
 #include "inventory.h"
 #include "command_parser.h"
+#include "game_variable_map.h"
 
 class lua_State;
 
@@ -24,7 +26,7 @@ struct Prompt {
 };
 
 enum struct GAME_STATES {
-    TRAVEL, PROMPT
+    TRAVEL, PROMPT, DIALOG
 };
 
 class GameManager {
@@ -38,6 +40,9 @@ class GameManager {
     Prompt current_prompt;
     GAME_STATES current_state;
 
+    GameVariableMap<std::string> global_str_variables;
+    GameVariableMap<int>         global_int_variables;
+
     // Scripting functions
     void s_print(const char *msg);
     void s_progress_time(int amount, char type);
@@ -45,6 +50,7 @@ class GameManager {
     void s_create_room(const char *room_id, const char *name);
     void s_create_item(const char *item_id, const char *name);
     void s_create_static_item(const char *item_id, const char *name);
+    void s_create_npc(const char *npc_id, const char *name);
     void s_player_add_item(const char *item_id);
     void s_player_add_items(const char *item_id, int quantity);
     bool s_player_remove_item(const char *item_id);
@@ -53,6 +59,10 @@ class GameManager {
     void s_create_prompt(const char *message, const char *table_name, const char* callback_function);
     void s_add_prompt_response(const char* response);
     void s_display_prompt();
+    void s_set_str_variable(const char *key, const char *value);
+    void s_set_int_variable(const char *key, int value);
+    const char* s_get_str_variable(const char *key);
+    int         s_get_int_variable(const char *key);
 
     // Command functions
     void c_help(const Command &command);
@@ -60,10 +70,11 @@ class GameManager {
     void c_clear(const Command &command);
     void c_move(const Command &command);
     void c_examine_room(const Command &command);
-    void c_examine_item(const Command &command);
+    void c_examine_object(const Command &command);
     void c_pickup(const Command &command);
     void c_drop(const Command &command);
     void c_inventory(const Command &command);
+    void c_talk(const Command &command);
     void c_interaction(const Command &command);
 
     void display_room();

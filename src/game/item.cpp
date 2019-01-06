@@ -49,7 +49,7 @@ void Item::s_set_state(const char *state) {
     set_state(std::string(state));
 }
 void Item::s_add_alias(const char *alias) {
-    aliases.push_back(std::string(alias));
+    aliases.emplace_back(std::string(alias));
 }
 void Item::s_set_str_variable(const char *key, const char *value) {
     string_variables.set_variable(std::string(key), std::string(value));
@@ -93,6 +93,7 @@ void Item::set_state(const std::string &state) {
     this->current_state = state;
 }
 bool Item::check_name(const std::string &test) {
+    // Check the name and all aliases to see if it matches the provided name
     const std::string caps_test = to_caps(test);
     if (to_caps(name) == caps_test) return true;
     for (const auto &x : aliases) {

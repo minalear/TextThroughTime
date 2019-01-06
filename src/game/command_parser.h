@@ -8,7 +8,10 @@
 #include "../tokenizer.h"
 
 enum struct COMMAND_TYPES {
-    DEBUG, HELP, CLEAR_SCREEN, MOVE, DROP, PICKUP, PLACE, EXAMINE_ITEM, EXAMINE_ROOM, INVENTORY, INTERACTION, NONE
+    DEBUG, HELP, CLEAR_SCREEN, MOVE,
+    DROP, PICKUP, PLACE, EXAMINE_ROOM,
+    EXAMINE_OBJECT, INVENTORY, INTERACTION,
+    TALK, NONE
 };
 
 struct Command {
@@ -19,8 +22,6 @@ struct Command {
 
     Command();
     ~Command();
-
-
 };
 
 Command process_input(const TokenGroup &tokens);

@@ -3,6 +3,11 @@ function AppendItemAlias(item, aliases)
 		item:AddAlias(aliases[i])
 	end
 end
+function AppendNPCAlias(npc, aliases)
+	for i = 1, #aliases do
+		npc:AddAlias(aliases[i])
+	end
+end
 function AppendPromptResponses(responses)
 	for i = 1, #responses do
 		Manager:AddPromptResponse(responses[i])

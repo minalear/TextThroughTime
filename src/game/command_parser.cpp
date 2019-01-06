@@ -4,14 +4,15 @@
 
 #include "command_parser.h"
 
-std::vector<std::string> superfluous_list, move_list, drop_list, pickup_list, place_list, examine_list, direction_list, room_list, inventory_list;
+std::vector<std::string> superfluous_list, move_list, drop_list, pickup_list, place_list,
+                         examine_list, direction_list, room_list, inventory_list, talk_list;
 
 Command::Command() {
     type = COMMAND_TYPES::NONE;
     args = nullptr;
     n_args = 0;
 
-    superfluous_list    = {"THE", "IN", "INTO", "A", "AN", "AT", "OUT"};
+    superfluous_list    = {"THE", "IN", "INTO", "A", "AN", "AT", "OUT", "TO", "WITH"};
     move_list           = {"MOVE", "GO", "TRAVEL", "ENTER"};
     drop_list           = {"DROP", "REMOVE"};
     pickup_list         = {"PICKUP", "TAKE", "GRAB"};
@@ -20,6 +21,7 @@ Command::Command() {
     direction_list      = {"NORTH", "SOUTH", "EAST", "WEST"};
     room_list           = {"ROOM", "LOCATION", "AREA"};
     inventory_list      = {"INVENTORY"};
+    talk_list           = {"TALK", "SPEAK", "CONVERSE"};
 }
 Command::~Command() {
     delete [] args;
@@ -50,17 +52,13 @@ Command process_input(const TokenGroup &tokens) {
     // Attempt to figure out the command and set the type
     if (contains(command.primary, move_list)) {
         command.type = COMMAND_TYPES::MOVE;
-    }
-    else if (contains(command.primary, drop_list)) {
+    } else if (contains(command.primary, drop_list)) {
         command.type = COMMAND_TYPES::DROP;
-    }
-    else if (contains(command.primary, pickup_list)) {
+    } else if (contains(command.primary, pickup_list)) {
         command.type = COMMAND_TYPES::PICKUP;
-    }
-    else if (contains(command.primary, place_list)) {
+    } else if (contains(command.primary, place_list)) {
         command.type = COMMAND_TYPES::PLACE;
-    }
-    else if (contains(command.primary, examine_list)) {
+    } else if (contains(command.primary, examine_list)) {
         // If the player just types "look" or types "inspect area"
         if (command.n_args == 0 || contains<std::string>(command.args[0], room_list)) {
             command.type = COMMAND_TYPES::EXAMINE_ROOM;
@@ -69,20 +67,19 @@ Command process_input(const TokenGroup &tokens) {
         else if (contains<std::string>(command.args[0], inventory_list)) {
             command.type = COMMAND_TYPES::INVENTORY;
         }
+        // Examine either an item in the room, your inventory, or an NPC
         else {
-            command.type = COMMAND_TYPES::EXAMINE_ITEM;
+            command.type = COMMAND_TYPES::EXAMINE_OBJECT;
         }
-    }
-    else if (contains(command.primary, inventory_list)) {
+    } else if (contains(command.primary, inventory_list)) {
         command.type = COMMAND_TYPES::INVENTORY;
-    }
-    else if (command.primary == "CLEAR") {
+    } else if (contains(command.primary, talk_list)) {
+        command.type = COMMAND_TYPES::TALK;
+    } else if (command.primary == "CLEAR") {
         command.type = COMMAND_TYPES::CLEAR_SCREEN;
-    }
-    else if (command.primary == "DEBUG") {
+    } else if (command.primary == "DEBUG") {
         command.type = COMMAND_TYPES::DEBUG;
-    }
-    else if (command.primary == "HELP") {
+    } else if (command.primary == "HELP") {
         command.type = COMMAND_TYPES::HELP;
     }
 

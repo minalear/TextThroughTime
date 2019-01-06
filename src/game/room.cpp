@@ -58,6 +58,8 @@ void Room::s_add_items(const char *item_id, int quantity) {
     if (game_map->get_inventory()->get_item(std::string(item_id), item_slot)) {
         room_inventory.add_item(item_slot->item, quantity);
     }
+
+    // TODO: Add error checking for invalid Item ID
 }
 void Room::s_remove_item(const char *item_id) {
     room_inventory.remove_item(item_id);
@@ -65,6 +67,18 @@ void Room::s_remove_item(const char *item_id) {
 void Room::s_remove_items(const char *item_id, int quantity) {
     room_inventory.remove_item(item_id);
 }
+void Room::s_add_npc(const char *npc_id) {
+    NPC *npc = nullptr;
+    if (game_map->get_npc_container()->get_npc(std::string(npc_id), npc)) {
+        npcs.add_npc(npc);
+    }
+
+    // TODO: Add error checking for invalid NPC ID
+}
+void Room::s_remove_npc(const char *npc_id) {
+    npcs.remove_npc(std::string(npc_id));
+}
+
 void Room::attach_room(Room *room, Directions direction) {
     if (connected_rooms.count(direction) == 0) {
         connected_rooms.insert(std::pair<Directions, Room*>(direction, room));
@@ -91,7 +105,7 @@ std::string Room::get_description() {
     return description;
 }
 std::string Room::get_full_description() {
-    return get_description() + room_inventory.get_room_descriptions();
+    return get_description() + room_inventory.get_room_descriptions() + npcs.get_room_descriptions();
 }
 void Room::set_name(const std::string& name) {
     this->name = name;
@@ -108,4 +122,7 @@ Room *Room::get_room(Directions direction) {
 }
 Inventory* Room::get_inventory() {
     return &room_inventory;
+}
+NPCContainer *Room::get_npc_container() {
+    return &npcs;
 }

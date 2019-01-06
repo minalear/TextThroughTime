@@ -12,7 +12,9 @@ DUNG_CELL:AddItem("CELL_BRICK")
 DUNG_CELL:AddItem("CELL_DOOR")
 DUNG_CELL:AddItem("CELL_BED")
 DUNG_CELL:AddItem("CELL_BUCKET")
-DUNG_CELL:AddItem("DEBUG_ITEM_001")
+--DUNG_CELL:AddItem("DEBUG_PROMPT_ITEM")
+
+DUNG_CELL:AddNPC("DEBUG_SANTA")
 
 -- Dungeon Hallway --
 Manager:CreateRoom("DUNG_HALLWAY", "Dungeon Hallway")

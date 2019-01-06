@@ -7,12 +7,15 @@
 
 #include <string>
 #include "map.h"
+#include "npc.h"
 #include "inventory.h"
+#include "npc_container.h"
 
 class Room {
     std::map<Directions, Room*> connected_rooms;
     std::string id, name, description;
     Inventory room_inventory;
+    NPCContainer npcs;
 
     Map *game_map;
 
@@ -32,6 +35,8 @@ public:
     void s_add_items(const char *item_id, int quantity);
     void s_remove_item(const char *item_id);
     void s_remove_items(const char *item_id, int quantity);
+    void s_add_npc(const char *npc_id);
+    void s_remove_npc(const char *npc_id);
 
     void attach_room(Room* room, Directions direction);
 
@@ -50,6 +55,7 @@ public:
     void set_map(Map *map);
 
     Inventory* get_inventory();
+    NPCContainer* get_npc_container();
 };
 
 #endif //TEXTTHROUGHTIME_ROOM_H

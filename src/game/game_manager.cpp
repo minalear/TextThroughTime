@@ -26,6 +26,7 @@ GameManager::GameManager(WindowManager *window_manager) {
         .addFunction("CreateRoom", &GameManager::s_create_room)
         .addFunction("CreateItem", &GameManager::s_create_item)
         .addFunction("CreateStaticItem", &GameManager::s_create_static_item)
+        .addFunction("CreateNPC", &GameManager::s_create_npc)
         .addFunction("PlayerAddItem", &GameManager::s_player_add_item)
         .addFunction("PlayerAddItems", &GameManager::s_player_add_items)
         .addFunction("PlayerRemoveItem", &GameManager::s_player_remove_item)
@@ -47,6 +48,8 @@ GameManager::GameManager(WindowManager *window_manager) {
         .addFunction("AddItems", &Room::s_add_items)
         .addFunction("RemoveItem", &Room::s_remove_item)
         .addFunction("RemoveItems", &Room::s_remove_items)
+        .addFunction("AddNPC", &Room::s_add_npc)
+        .addFunction("RemoveNPC", &Room::s_remove_npc)
     .endClass()
     .beginClass<Item>("Item")
         .addFunction("GetID", &Item::s_get_id)
@@ -64,15 +67,37 @@ GameManager::GameManager(WindowManager *window_manager) {
         .addFunction("IsStatic", &Item::get_is_static)
         .addFunction("SetIsStatic", &Item::set_is_static)
         .addFunction("AddAlias", &Item::s_add_alias)
+    .endClass()
+    .beginClass<NPC>("NPC")
+        .addFunction("GetID", &NPC::s_get_id)
+        .addFunction("GetName", &NPC::s_get_name)
+        .addFunction("GetDescription", &NPC::s_get_description)
+        .addFunction("GetRoomDescription", &NPC::s_get_room_description)
+        .addFunction("GetState", &NPC::s_get_state)
+        .addFunction("GetStrVar", &NPC::s_get_str_variable)
+        .addFunction("GetIntVar", &NPC::s_get_int_variable)
+        .addFunction("SetName", &NPC::s_set_name)
+        .addFunction("SetDescription", &NPC::s_set_description)
+        .addFunction("SetRoomDescription", &NPC::s_set_room_description)
+        .addFunction("SetState", &NPC::s_set_state)
+        .addFunction("AddAlias", &NPC::s_add_alias)
+        .addFunction("SetStrVar", &NPC::s_set_str_variable)
+        .addFunction("SetIntVar", &NPC::s_set_int_variable)
     .endClass();
 
     push(L, this);
     lua_setglobal(L, "Manager");
 
-    luaL_dofile(L, "scripts/init.lua");
-    lua_pcall(L, 0, 0, 0);
+    try {
+        luaL_dofile(L, "scripts/init.lua");
+        auto result = lua_pcall(L, 0, 0, 0);
+        //if (result != 0) throw LuaError(L);
 
-    initialize_game();
+        initialize_game();
+    } catch (LuaError &e) {
+        std::cout << e.what() << std::endl;
+        window_manager->print_to_log(std::string(e.what()));
+    }
 }
 GameManager::~GameManager() { }
 
@@ -83,7 +108,8 @@ void GameManager::initialize_game() {
 
 void GameManager::handle_input(const std::string &input) {
     // Process player input into a Command
-    auto command = process_input(tokenize(input));
+    auto tokenized_input = tokenize(input);
+    auto command = process_input(tokenized_input);
 
     if (current_state == GAME_STATES::TRAVEL) {
         if (command.type == COMMAND_TYPES::NONE) {
@@ -104,10 +130,12 @@ void GameManager::handle_input(const std::string &input) {
             // c_place(command);
         } else if (command.type == COMMAND_TYPES::EXAMINE_ROOM) {
             c_examine_room(command);
-        } else if (command.type == COMMAND_TYPES::EXAMINE_ITEM) {
-            c_examine_item(command);
+        } else if (command.type == COMMAND_TYPES::EXAMINE_OBJECT) {
+            c_examine_object(command);
         } else if (command.type == COMMAND_TYPES::INVENTORY) {
             c_inventory(command);
+        } else if (command.type == COMMAND_TYPES::TALK) {
+            c_talk(command);
         } else if (command.type == COMMAND_TYPES::INTERACTION) {
             c_interaction(command);
         }
@@ -116,7 +144,7 @@ void GameManager::handle_input(const std::string &input) {
         if (prompt_callback(command.primary)) {
             current_state = GAME_STATES::TRAVEL;
             window_manager->print_to_log("\n\n");
-            display_room();
+            // display_room();
         } else {
             window_manager->print_to_log("Invalid response.\n\n");
             display_prompt();
@@ -124,6 +152,8 @@ void GameManager::handle_input(const std::string &input) {
 
         // TODO: Do better error checking
         // just calling prompt_callback could be an error if the script isn't function correctly
+    } else if (current_state == GAME_STATES::DIALOG) {
+
     }
 }
 
@@ -169,6 +199,16 @@ void GameManager::s_create_static_item(const char *item_id, const char *name) {
     push(L, new_item);
     lua_setglobal(L, item_id);
 }
+void GameManager::s_create_npc(const char *npc_id, const char *name) {
+    // Create the NPC
+    auto new_npc = new NPC(std::string(npc_id), std::string(name), "NULL DESCRIPTION");
+    new_npc->set_state("BASE");
+    game_map.get_npc_container()->add_npc(new_npc);
+
+    // Make the NPC available in the script
+    push(L, new_npc);
+    lua_setglobal(L, npc_id);
+}
 void GameManager::s_player_add_item(const char *item_id) {
     InventorySlot *item_slot = nullptr;
     if (game_map.get_inventory()->get_item(item_id, item_slot)) {
@@ -207,6 +247,18 @@ void GameManager::s_add_prompt_response(const char* response) {
 }
 void GameManager::s_display_prompt() {
     display_prompt();
+}
+void GameManager::s_set_str_variable(const char *key, const char *value) {
+    global_str_variables.set_variable(std::string(key), std::string(value));
+}
+void GameManager::s_set_int_variable(const char *key, int value) {
+    global_int_variables.set_variable(std::string(key), value);
+}
+const char* GameManager::s_get_str_variable(const char *key) {
+    return global_str_variables.get_variable(std::string(key)).c_str();
+}
+int GameManager::s_get_int_variable(const char *key) {
+    return global_int_variables.get_variable(std::string(key));
 }
 
 // Command Functions
@@ -302,13 +354,16 @@ void GameManager::c_examine_room(const Command &command) {
         room_scripts["OnLook"]();
     }
 }
-void GameManager::c_examine_item(const Command &command) {
+void GameManager::c_examine_object(const Command &command) {
     InventorySlot *item_slot = nullptr;
+    NPC *npc = nullptr;
+
     if (player_inventory.get_item_by_name(command.args[0], item_slot)) {
         window_manager->print_to_log(item_slot->item->get_description() + "\n\n");
-    }
-    else if (current_room->get_inventory()->get_item_by_name(command.args[0], item_slot)) {
+    } else if (current_room->get_inventory()->get_item_by_name(command.args[0], item_slot)) {
         window_manager->print_to_log(item_slot->item->get_description() + "\n\n");
+    } else if (current_room->get_npc_container()->get_npc_by_name(command.args[0], npc)) {
+        window_manager->print_to_log(npc->get_description() + "\n\n");
     }
 }
 void GameManager::c_pickup(const Command &command) {
@@ -317,8 +372,7 @@ void GameManager::c_pickup(const Command &command) {
         if (item_slot->item->get_is_static()) {
             // We cannot pickup static items.
             window_manager->print_to_log("You cannot pick that up!");
-        }
-        else {
+        } else {
             // We can pickup non-static items.
             player_inventory.add_item(item_slot->item, item_slot->quantity);
             current_room->get_inventory()->remove_item(item_slot->item->get_id(), item_slot->quantity);
@@ -365,14 +419,16 @@ void GameManager::c_drop(const Command &command) {
         if (!item_scripts.isNil() && !item_scripts["OnDrop"].isNil()) {
             item_scripts["OnDrop"]();
         }
-    }
-    else {
+    } else {
         window_manager->print_to_log("There is no item to drop by that name.\n");
     }
 }
 void GameManager::c_inventory(const Command &command) {
     window_manager->print_to_log("== Current Inventory ==");
     window_manager->print_to_log(player_inventory.get_item_list());
+}
+void GameManager::c_talk(const Command &command) {
+
 }
 
 // TODO: Implement item interactions with other items (ie dumping poo pale into city fountain)

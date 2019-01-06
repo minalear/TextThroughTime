@@ -16,7 +16,7 @@ void Inventory::add_item(Item *item) {
         slot->quantity += 1;
     } else {
         slot = new InventorySlot(item, 1);
-        items.push_back(slot);
+        items.emplace_back(slot);
     }
 }
 void Inventory::add_item(Item *item, int quantity) {
@@ -25,7 +25,7 @@ void Inventory::add_item(Item *item, int quantity) {
         slot->quantity += 1;
     } else {
         slot = new InventorySlot(item, quantity);
-        items.push_back(slot);
+        items.emplace_back(slot);
     }
 }
 bool Inventory::remove_item(const std::string &unique_id) {

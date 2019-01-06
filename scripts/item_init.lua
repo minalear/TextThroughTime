@@ -1,18 +1,48 @@
 -- Debug Items --
-Manager:CreateStaticItem("DEBUG_ITEM_001", "Debug")
-DEBUG_ITEM_001:SetIntVar("COUNTER", 0)
-DEBUG_ITEM_001:SetDescription("The counter on the object reads " .. tostring(DEBUG_ITEM_001:GetIntVar("COUNTER")))
-DEBUG_ITEM_001_SCRIPTS = {
+Manager:CreateItem("COAL", "Coal")
+COAL:SetDescription("A hard, lumpy rock given to naughtly little boys and girls.")
+COAL_SCRIPTS = {
 	OnInteract = function(action)
-		counter_value = DEBUG_ITEM_001:GetIntVar("COUNTER")
-		if action == "INCREMENT" then
-			DEBUG_ITEM_001:SetIntVar("COUNTER", counter_value+1)
-			Manager:Print("You increase the counter of the object by one.")
-			DEBUG_ITEM_001:SetDescription("The counter on the object reads " .. tostring(DEBUG_ITEM_001:GetIntVar("COUNTER")))
-		elseif action == "DECREMENT" then
-			DEBUG_ITEM_001:SetIntVar("COUNTER", counter_value-1)
-			Manager:Print("You decrease the counter of the object by one.")
-			DEBUG_ITEM_001:SetDescription("The counter on the object reads " .. tostring(DEBUG_ITEM_001:GetIntVar("COUNTER")))
+		if Contains({"EAT", "SWALLOW", "CONSUME"}, action) then
+			Manager:Print("What the fuck... you eat the coal?")
+			Manager:PlayerRemoveItem("COAL")
+		end
+	end
+}
+
+Manager:CreateItem("PRESENT", "Present")
+PRESENT:SetDescription("A beautifully wrapped gift granted to you by the one and only Santa Claus!")
+PRESENT_SCRIPTS = {
+	OnInteract = function(action)
+		if Contains({"OPEN", "UNWRAP"}, action) then
+			Manager:Print("You unwrap the present to reveal a lump of coal!")
+			Manager:PlayerRemoveItem("PRESENT")
+			Manager:PlayerAddItem("COAL")
+		end
+	end
+}
+
+-- Prompt Example --
+Manager:CreateStaticItem("DEBUG_PROMPT_ITEM", "Billboard")
+DEBUG_PROMPT_ITEM:SetRoomDescription("A billboard with questions appears before you.")
+DEBUG_PROMPT_ITEM_SCRIPTS = {
+	OnInteract = function(action)
+		if action == "READ" then
+			Manager:CreatePrompt("Sup dawg, this is a prompt.  What do you choose?", "DEBUG_PROMPT_ITEM_SCRIPTS", "PromptCallback")
+			AppendPromptResponses({"Nothing.", "Everything."})
+			Manager:DisplayPrompt()
+		end
+	end,
+	PromptCallback = function(reply)
+		if Contains({"1", "2"}, reply) then 
+			if reply == "1" then
+				Manager:Print("That is a wise choice.")
+			else
+				Manager:Print("WRONG!")
+			end
+			return true
+		else
+			return false
 		end
 	end
 }
