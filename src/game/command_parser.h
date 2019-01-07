@@ -24,6 +24,7 @@ struct Command {
     ~Command();
 };
 
+void init_lists();
 Command process_input(const TokenGroup &tokens);
 
 #endif //TEXTTHROUGHTIME_COMMAND_PARSER_H

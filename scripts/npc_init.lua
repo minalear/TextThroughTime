@@ -4,19 +4,7 @@ AppendNPCAlias(DEBUG_SANTA, {"SANTA", "CLAUS", "JOLLY MAN", "JOLLY LOOKING MAN"}
 DEBUG_SANTA:SetDescription("He appears to be a jolly looking man in a bright red coat, currently carrying large canvas sack full of rectangular objects.  Perhaps this is the legendary Santa Claus???")
 DEBUG_SANTA:SetRoomDescription("A jolly looking man stands near the corner.")
 
---DEBUG_SANTA:CreateDialogState("INTRO")
---DEBUG_SANTA:SetDialogString("INTRO", "Hello there!  How may I help you?")
---DEBUG_SANTA:AddDialogOption("INTRO", "You can bugger off old man.")
---DEBUG_SANTA:AddDialogOption("INTRO", "Can you give me some presents?")
---DEBUG_SANTA:AddDialogOption("INTRO", "Goodbye!")
-
---DEBUG_SANTA:CreateDialogState("GIFT_GIVEN")
---DEBUG_SANTA:CreateDialogString("GIFT_GIVEN", "Scram kid, you already got your present.")
-
---DEBUG_SANTA:SetDialogState("INTRO")
-
-
-DEBUG_SANTA:SetDialogTable("DEBUG_SANTA_DIALOG")
+DEBUG_SANTA:SetDialogScript("DEBUG_SANTA_DIALOG")
 DEBUG_SANTA:CreateDialogState("INTRO")
 DEBUG_SANTA:SetDialogString("INTRO", "Hello there!  How may I help you?")
 DEBUG_SANTA:AddDialogOption("INTRO", "You can bugger off old man!")
@@ -24,19 +12,42 @@ DEBUG_SANTA:AddDialogOption("INTRO", "Can you give me some presents?")
 DEBUG_SANTA:AddDialogOption("INTRO", "Goodbye.")
 
 DEBUG_SANTA:CreateDialogState("GIFT_GIVEN")
-DEBUG_SANTA:SetDialogString("Scram kid, you already got your present.")
+DEBUG_SANTA:SetDialogString("GIFT_GIVEN", "Scram kid, you already got your present.")
 DEBUG_SANTA:AddDialogOption("GIFT_GIVEN", "Goodbye.")
+DEBUG_SANTA:SetDialogState("INTRO")
 
 DEBUG_SANTA_DIALOG = {
 	OnTalk = function() 
-		Manager:ShowDialog("DEBUG_SANTA", "INTRO")
-	end
+		Manager:DisplayDialog("DEBUG_SANTA")
+	end,
 	OnReply = function(reply)
-		if DEBUG_SANTA:GetDialogState() == "INTRO" then
-			if reply 
-			DEBUG_SANTA:SetDialogState("GIFT_GIVEN")
-		elseif DEBUG_SANTA:GetDialogState() == "GIFT_GIVEN" then
+		current_dialog_state = DEBUG_SANTA:GetDialogState()
+		if current_dialog_state == "INTRO" then
+			if reply == "1" then
+				Manager:NPCSpeak("DEBUG_SANTA", "It seems you have been a naughty boy... a very naughty boy UwU")
+				Manager:PlayerAddItem("COAL")
+				Manager:Print("You received a piece of coal from Santa Claus.")
+				Manager:ExitDialog()
+				DEBUG_SANTA:SetDialogState("GIFT_GIVEN")
+				return true
+			elseif reply == "2" then
+				Manager:NPCSpeak("DEBUG_SANTA", "Sure, my friend!  Here you go!")
+				Manager:PlayerAddItem("PRESENT")
+				Manager:Print("You received a magnificiently wrapped present from Santa Claus!")
+				Manager:ExitDialog()
+				DEBUG_SANTA:SetDialogState("GIFT_GIVEN")
+				return true
+			else
+				Manager:NPCSpeak("DEBUG_SANTA", "Whatever, kid.")
+				Manager:ExitDialog()
+				return true
+			end
 		
-		elseif 
+		elseif current_dialog_state == "GIFT_GIVEN" then
+			Manager:ExitDialog()
+			return true
+		end
+		
+		return false
 	end
 }

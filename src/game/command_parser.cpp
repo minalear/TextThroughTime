@@ -7,11 +7,7 @@
 std::vector<std::string> superfluous_list, move_list, drop_list, pickup_list, place_list,
                          examine_list, direction_list, room_list, inventory_list, talk_list;
 
-Command::Command() {
-    type = COMMAND_TYPES::NONE;
-    args = nullptr;
-    n_args = 0;
-
+void init_lists() {
     superfluous_list    = {"THE", "IN", "INTO", "A", "AN", "AT", "OUT", "TO", "WITH"};
     move_list           = {"MOVE", "GO", "TRAVEL", "ENTER"};
     drop_list           = {"DROP", "REMOVE"};
@@ -22,6 +18,12 @@ Command::Command() {
     room_list           = {"ROOM", "LOCATION", "AREA"};
     inventory_list      = {"INVENTORY"};
     talk_list           = {"TALK", "SPEAK", "CONVERSE"};
+}
+
+Command::Command() {
+    type = COMMAND_TYPES::NONE;
+    args = nullptr;
+    n_args = 0;
 }
 Command::~Command() {
     delete [] args;

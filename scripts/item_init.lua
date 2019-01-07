@@ -76,21 +76,21 @@ CELL_BUCKET:SetState("EMPTY")
 AppendItemAlias(CELL_BUCKET, {"bucket", "pale"})
 CELL_BUCKET_SCRIPTS = {
 	OnInteract = function(action)
-		current_state = CELL_BUCKET:GetState()
+		current_game_state = CELL_BUCKET:GetState()
 		if Contains({"SNIFF", "SMELL"}, action) then
 			Manager:Print("It does not smell pleasant.  What did you expect?")
 		elseif Contains({"DUMP", "POUR"}, action) then -- Dumping the bucket out --
-			if current_state == "EMTY" then
+			if current_game_state == "EMTY" then
 				Manager:Print("There isn't much in here to pour out.")
-			elseif current_state == "FULL" then
+			elseif current_game_state == "FULL" then
 				Manager:Print("You dump the contents of the poo pale onto the floor, splattering the excrement everywhere.  What the fuck is wrong with you?")
 				CELL_BUCKET:SetState("EMPTY")
 			end
 		elseif Contains({"USE", "POOP", "SHIT", "PISS", "PEE", "DEFECATE", "RELIEVE"}, action) then
-			if current_state == "EMPTY" then
+			if current_game_state == "EMPTY" then
 				Manager:Print("You relieve yourself into the pale, filling the bucket.")
 				CELL_BUCKET:SetState("FULL")
-			elseif current_state == "FULL" then
+			elseif current_game_state == "FULL" then
 				Manager:Print("You attempt to relieve yourself into the pale, however it is already full.  It overflows a little... gross.")
 			end
 		end

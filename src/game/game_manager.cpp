@@ -14,6 +14,8 @@ GameManager::GameManager(WindowManager *window_manager) {
     this->window_manager = window_manager;
     current_room = nullptr;
 
+    init_lists(); // Initialize command lists
+
     L = luaL_newstate();
     luaL_openlibs(L);
 
@@ -21,6 +23,7 @@ GameManager::GameManager(WindowManager *window_manager) {
         .addFunction("Rand", minalear::rand_int)
     .beginClass<GameManager>("GameManager")
         .addFunction("Print", &GameManager::s_print)
+        .addFunction("NPCSpeak", &GameManager::s_npc_speak)
         .addFunction("ProgressTime", &GameManager::s_progress_time)
         .addFunction("SetCurrentRoom", &GameManager::s_set_current_room)
         .addFunction("CreateRoom", &GameManager::s_create_room)
@@ -35,6 +38,8 @@ GameManager::GameManager(WindowManager *window_manager) {
         .addFunction("CreatePrompt", &GameManager::s_create_prompt)
         .addFunction("AddPromptResponse", &GameManager::s_add_prompt_response)
         .addFunction("DisplayPrompt", &GameManager::s_display_prompt)
+        .addFunction("DisplayDialog", &GameManager::s_display_dialog)
+        .addFunction("ExitDialog", &GameManager::s_exit_dialog)
         .addFunction("SetStrVar", &GameManager::s_set_str_variable)
         .addFunction("SetIntVar", &GameManager::s_set_int_variable)
         .addFunction("GetStrVar", &GameManager::s_get_str_variable)
@@ -96,6 +101,12 @@ GameManager::GameManager(WindowManager *window_manager) {
         .addFunction("HasProperty", &NPC::s_has_property)
         .addFunction("AddProperty", &NPC::s_add_property)
         .addFunction("RemoveProperty", &NPC::s_remove_property)
+        .addFunction("SetDialogScript", &NPC::s_set_dialog_script)
+        .addFunction("CreateDialogState", &NPC::s_create_dialog_state)
+        .addFunction("SetDialogState", &NPC::s_set_dialog_state)
+        .addFunction("GetDialogState", &NPC::s_get_dialog_state)
+        .addFunction("SetDialogString", &NPC::s_set_dialog_string)
+        .addFunction("AddDialogOption", &NPC::s_add_dialog_option)
     .endClass();
 
     push(L, this);
@@ -115,7 +126,7 @@ GameManager::GameManager(WindowManager *window_manager) {
 GameManager::~GameManager() { }
 
 void GameManager::initialize_game() {
-    current_state = GAME_STATES::TRAVEL;
+    current_game_state = GAME_STATES::TRAVEL;
     display_room();
 }
 
@@ -124,7 +135,7 @@ void GameManager::handle_input(const std::string &input) {
     auto tokenized_input = tokenize(input);
     auto command = process_input(tokenized_input);
 
-    if (current_state == GAME_STATES::TRAVEL) {
+    if (current_game_state == GAME_STATES::TRAVEL) {
         if (command.type == COMMAND_TYPES::NONE) {
             window_manager->print_to_log("The input does not appear to be valid.  Double check your spelling.  Type 'help' for a complete list.");
         } else if (command.type == COMMAND_TYPES::DEBUG) {
@@ -152,10 +163,10 @@ void GameManager::handle_input(const std::string &input) {
         } else if (command.type == COMMAND_TYPES::INTERACTION) {
             c_interaction(command);
         }
-    } else if (current_state == GAME_STATES::PROMPT) {
+    } else if (current_game_state == GAME_STATES::PROMPT) {
         LuaRef prompt_callback = getGlobal(L, current_prompt.table_name)[current_prompt.callback_function];
         if (prompt_callback(command.primary)) {
-            current_state = GAME_STATES::TRAVEL;
+            current_game_state = GAME_STATES::TRAVEL;
             window_manager->print_to_log("\n\n");
             // display_room();
         } else {
@@ -165,14 +176,27 @@ void GameManager::handle_input(const std::string &input) {
 
         // TODO: Do better error checking
         // just calling prompt_callback could be an error if the script isn't function correctly
-    } else if (current_state == GAME_STATES::DIALOG) {
-
+    } else if (current_game_state == GAME_STATES::DIALOG) {
+        LuaRef dialog_callback = getGlobal(L, talking_npc->get_dialog_script().c_str());
+        if (!dialog_callback.isNil() && !dialog_callback["OnReply"].isNil()) {
+            if (!dialog_callback["OnReply"](command.primary)) {
+                window_manager->print_to_log("Invalid response.\n\n");
+                display_dialog();
+            }
+        }
+        // TODO: Else throw error
     }
 }
 
 // Scripting Functions
 void GameManager::s_print(const char *line) {
     window_manager->print_to_log(std::string(line));
+}
+void GameManager::s_npc_speak(const char *npc_id, const char *msg) {
+    NPC *npc;
+    if (game_map.get_npc_container()->get_npc(std::string(npc_id), npc)) {
+        window_manager->print_to_log(npc->get_name() + " - \"" + std::string(msg) + "\"\n");
+    }
 }
 void GameManager::s_progress_time(int amount, char type) {
     // TODO: Implement TIME
@@ -260,6 +284,19 @@ void GameManager::s_add_prompt_response(const char* response) {
 }
 void GameManager::s_display_prompt() {
     display_prompt();
+}
+void GameManager::s_display_dialog(const char *npc_id) {
+    NPC *npc;
+    if (current_room->get_npc_container()->get_npc(std::string(npc_id), npc)) {
+        talking_npc = npc;
+        display_dialog();
+    } else {
+        window_manager->print_to_log("There is no one around with that name!");
+    }
+}
+void GameManager::s_exit_dialog() {
+    current_game_state = GAME_STATES::TRAVEL;
+    //display_room();
 }
 void GameManager::s_set_str_variable(const char *key, const char *value) {
     global_str_variables.set_variable(std::string(key), std::string(value));
@@ -404,7 +441,7 @@ void GameManager::c_pickup(const Command &command) {
                 item_scripts["OnPickup"]();
             }
 
-            window_manager->print_to_log(item_slot->item->get_name() + " has been added to your inventory.\n");
+            window_manager->print_to_log("You received " + item_slot->item->get_name() + ".\n");
         }
     }
     else {
@@ -441,7 +478,17 @@ void GameManager::c_inventory(const Command &command) {
     window_manager->print_to_log(player_inventory.get_item_list());
 }
 void GameManager::c_talk(const Command &command) {
-
+    // Talk to [NPC_NAME]
+    NPC *npc;
+    if (current_room->get_npc_container()->get_npc_by_name(command.args[0], npc)) {
+        LuaRef npc_dialog_scripts = getGlobal(L, npc->get_dialog_script().c_str());
+        if (!npc_dialog_scripts.isNil() && !npc_dialog_scripts["OnTalk"].isNil()) {
+            npc_dialog_scripts["OnTalk"]();
+        }
+        // TODO: else Throw Dialog not found error
+    } else {
+        window_manager->print_to_log("There is no one around with that name!");
+    }
 }
 
 // TODO: Implement item interactions with other items (ie dumping poo pale into city fountain)
@@ -476,12 +523,25 @@ void GameManager::display_room() {
     window_manager->print_to_log(" ");
 }
 void GameManager::display_prompt() {
-    current_state = GAME_STATES::PROMPT;
+    current_game_state = GAME_STATES::PROMPT;
 
     window_manager->print_to_log(current_prompt.message);
     int i = 1;
     for (const auto &x : current_prompt.responses) {
         window_manager->print_to_log(std::to_string(i++) + ") " + x);
+    }
+}
+void GameManager::display_dialog() {
+    DialogState *state;
+    if (talking_npc->get_dialog_state(talking_npc->get_dialog_state(), state)) {
+        current_game_state = GAME_STATES::DIALOG;
+        window_manager->set_title(talking_npc->get_name());
+        window_manager->print_to_log(state->dialog_text);
+
+        int i = 1;
+        for (const auto &x : state->dialog_options) {
+            window_manager->print_to_log(std::to_string(i++) + ") " + x);
+        }
     }
 }
 void GameManager::set_current_room(Room *new_room){

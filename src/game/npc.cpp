@@ -5,6 +5,11 @@
 #include "npc.h"
 #include "../tokenizer.h"
 
+DialogState::DialogState(const std::string &unique_id, NPC *owner) {
+    this->id = unique_id;
+    this->owner = owner;
+}
+
 NPC::NPC(const std::string &id) {
     this->id = id;
     set_name("[NPC NAME]");
@@ -15,7 +20,12 @@ NPC::NPC(const std::string &id, const std::string &name, const std::string &desc
     set_name(name);
     set_description(desc);
 }
-NPC::~NPC() { }
+NPC::~NPC() {
+    for (auto &x : dialog_states) {
+        delete x;
+    }
+    dialog_states.clear();
+}
 
 const char *NPC::s_get_id() {
     return this->id.c_str();
@@ -79,6 +89,31 @@ void NPC::s_remove_property(const char *prop) {
         }
     }
 }
+void NPC::s_set_dialog_script(const char *table_name) {
+    this->dialog_script = std::string(table_name);
+}
+void NPC::s_create_dialog_state(const char *state_id) {
+    auto new_state = new DialogState(std::string(state_id), this);
+    dialog_states.emplace_back(new_state);
+}
+void NPC::s_set_dialog_state(const char *state) {
+    current_dialog_state = std::string(state);
+}
+void NPC::s_set_dialog_string(const char *id, const char *str) {
+    DialogState *state;
+    if (get_dialog_state(std::string(id), state)) {
+        state->dialog_text = std::string(str);
+    }
+}
+void NPC::s_add_dialog_option(const char *id, const char *str) {
+    DialogState *state;
+    if (get_dialog_state(std::string(id), state)) {
+        state->dialog_options.emplace_back(std::string(str));
+    }
+}
+const char* NPC::s_get_dialog_state() {
+    return current_dialog_state.c_str();
+}
 
 std::string NPC::get_id() {
     return this->id;
@@ -94,6 +129,22 @@ std::string NPC::get_room_description() {
 }
 std::string NPC::get_state() {
     return this->current_state;
+}
+std::string NPC::get_dialog_state() {
+    return this->current_dialog_state;
+}
+std::string NPC::get_dialog_script() {
+    return this->dialog_script;
+}
+bool NPC::get_dialog_state(const std::string &id, DialogState *&state) {
+    for (auto &x : dialog_states) {
+        if (id == x->id) {
+            state = x;
+            return true;
+        }
+    }
+
+    return false;
 }
 void NPC::set_name(const std::string &name) {
     this->name = name;
