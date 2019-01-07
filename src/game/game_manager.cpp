@@ -54,6 +54,9 @@ GameManager::GameManager(WindowManager *window_manager) {
         .addFunction("RemoveItems", &Room::s_remove_items)
         .addFunction("AddNPC", &Room::s_add_npc)
         .addFunction("RemoveNPC", &Room::s_remove_npc)
+        .addFunction("HasProperty", &Room::s_has_property)
+        .addFunction("AddProperty", &Room::s_add_property)
+        .addFunction("RemoveProperty", &Room::s_remove_property)
     .endClass()
     .beginClass<Item>("Item")
         .addFunction("GetID", &Item::s_get_id)
@@ -71,6 +74,9 @@ GameManager::GameManager(WindowManager *window_manager) {
         .addFunction("IsStatic", &Item::get_is_static)
         .addFunction("SetIsStatic", &Item::set_is_static)
         .addFunction("AddAlias", &Item::s_add_alias)
+        .addFunction("HasProperty", &Item::s_has_property)
+        .addFunction("AddProperty", &Item::s_add_property)
+        .addFunction("RemoveProperty", &Item::s_remove_property)
     .endClass()
     .beginClass<NPC>("NPC")
         .addFunction("GetID", &NPC::s_get_id)
@@ -87,6 +93,9 @@ GameManager::GameManager(WindowManager *window_manager) {
         .addFunction("AddAlias", &NPC::s_add_alias)
         .addFunction("SetStrVar", &NPC::s_set_str_variable)
         .addFunction("SetIntVar", &NPC::s_set_int_variable)
+        .addFunction("HasProperty", &NPC::s_has_property)
+        .addFunction("AddProperty", &NPC::s_add_property)
+        .addFunction("RemoveProperty", &NPC::s_remove_property)
     .endClass();
 
     push(L, this);
