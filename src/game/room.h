@@ -19,6 +19,8 @@ class Room {
 
     Map *game_map;
 
+    std::vector<std::string> properties;
+
 public:
     Room(const std::string &id);
     Room(const std::string &id, const std::string &name, const std::string &description, Map *map);
@@ -37,6 +39,9 @@ public:
     void s_remove_items(const char *item_id, int quantity);
     void s_add_npc(const char *npc_id);
     void s_remove_npc(const char *npc_id);
+    bool s_has_property(const char *property);
+    void s_add_property(const char *property);
+    void s_remove_property(const char *property);
 
     void attach_room(Room* room, Directions direction);
 

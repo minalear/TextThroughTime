@@ -17,6 +17,7 @@ class NPC {
     std::string current_state;
 
     std::vector<std::string> aliases;
+    std::vector<std::string> properties;
 
     GameVariableMap<std::string> string_variables;
     GameVariableMap<int>         int_variables;
@@ -35,6 +36,7 @@ public:
     const char* s_get_state();
     const char* s_get_str_variable(const char *key);
     int         s_get_int_variable(const char *key);
+    bool        s_has_property(const char *property);
 
     void s_set_name(const char *name);
     void s_set_description(const char *desc);
@@ -43,6 +45,8 @@ public:
     void s_add_alias(const char *alias);
     void s_set_str_variable(const char *key, const char *value);
     void s_set_int_variable(const char *key, int value);
+    void s_add_property(const char *property);
+    void s_remove_property(const char *property);
 
     // Getters/Setters
     std::string get_id();

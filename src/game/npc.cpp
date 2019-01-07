@@ -38,6 +38,14 @@ const char *NPC::s_get_str_variable(const char *key) {
 int NPC::s_get_int_variable(const char *key) {
     return int_variables.get_variable(std::string(key));
 }
+bool NPC::s_has_property(const char *prop) {
+    const std::string property = std::string(prop);
+    for (const auto &x : properties) {
+        if (property == x) return true;
+    }
+
+    return false;
+}
 
 void NPC::s_set_name(const char *name) {
     set_name(std::string(name));
@@ -59,6 +67,17 @@ void NPC::s_set_str_variable(const char *key, const char *value) {
 }
 void NPC::s_set_int_variable(const char *key, int value) {
     int_variables.set_variable(std::string(key), value);
+}
+void NPC::s_add_property(const char *property) {
+    properties.emplace_back(std::string(property));
+}
+void NPC::s_remove_property(const char *prop) {
+    const std::string property = std::string(prop);
+    for (int i = 0; i < properties.size(); i++) {
+        if (property == properties[i]) {
+            properties.erase(properties.begin() + i);
+        }
+    }
 }
 
 std::string NPC::get_id() {

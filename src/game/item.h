@@ -17,6 +17,7 @@ class Item {
     std::string current_state; // Used to define different behaviors depending on the item's current state
 
     std::vector<std::string> aliases; // Alternative short names that can be used to refer to this item
+    std::vector<std::string> properties;
 
     GameVariableMap<std::string> string_variables;
     GameVariableMap<int>         int_variables;
@@ -42,6 +43,9 @@ public:
     void s_add_alias(const char *alias);
     void s_set_str_variable(const char *key, const char *value);
     void s_set_int_variable(const char *key, int value);
+    bool s_has_property(const char *property);
+    void s_add_property(const char *property);
+    void s_remove_property(const char *property);
 
     std::string get_id();
     std::string get_name();

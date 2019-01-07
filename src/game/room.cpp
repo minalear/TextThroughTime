@@ -78,6 +78,25 @@ void Room::s_add_npc(const char *npc_id) {
 void Room::s_remove_npc(const char *npc_id) {
     npcs.remove_npc(std::string(npc_id));
 }
+bool Room::s_has_property(const char *prop) {
+    const std::string property = std::string(prop);
+    for (const auto &x : properties) {
+        if (property == x) return true;
+    }
+
+    return false;
+}
+void Room::s_add_property(const char *property) {
+    properties.emplace_back(std::string(property));
+}
+void Room::s_remove_property(const char *prop) {
+    const std::string property = std::string(prop);
+    for (int i = 0; i < properties.size(); i++) {
+        if (property == properties[i]) {
+            properties.erase(properties.begin() + i);
+        }
+    }
+}
 
 void Room::attach_room(Room *room, Directions direction) {
     if (connected_rooms.count(direction) == 0) {

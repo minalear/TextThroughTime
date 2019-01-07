@@ -57,6 +57,25 @@ void Item::s_set_str_variable(const char *key, const char *value) {
 void Item::s_set_int_variable(const char *key, int value) {
     int_variables.set_variable(std::string(key), value);
 }
+bool Item::s_has_property(const char *prop) {
+    const std::string property = std::string(prop);
+    for (const auto &x : properties) {
+        if (property == x) return true;
+    }
+
+    return false;
+}
+void Item::s_add_property(const char *property) {
+    properties.emplace_back(std::string(property));
+}
+void Item::s_remove_property(const char *prop) {
+    const std::string property = std::string(prop);
+    for (int i = 0; i < properties.size(); i++) {
+        if (property == properties[i]) {
+            properties.erase(properties.begin() + i);
+        }
+    }
+}
 
 std::string Item::get_id() {
     return this->id;
