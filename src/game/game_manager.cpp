@@ -7,6 +7,7 @@
 #include "../error_handling.h"
 #include "game_manager.h"
 #include "../core/math_utils.h"
+#include "item.h"
 
 using namespace luabridge;
 
@@ -226,6 +227,17 @@ void GameManager::s_create_static_item(const char *item_id, const char *name) {
     // Create the item
     auto new_item = new Item(std::string(item_id), std::string(name), "NULL DESCRIPTION");
     new_item->s_add_property("STATIC");
+    new_item->set_state("BASE");
+    game_map.get_inventory()->add_item(new_item);
+
+    // Make the item available in the init script
+    push(L, new_item);
+    lua_setglobal(L, item_id);
+}
+void GameManager::s_create_container(const char *item_id, const char *name) {
+    // Create the item
+    auto new_item = new Item(std::string(item_id), std::string(name), "NULL DESCRIPTION");
+    new_item->s_add_property("CONTAINER");
     new_item->set_state("BASE");
     game_map.get_inventory()->add_item(new_item);
 

@@ -4,6 +4,7 @@
 
 #include "inventory.h"
 #include "../tokenizer.h"
+#include "item.h"
 
 InventorySlot::InventorySlot(Item* item, int quantity) {
     this->item = item;

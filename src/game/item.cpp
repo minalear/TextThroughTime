@@ -115,3 +115,7 @@ bool Item::check_name(const std::string &test) {
 
     return false;
 }
+
+Inventory* Item::get_inventory() {
+    return &container_items;
+}

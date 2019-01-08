@@ -52,6 +52,7 @@ class GameManager {
     void s_create_room(const char *room_id, const char *name);
     void s_create_item(const char *item_id, const char *name);
     void s_create_static_item(const char *item_id, const char *name);
+    void s_create_container(const char *item_id, const char *name);
     void s_create_npc(const char *npc_id, const char *name);
     void s_player_add_item(const char *item_id);
     void s_player_add_items(const char *item_id, int quantity);

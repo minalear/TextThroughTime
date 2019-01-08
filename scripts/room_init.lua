@@ -1,3 +1,11 @@
+Manager:CreateRoom("LOBBY", "Arena Lobby")
+LOBBY:SetDescription("The lobby of the arena is cramped and crowded with warriors from around the world.")
+
+Manager:CreateRoom("ARENA", "Arena")
+ARENA:SetDescription("The roar of the crowd consumes you as you face against your enemy.")
+
+
+
 -- Shared Functions --
 function imprison_player()
 	Manager:Print("The guards notice you and aprehend you before you could escape!  They drag you back to your cell.")

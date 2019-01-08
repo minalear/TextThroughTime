@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include "game_variable_map.h"
+#include "inventory.h"
 
 class Item {
     std::string id; // The unique ID of the item
@@ -21,6 +22,7 @@ class Item {
 
     GameVariableMap<std::string> string_variables;
     GameVariableMap<int>         int_variables;
+    Inventory container_items;
 
 public:
     Item(const std::string &id);
@@ -56,6 +58,8 @@ public:
     void set_room_description(const std::string &desc);
     void set_state(const std::string &state);
     bool check_name(const std::string &name);
+
+    Inventory* get_inventory();
 };
 
 #endif //TEXTTHROUGHTIME_ITEM_H

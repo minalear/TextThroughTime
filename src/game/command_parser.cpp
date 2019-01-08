@@ -8,7 +8,7 @@ std::vector<std::string> superfluous_list, move_list, drop_list, pickup_list, pl
                          examine_list, direction_list, room_list, inventory_list, talk_list;
 
 void init_lists() {
-    superfluous_list    = {"THE", "IN", "INTO", "A", "AN", "AT", "OUT", "TO", "WITH"};
+    superfluous_list    = {"THE", "IN", "INTO", "A", "AN", "AT", "OUT", "TO", "WITH", "FROM"};
     move_list           = {"MOVE", "GO", "TRAVEL", "ENTER"};
     drop_list           = {"DROP", "REMOVE"};
     pickup_list         = {"PICKUP", "TAKE", "GRAB"};
@@ -57,9 +57,17 @@ Command process_input(const TokenGroup &tokens) {
     } else if (contains(command.primary, drop_list)) {
         command.type = COMMAND_TYPES::DROP;
     } else if (contains(command.primary, pickup_list)) {
-        command.type = COMMAND_TYPES::PICKUP;
+        if (command.n_args == 1) {
+            command.type = COMMAND_TYPES::PICKUP; // Pickup item from the room
+        } else if (command.n_args == 2) {
+            command.type = COMMAND_TYPES::TAKE; // Take an item from a container
+        }
     } else if (contains(command.primary, place_list)) {
-        command.type = COMMAND_TYPES::PLACE;
+        if (command.n_args > 1) {
+            command.type = COMMAND_TYPES::PLACE; // Place an item into a container
+        } else {
+            command.type = COMMAND_TYPES::DROP;
+        }
     } else if (contains(command.primary, examine_list)) {
         // If the player just types "look" or types "inspect area"
         if (command.n_args == 0 || contains<std::string>(command.args[0], room_list)) {
