@@ -10,8 +10,9 @@ Item::Item(const std::string &id) {
     set_name("[ROOM]");
     set_description("[DESCRIPTION]");
 }
-Item::Item(const std::string &id, const std::string &name, const std::string &desc) {
+Item::Item(const std::string &id, const std::string &name, const std::string &desc, Map *map) {
     this->id = id;
+    this->game_map = map;
     set_name(name);
     set_description(desc);
 }
@@ -76,6 +77,24 @@ void Item::s_remove_property(const char *prop) {
         }
     }
 }
+void Item::s_add_item(const char *item_id) {
+    InventorySlot *item_slot = nullptr;
+    if (game_map->get_inventory()->get_item(std::string(item_id), item_slot)) {
+        container_items.add_item(item_slot->item, 1);
+    }
+}
+void Item::s_add_items(const char *item_id, int quantity) {
+    InventorySlot *item_slot = nullptr;
+    if (game_map->get_inventory()->get_item(std::string(item_id), item_slot)) {
+        container_items.add_item(item_slot->item, quantity);
+    }
+}
+void Item::s_remove_item(const char *item_id) {
+    container_items.remove_item(item_id);
+}
+void Item::s_remove_items(const char *item_id, int quantity) {
+    container_items.remove_item(item_id, quantity);
+}
 
 std::string Item::get_id() {
     return this->id;
@@ -92,9 +111,6 @@ std::string Item::get_room_description() {
 std::string Item::get_state() {
     return this->current_state;
 }
-bool Item::get_is_static() {
-    return this->is_static;
-}
 
 void Item::set_name(const std::string &name) {
     this->name = name;
@@ -104,9 +120,6 @@ void Item::set_description(const std::string &desc) {
 }
 void Item::set_room_description(const std::string &desc) {
     this->room_description = desc;
-}
-void Item::set_is_static(bool value) {
-    this->is_static = value;
 }
 void Item::set_state(const std::string &state) {
     this->current_state = state;
@@ -120,4 +133,8 @@ bool Item::check_name(const std::string &test) {
     }
 
     return false;
+}
+
+Inventory* Item::get_inventory() {
+    return &container_items;
 }

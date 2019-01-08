@@ -8,6 +8,8 @@
 #include <string>
 #include <vector>
 #include "game_variable_map.h"
+#include "inventory.h"
+#include "map.h"
 
 class Item {
     std::string id; // The unique ID of the item
@@ -21,12 +23,13 @@ class Item {
 
     GameVariableMap<std::string> string_variables;
     GameVariableMap<int>         int_variables;
+    Inventory container_items;
 
-    bool is_static = false;
+    Map *game_map;
 
 public:
     Item(const std::string &id);
-    Item(const std::string &id, const std::string &name, const std::string &desc);
+    Item(const std::string &id, const std::string &name, const std::string &desc, Map *map);
     ~Item();
 
     const char* s_get_id();
@@ -46,20 +49,24 @@ public:
     bool s_has_property(const char *property);
     void s_add_property(const char *property);
     void s_remove_property(const char *property);
+    void s_add_item(const char *item_id);
+    void s_add_items(const char *item_id, int quantity);
+    void s_remove_item(const char *item_id);
+    void s_remove_items(const char *item_id, int quantity);
 
     std::string get_id();
     std::string get_name();
     std::string get_description();
     std::string get_room_description();
     std::string get_state();
-    bool get_is_static();
 
     void set_name(const std::string &name);
     void set_description(const std::string &desc);
     void set_room_description(const std::string &desc);
-    void set_is_static(bool value);
     void set_state(const std::string &state);
     bool check_name(const std::string &name);
+
+    Inventory* get_inventory();
 };
 
 #endif //TEXTTHROUGHTIME_ITEM_H

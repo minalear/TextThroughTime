@@ -7,7 +7,8 @@
 
 #include <vector>
 #include <string>
-#include "item.h"
+
+class Item;
 
 struct InventorySlot {
     Item *item;

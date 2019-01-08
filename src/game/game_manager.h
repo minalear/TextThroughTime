@@ -52,6 +52,8 @@ class GameManager {
     void s_create_room(const char *room_id, const char *name);
     void s_create_item(const char *item_id, const char *name);
     void s_create_static_item(const char *item_id, const char *name);
+    void s_create_container(const char *item_id, const char *name);
+    void s_create_static_container(const char *item_id, const char *name);
     void s_create_npc(const char *npc_id, const char *name);
     void s_player_add_item(const char *item_id);
     void s_player_add_items(const char *item_id, int quantity);
@@ -77,6 +79,8 @@ class GameManager {
     void c_examine_object(const Command &command);
     void c_pickup(const Command &command);
     void c_drop(const Command &command);
+    void c_take(const Command &command);
+    void c_place(const Command &command);
     void c_inventory(const Command &command);
     void c_talk(const Command &command);
     void c_interaction(const Command &command);

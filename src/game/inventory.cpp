@@ -4,6 +4,7 @@
 
 #include "inventory.h"
 #include "../tokenizer.h"
+#include "item.h"
 
 InventorySlot::InventorySlot(Item* item, int quantity) {
     this->item = item;
@@ -84,10 +85,10 @@ bool Inventory::get_item_by_name(const std::string &name, InventorySlot *&item) 
 std::string Inventory::get_item_list(bool ignore_static) {
     std::string buffer;
     for (const auto &slot : items) {
-        if (!ignore_static && slot->item->get_is_static()) {
+        if (!ignore_static && slot->item->s_has_property("STATIC")) {
             buffer += slot->item->get_name() + "(static)\n";
         }
-        else if (!slot->item->get_is_static()) {
+        else if (!slot->item->s_has_property("STATIC")) {
             buffer += slot->item->get_name() + "  -  " + std::to_string(slot->quantity) + "\n";
         }
     }

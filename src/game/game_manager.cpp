@@ -7,6 +7,7 @@
 #include "../error_handling.h"
 #include "game_manager.h"
 #include "../core/math_utils.h"
+#include "item.h"
 
 using namespace luabridge;
 
@@ -29,6 +30,8 @@ GameManager::GameManager(WindowManager *window_manager) {
         .addFunction("CreateRoom", &GameManager::s_create_room)
         .addFunction("CreateItem", &GameManager::s_create_item)
         .addFunction("CreateStaticItem", &GameManager::s_create_static_item)
+        .addFunction("CreateContainer", &GameManager::s_create_container)
+        .addFunction("CreateStaticContainer", &GameManager::s_create_static_container)
         .addFunction("CreateNPC", &GameManager::s_create_npc)
         .addFunction("PlayerAddItem", &GameManager::s_player_add_item)
         .addFunction("PlayerAddItems", &GameManager::s_player_add_items)
@@ -76,12 +79,14 @@ GameManager::GameManager(WindowManager *window_manager) {
         .addFunction("SetState", &Item::s_set_state)
         .addFunction("SetStrVar", &Item::s_set_str_variable)
         .addFunction("SetIntVar", &Item::s_set_int_variable)
-        .addFunction("IsStatic", &Item::get_is_static)
-        .addFunction("SetIsStatic", &Item::set_is_static)
         .addFunction("AddAlias", &Item::s_add_alias)
         .addFunction("HasProperty", &Item::s_has_property)
         .addFunction("AddProperty", &Item::s_add_property)
         .addFunction("RemoveProperty", &Item::s_remove_property)
+        .addFunction("AddItem", &Item::s_add_item)
+        .addFunction("AddItems", &Item::s_add_items)
+        .addFunction("RemoveItem", &Item::s_remove_item)
+        .addFunction("RemoveItems", &Item::s_remove_items)
     .endClass()
     .beginClass<NPC>("NPC")
         .addFunction("GetID", &NPC::s_get_id)
@@ -139,29 +144,31 @@ void GameManager::handle_input(const std::string &input) {
         if (command.type == COMMAND_TYPES::NONE) {
             window_manager->print_to_log("The input does not appear to be valid.  Double check your spelling.  Type 'help' for a complete list.");
         } else if (command.type == COMMAND_TYPES::DEBUG) {
-            c_debug(command);
+            c_debug(command); // Debug functionality
         } else if (command.type == COMMAND_TYPES::HELP) {
-            c_help(command);
+            c_help(command); // Help menu listing descriptions of common commands
         } else if (command.type == COMMAND_TYPES::CLEAR_SCREEN) {
-            c_clear(command);
+            c_clear(command); // Clears the screen
         } else if (command.type == COMMAND_TYPES::MOVE) {
-            c_move(command);
-        } else if (command.type == COMMAND_TYPES::DROP) {
-            c_drop(command);
+            c_move(command); // Moves the player in a direction
         } else if (command.type == COMMAND_TYPES::PICKUP) {
-            c_pickup(command);
+            c_pickup(command); // Pickup an item from the room
+        } else if (command.type == COMMAND_TYPES::DROP) {
+            c_drop(command); // Drop an item into the room
+        } else if (command.type == COMMAND_TYPES::TAKE) {
+            c_take(command); // Take an item from a container
         } else if (command.type == COMMAND_TYPES::PLACE) {
-            // c_place(command);
+            c_place(command); // Place an item into a container
         } else if (command.type == COMMAND_TYPES::EXAMINE_ROOM) {
-            c_examine_room(command);
+            c_examine_room(command); // Examine the room
         } else if (command.type == COMMAND_TYPES::EXAMINE_OBJECT) {
-            c_examine_object(command);
+            c_examine_object(command); // Examine an object
         } else if (command.type == COMMAND_TYPES::INVENTORY) {
-            c_inventory(command);
+            c_inventory(command); // List items in your inventory
         } else if (command.type == COMMAND_TYPES::TALK) {
-            c_talk(command);
+            c_talk(command); // Talk to an npc
         } else if (command.type == COMMAND_TYPES::INTERACTION) {
-            c_interaction(command);
+            c_interaction(command); // Advanced item interaction
         }
     } else if (current_game_state == GAME_STATES::PROMPT) {
         LuaRef prompt_callback = getGlobal(L, current_prompt.table_name)[current_prompt.callback_function];
@@ -216,8 +223,7 @@ void GameManager::s_create_room(const char *unique_id, const char *name) {
 }
 void GameManager::s_create_item(const char *item_id, const char *name) {
     // Create the item
-    auto new_item = new Item(std::string(item_id), std::string(name), "NULL DESCRIPTION");
-    new_item->set_is_static(false);
+    auto new_item = new Item(std::string(item_id), std::string(name), "NULL DESCRIPTION", &game_map);
     new_item->set_state("BASE");
     game_map.get_inventory()->add_item(new_item);
 
@@ -227,8 +233,31 @@ void GameManager::s_create_item(const char *item_id, const char *name) {
 }
 void GameManager::s_create_static_item(const char *item_id, const char *name) {
     // Create the item
-    auto new_item = new Item(std::string(item_id), std::string(name), "NULL DESCRIPTION");
-    new_item->set_is_static(true);
+    auto new_item = new Item(std::string(item_id), std::string(name), "NULL DESCRIPTION", &game_map);
+    new_item->s_add_property("STATIC");
+    new_item->set_state("BASE");
+    game_map.get_inventory()->add_item(new_item);
+
+    // Make the item available in the init script
+    push(L, new_item);
+    lua_setglobal(L, item_id);
+}
+void GameManager::s_create_container(const char *item_id, const char *name) {
+    // Create the item
+    auto new_item = new Item(std::string(item_id), std::string(name), "NULL DESCRIPTION", &game_map);
+    new_item->s_add_property("CONTAINER");
+    new_item->set_state("BASE");
+    game_map.get_inventory()->add_item(new_item);
+
+    // Make the item available in the init script
+    push(L, new_item);
+    lua_setglobal(L, item_id);
+}
+void GameManager::s_create_static_container(const char *item_id, const char *name) {
+    // Create the item
+    auto new_item = new Item(std::string(item_id), std::string(name), "NULL DESCRIPTION", &game_map);
+    new_item->s_add_property("STATIC");
+    new_item->s_add_property("CONTAINER");
     new_item->set_state("BASE");
     game_map.get_inventory()->add_item(new_item);
 
@@ -408,10 +437,12 @@ void GameManager::c_examine_object(const Command &command) {
     InventorySlot *item_slot = nullptr;
     NPC *npc = nullptr;
 
-    if (player_inventory.get_item_by_name(command.args[0], item_slot)) {
+    if (player_inventory.get_item_by_name(command.args[0], item_slot) || current_room->get_inventory()->get_item_by_name(command.args[0], item_slot)) {
         window_manager->print_to_log(item_slot->item->get_description() + "\n\n");
-    } else if (current_room->get_inventory()->get_item_by_name(command.args[0], item_slot)) {
-        window_manager->print_to_log(item_slot->item->get_description() + "\n\n");
+        if (item_slot->item->s_has_property("CONTAINER") && !item_slot->item->s_has_property("LOCKED")) {
+            window_manager->print_to_log("== " + item_slot->item->get_name() + "'s Inventory ==");
+            window_manager->print_to_log(item_slot->item->get_inventory()->get_item_list());
+        }
     } else if (current_room->get_npc_container()->get_npc_by_name(command.args[0], npc)) {
         window_manager->print_to_log(npc->get_description() + "\n\n");
     }
@@ -419,7 +450,7 @@ void GameManager::c_examine_object(const Command &command) {
 void GameManager::c_pickup(const Command &command) {
     InventorySlot *item_slot = nullptr;
     if (current_room->get_inventory()->get_item_by_name(command.args[0], item_slot)) {
-        if (item_slot->item->get_is_static()) {
+        if (item_slot->item->s_has_property("STATIC")) {
             // We cannot pickup static items.
             window_manager->print_to_log("You cannot pick that up!");
         } else {
@@ -471,6 +502,80 @@ void GameManager::c_drop(const Command &command) {
         }
     } else {
         window_manager->print_to_log("There is no item to drop by that name.\n");
+    }
+}
+void GameManager::c_take(const Command &command) {
+    // take [0] from [1]
+    InventorySlot *container_slot = nullptr;
+    InventorySlot *item_slot = nullptr;
+
+    // Check the room inventory first then the player's inventory for the container
+    if (current_room->get_inventory()->get_item_by_name(command.args[1], container_slot) || player_inventory.get_item_by_name(command.args[1], container_slot)) {
+        // Make sure the item we're taking from is a container and it is not locked
+        if (!container_slot->item->s_has_property("CONTAINER")) {
+            window_manager->print_to_log("You cannot take an item from that!");
+        } else if (container_slot->item->s_has_property("LOCKED")) {
+            window_manager->print_to_log("It is locked!");
+        } else {
+            Inventory *container = container_slot->item->get_inventory();
+            if (container->get_item_by_name(command.args[0], item_slot)) {
+                player_inventory.add_item(item_slot->item, item_slot->quantity);
+                container->remove_item(item_slot->item->get_id(), item_slot->quantity);
+
+                // Execute the container's OnItemRemoved trigger
+                std::string script_table_name = container_slot->item->get_id() + "_SCRIPTS";
+                LuaRef container_scripts = getGlobal(L, script_table_name.c_str());
+                if (!container_scripts.isNil() && !container_scripts["OnItemRemoved"].isNil()) {
+                    container_scripts["OnItemRemoved"](item_slot->item);
+                }
+
+                // Execute the items's OnPickup trigger
+                script_table_name = item_slot->item->get_id() + "_SCRIPTS";
+                LuaRef item_scripts = getGlobal(L, script_table_name.c_str());
+                if (!item_scripts.isNil() && !item_scripts["OnPickup"].isNil()) {
+                    item_scripts["OnPickup"]();
+                }
+
+                window_manager->print_to_log("You received " + item_slot->item->get_name() + ".\n");
+            }
+        }
+    }
+}
+void GameManager::c_place(const Command &command) {
+    // place [0] into [1]
+    InventorySlot *container_slot = nullptr;
+    InventorySlot *item_slot = nullptr;
+
+    // Check the room inventory first then the player's inventory for the container
+    if (current_room->get_inventory()->get_item_by_name(command.args[1], container_slot) || player_inventory.get_item_by_name(command.args[1], container_slot)) {
+        // Make sure the item we're placing into is a container and it is not locked
+        if (!container_slot->item->s_has_property("CONTAINER")) {
+            window_manager->print_to_log("You cannot take an item from that!");
+        } else if (container_slot->item->s_has_property("LOCKED")) {
+            window_manager->print_to_log("It is locked!");
+        } else {
+            Inventory *container = container_slot->item->get_inventory();
+            if (container->get_item_by_name(command.args[0], item_slot)) {
+                container->add_item(item_slot->item, item_slot->quantity);
+                player_inventory.remove_item(item_slot->item->get_id(), item_slot->quantity);
+
+                // Execute the container's OnItemAdded trigger
+                std::string script_table_name = container_slot->item->get_id() + "_SCRIPTS";
+                LuaRef container_scripts = getGlobal(L, script_table_name.c_str());
+                if (!container_scripts.isNil() && !container_scripts["OnItemAdded"].isNil()) {
+                    container_scripts["OnItemAdded"](item_slot->item);
+                }
+
+                // Execute the items's OnPickup trigger
+                script_table_name = item_slot->item->get_id() + "_SCRIPTS";
+                LuaRef item_scripts = getGlobal(L, script_table_name.c_str());
+                if (!item_scripts.isNil() && !item_scripts["OnPickup"].isNil()) {
+                    item_scripts["OnPickup"]();
+                }
+
+                window_manager->print_to_log("You received " + item_slot->item->get_name() + ".\n");
+            }
+        }
     }
 }
 void GameManager::c_inventory(const Command &command) {
