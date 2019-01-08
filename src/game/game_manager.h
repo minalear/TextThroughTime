@@ -15,6 +15,7 @@
 #include "inventory.h"
 #include "command_parser.h"
 #include "game_variable_map.h"
+#include "dice_roller.h"
 
 class lua_State;
 
@@ -34,6 +35,8 @@ class GameManager {
     Map game_map;
     Room *current_room;
     Inventory player_inventory;
+
+    DiceRoller dice;
 
     lua_State* L;
 
@@ -74,6 +77,7 @@ class GameManager {
     void c_help(const Command &command);
     void c_debug(const Command &command);
     void c_clear(const Command &command);
+    void c_roll_dice(const Command &command);
     void c_move(const Command &command);
     void c_examine_room(const Command &command);
     void c_examine_object(const Command &command);

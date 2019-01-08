@@ -91,6 +91,8 @@ Command process_input(const TokenGroup &tokens) {
         command.type = COMMAND_TYPES::DEBUG;
     } else if (command.primary == "HELP") {
         command.type = COMMAND_TYPES::HELP;
+    } else if (command.primary == "ROLL") {
+        command.type = COMMAND_TYPES::ROLL_DICE;
     }
 
     // Special circumstances

@@ -21,7 +21,9 @@ GameManager::GameManager(WindowManager *window_manager) {
     luaL_openlibs(L);
 
     getGlobalNamespace(L)
-        .addFunction("Rand", minalear::rand_int)
+    .beginClass<DiceRoller>("Dice")
+        .addFunction("Roll", &DiceRoller::s_roll_dice)
+    .endClass()
     .beginClass<GameManager>("GameManager")
         .addFunction("Print", &GameManager::s_print)
         .addFunction("NPCSpeak", &GameManager::s_npc_speak)
@@ -169,6 +171,8 @@ void GameManager::handle_input(const std::string &input) {
             c_talk(command); // Talk to an npc
         } else if (command.type == COMMAND_TYPES::INTERACTION) {
             c_interaction(command); // Advanced item interaction
+        } else if (command.type == COMMAND_TYPES::ROLL_DICE) {
+            c_roll_dice(command);
         }
     } else if (current_game_state == GAME_STATES::PROMPT) {
         LuaRef prompt_callback = getGlobal(L, current_prompt.table_name)[current_prompt.callback_function];
@@ -341,6 +345,9 @@ int GameManager::s_get_int_variable(const char *key) {
 }
 
 // Command Functions
+void GameManager::c_roll_dice(const Command &command) {
+    window_manager->print_to_log("You rolled " + std::to_string(dice.roll_dice(command.args[0])));
+}
 void GameManager::c_help(const Command &command) {
     window_manager->print_to_log("This is a helpful response.");
 }

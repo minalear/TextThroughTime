@@ -10,6 +10,7 @@ file(GLOB SOURCE_FILES
         src/*.cpp src/*.h
         src/core/*.cpp src/core/*.h
         src/game/*.cpp src/game/*.h
+        src/game/combat/*.cpp src/game/combat/*.h
         C:/Libraries/OpenGL/GLAD/src/glad.c)
 file(GLOB FONT_FILES fonts/*.fnt fonts/*.png)
 file(GLOB SHADER_FILES shaders/*.glsl)
