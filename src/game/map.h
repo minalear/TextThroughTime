@@ -8,6 +8,7 @@
 #include <map>
 #include <string>
 #include "inventory.h"
+#include "npc_container.h"
 
 class Room;
 typedef std::pair<std::string, Room*> RoomIndex;
@@ -20,6 +21,7 @@ class Map {
 private:
     std::map<std::string, Room*> game_map;
     Inventory all_items; // List of all items in the game
+    NPCContainer all_npcs;
 
 public:
     Map();
@@ -37,6 +39,7 @@ public:
             const std::string &direction);
     Room* get_room(const std::string &id);
     Inventory* get_inventory();
+    NPCContainer* get_npc_container();
 };
 
 #endif //TEXTTHROUGHTIME_MAP_H
