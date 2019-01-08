@@ -65,7 +65,7 @@ void Room::s_remove_item(const char *item_id) {
     room_inventory.remove_item(item_id);
 }
 void Room::s_remove_items(const char *item_id, int quantity) {
-    room_inventory.remove_item(item_id);
+    room_inventory.remove_item(item_id, quantity);
 }
 void Room::s_add_npc(const char *npc_id) {
     NPC *npc = nullptr;

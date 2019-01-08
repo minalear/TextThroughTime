@@ -9,6 +9,7 @@
 #include <vector>
 #include "game_variable_map.h"
 #include "inventory.h"
+#include "map.h"
 
 class Item {
     std::string id; // The unique ID of the item
@@ -24,9 +25,11 @@ class Item {
     GameVariableMap<int>         int_variables;
     Inventory container_items;
 
+    Map *game_map;
+
 public:
     Item(const std::string &id);
-    Item(const std::string &id, const std::string &name, const std::string &desc);
+    Item(const std::string &id, const std::string &name, const std::string &desc, Map *map);
     ~Item();
 
     const char* s_get_id();
@@ -46,6 +49,10 @@ public:
     bool s_has_property(const char *property);
     void s_add_property(const char *property);
     void s_remove_property(const char *property);
+    void s_add_item(const char *item_id);
+    void s_add_items(const char *item_id, int quantity);
+    void s_remove_item(const char *item_id);
+    void s_remove_items(const char *item_id, int quantity);
 
     std::string get_id();
     std::string get_name();

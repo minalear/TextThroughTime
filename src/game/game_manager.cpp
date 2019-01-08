@@ -30,6 +30,8 @@ GameManager::GameManager(WindowManager *window_manager) {
         .addFunction("CreateRoom", &GameManager::s_create_room)
         .addFunction("CreateItem", &GameManager::s_create_item)
         .addFunction("CreateStaticItem", &GameManager::s_create_static_item)
+        .addFunction("CreateContainer", &GameManager::s_create_container)
+        .addFunction("CreateStaticContainer", &GameManager::s_create_static_container)
         .addFunction("CreateNPC", &GameManager::s_create_npc)
         .addFunction("PlayerAddItem", &GameManager::s_player_add_item)
         .addFunction("PlayerAddItems", &GameManager::s_player_add_items)
@@ -81,6 +83,10 @@ GameManager::GameManager(WindowManager *window_manager) {
         .addFunction("HasProperty", &Item::s_has_property)
         .addFunction("AddProperty", &Item::s_add_property)
         .addFunction("RemoveProperty", &Item::s_remove_property)
+        .addFunction("AddItem", &Item::s_add_item)
+        .addFunction("AddItems", &Item::s_add_items)
+        .addFunction("RemoveItem", &Item::s_remove_item)
+        .addFunction("RemoveItems", &Item::s_remove_items)
     .endClass()
     .beginClass<NPC>("NPC")
         .addFunction("GetID", &NPC::s_get_id)
@@ -217,7 +223,7 @@ void GameManager::s_create_room(const char *unique_id, const char *name) {
 }
 void GameManager::s_create_item(const char *item_id, const char *name) {
     // Create the item
-    auto new_item = new Item(std::string(item_id), std::string(name), "NULL DESCRIPTION");
+    auto new_item = new Item(std::string(item_id), std::string(name), "NULL DESCRIPTION", &game_map);
     new_item->set_state("BASE");
     game_map.get_inventory()->add_item(new_item);
 
@@ -227,7 +233,7 @@ void GameManager::s_create_item(const char *item_id, const char *name) {
 }
 void GameManager::s_create_static_item(const char *item_id, const char *name) {
     // Create the item
-    auto new_item = new Item(std::string(item_id), std::string(name), "NULL DESCRIPTION");
+    auto new_item = new Item(std::string(item_id), std::string(name), "NULL DESCRIPTION", &game_map);
     new_item->s_add_property("STATIC");
     new_item->set_state("BASE");
     game_map.get_inventory()->add_item(new_item);
@@ -238,7 +244,19 @@ void GameManager::s_create_static_item(const char *item_id, const char *name) {
 }
 void GameManager::s_create_container(const char *item_id, const char *name) {
     // Create the item
-    auto new_item = new Item(std::string(item_id), std::string(name), "NULL DESCRIPTION");
+    auto new_item = new Item(std::string(item_id), std::string(name), "NULL DESCRIPTION", &game_map);
+    new_item->s_add_property("CONTAINER");
+    new_item->set_state("BASE");
+    game_map.get_inventory()->add_item(new_item);
+
+    // Make the item available in the init script
+    push(L, new_item);
+    lua_setglobal(L, item_id);
+}
+void GameManager::s_create_static_container(const char *item_id, const char *name) {
+    // Create the item
+    auto new_item = new Item(std::string(item_id), std::string(name), "NULL DESCRIPTION", &game_map);
+    new_item->s_add_property("STATIC");
     new_item->s_add_property("CONTAINER");
     new_item->set_state("BASE");
     game_map.get_inventory()->add_item(new_item);
@@ -419,10 +437,12 @@ void GameManager::c_examine_object(const Command &command) {
     InventorySlot *item_slot = nullptr;
     NPC *npc = nullptr;
 
-    if (player_inventory.get_item_by_name(command.args[0], item_slot)) {
+    if (player_inventory.get_item_by_name(command.args[0], item_slot) || current_room->get_inventory()->get_item_by_name(command.args[0], item_slot)) {
         window_manager->print_to_log(item_slot->item->get_description() + "\n\n");
-    } else if (current_room->get_inventory()->get_item_by_name(command.args[0], item_slot)) {
-        window_manager->print_to_log(item_slot->item->get_description() + "\n\n");
+        if (item_slot->item->s_has_property("CONTAINER") && !item_slot->item->s_has_property("LOCKED")) {
+            window_manager->print_to_log("== " + item_slot->item->get_name() + "'s Inventory ==");
+            window_manager->print_to_log(item_slot->item->get_inventory()->get_item_list());
+        }
     } else if (current_room->get_npc_container()->get_npc_by_name(command.args[0], npc)) {
         window_manager->print_to_log(npc->get_description() + "\n\n");
     }
@@ -482,6 +502,80 @@ void GameManager::c_drop(const Command &command) {
         }
     } else {
         window_manager->print_to_log("There is no item to drop by that name.\n");
+    }
+}
+void GameManager::c_take(const Command &command) {
+    // take [0] from [1]
+    InventorySlot *container_slot = nullptr;
+    InventorySlot *item_slot = nullptr;
+
+    // Check the room inventory first then the player's inventory for the container
+    if (current_room->get_inventory()->get_item_by_name(command.args[1], container_slot) || player_inventory.get_item_by_name(command.args[1], container_slot)) {
+        // Make sure the item we're taking from is a container and it is not locked
+        if (!container_slot->item->s_has_property("CONTAINER")) {
+            window_manager->print_to_log("You cannot take an item from that!");
+        } else if (container_slot->item->s_has_property("LOCKED")) {
+            window_manager->print_to_log("It is locked!");
+        } else {
+            Inventory *container = container_slot->item->get_inventory();
+            if (container->get_item_by_name(command.args[0], item_slot)) {
+                player_inventory.add_item(item_slot->item, item_slot->quantity);
+                container->remove_item(item_slot->item->get_id(), item_slot->quantity);
+
+                // Execute the container's OnItemRemoved trigger
+                std::string script_table_name = container_slot->item->get_id() + "_SCRIPTS";
+                LuaRef container_scripts = getGlobal(L, script_table_name.c_str());
+                if (!container_scripts.isNil() && !container_scripts["OnItemRemoved"].isNil()) {
+                    container_scripts["OnItemRemoved"](item_slot->item);
+                }
+
+                // Execute the items's OnPickup trigger
+                script_table_name = item_slot->item->get_id() + "_SCRIPTS";
+                LuaRef item_scripts = getGlobal(L, script_table_name.c_str());
+                if (!item_scripts.isNil() && !item_scripts["OnPickup"].isNil()) {
+                    item_scripts["OnPickup"]();
+                }
+
+                window_manager->print_to_log("You received " + item_slot->item->get_name() + ".\n");
+            }
+        }
+    }
+}
+void GameManager::c_place(const Command &command) {
+    // place [0] into [1]
+    InventorySlot *container_slot = nullptr;
+    InventorySlot *item_slot = nullptr;
+
+    // Check the room inventory first then the player's inventory for the container
+    if (current_room->get_inventory()->get_item_by_name(command.args[1], container_slot) || player_inventory.get_item_by_name(command.args[1], container_slot)) {
+        // Make sure the item we're placing into is a container and it is not locked
+        if (!container_slot->item->s_has_property("CONTAINER")) {
+            window_manager->print_to_log("You cannot take an item from that!");
+        } else if (container_slot->item->s_has_property("LOCKED")) {
+            window_manager->print_to_log("It is locked!");
+        } else {
+            Inventory *container = container_slot->item->get_inventory();
+            if (container->get_item_by_name(command.args[0], item_slot)) {
+                container->add_item(item_slot->item, item_slot->quantity);
+                player_inventory.remove_item(item_slot->item->get_id(), item_slot->quantity);
+
+                // Execute the container's OnItemAdded trigger
+                std::string script_table_name = container_slot->item->get_id() + "_SCRIPTS";
+                LuaRef container_scripts = getGlobal(L, script_table_name.c_str());
+                if (!container_scripts.isNil() && !container_scripts["OnItemAdded"].isNil()) {
+                    container_scripts["OnItemAdded"](item_slot->item);
+                }
+
+                // Execute the items's OnPickup trigger
+                script_table_name = item_slot->item->get_id() + "_SCRIPTS";
+                LuaRef item_scripts = getGlobal(L, script_table_name.c_str());
+                if (!item_scripts.isNil() && !item_scripts["OnPickup"].isNil()) {
+                    item_scripts["OnPickup"]();
+                }
+
+                window_manager->print_to_log("You received " + item_slot->item->get_name() + ".\n");
+            }
+        }
     }
 }
 void GameManager::c_inventory(const Command &command) {

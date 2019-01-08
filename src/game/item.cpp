@@ -10,8 +10,9 @@ Item::Item(const std::string &id) {
     set_name("[ROOM]");
     set_description("[DESCRIPTION]");
 }
-Item::Item(const std::string &id, const std::string &name, const std::string &desc) {
+Item::Item(const std::string &id, const std::string &name, const std::string &desc, Map *map) {
     this->id = id;
+    this->game_map = map;
     set_name(name);
     set_description(desc);
 }
@@ -75,6 +76,24 @@ void Item::s_remove_property(const char *prop) {
             properties.erase(properties.begin() + i);
         }
     }
+}
+void Item::s_add_item(const char *item_id) {
+    InventorySlot *item_slot = nullptr;
+    if (game_map->get_inventory()->get_item(std::string(item_id), item_slot)) {
+        container_items.add_item(item_slot->item, 1);
+    }
+}
+void Item::s_add_items(const char *item_id, int quantity) {
+    InventorySlot *item_slot = nullptr;
+    if (game_map->get_inventory()->get_item(std::string(item_id), item_slot)) {
+        container_items.add_item(item_slot->item, quantity);
+    }
+}
+void Item::s_remove_item(const char *item_id) {
+    container_items.remove_item(item_id);
+}
+void Item::s_remove_items(const char *item_id, int quantity) {
+    container_items.remove_item(item_id, quantity);
 }
 
 std::string Item::get_id() {
