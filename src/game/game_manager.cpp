@@ -76,8 +76,6 @@ GameManager::GameManager(WindowManager *window_manager) {
         .addFunction("SetState", &Item::s_set_state)
         .addFunction("SetStrVar", &Item::s_set_str_variable)
         .addFunction("SetIntVar", &Item::s_set_int_variable)
-        .addFunction("IsStatic", &Item::get_is_static)
-        .addFunction("SetIsStatic", &Item::set_is_static)
         .addFunction("AddAlias", &Item::s_add_alias)
         .addFunction("HasProperty", &Item::s_has_property)
         .addFunction("AddProperty", &Item::s_add_property)
@@ -217,7 +215,6 @@ void GameManager::s_create_room(const char *unique_id, const char *name) {
 void GameManager::s_create_item(const char *item_id, const char *name) {
     // Create the item
     auto new_item = new Item(std::string(item_id), std::string(name), "NULL DESCRIPTION");
-    new_item->set_is_static(false);
     new_item->set_state("BASE");
     game_map.get_inventory()->add_item(new_item);
 
@@ -228,7 +225,7 @@ void GameManager::s_create_item(const char *item_id, const char *name) {
 void GameManager::s_create_static_item(const char *item_id, const char *name) {
     // Create the item
     auto new_item = new Item(std::string(item_id), std::string(name), "NULL DESCRIPTION");
-    new_item->set_is_static(true);
+    new_item->s_add_property("STATIC");
     new_item->set_state("BASE");
     game_map.get_inventory()->add_item(new_item);
 
@@ -419,7 +416,7 @@ void GameManager::c_examine_object(const Command &command) {
 void GameManager::c_pickup(const Command &command) {
     InventorySlot *item_slot = nullptr;
     if (current_room->get_inventory()->get_item_by_name(command.args[0], item_slot)) {
-        if (item_slot->item->get_is_static()) {
+        if (item_slot->item->s_has_property("STATIC")) {
             // We cannot pickup static items.
             window_manager->print_to_log("You cannot pick that up!");
         } else {

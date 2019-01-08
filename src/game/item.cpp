@@ -92,9 +92,6 @@ std::string Item::get_room_description() {
 std::string Item::get_state() {
     return this->current_state;
 }
-bool Item::get_is_static() {
-    return this->is_static;
-}
 
 void Item::set_name(const std::string &name) {
     this->name = name;
@@ -104,9 +101,6 @@ void Item::set_description(const std::string &desc) {
 }
 void Item::set_room_description(const std::string &desc) {
     this->room_description = desc;
-}
-void Item::set_is_static(bool value) {
-    this->is_static = value;
 }
 void Item::set_state(const std::string &state) {
     this->current_state = state;
