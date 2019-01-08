@@ -78,6 +78,8 @@ class GameManager {
     void c_examine_object(const Command &command);
     void c_pickup(const Command &command);
     void c_drop(const Command &command);
+    void c_take(const Command &command);
+    void c_place(const Command &command);
     void c_inventory(const Command &command);
     void c_talk(const Command &command);
     void c_interaction(const Command &command);

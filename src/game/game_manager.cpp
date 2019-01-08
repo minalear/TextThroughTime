@@ -138,29 +138,31 @@ void GameManager::handle_input(const std::string &input) {
         if (command.type == COMMAND_TYPES::NONE) {
             window_manager->print_to_log("The input does not appear to be valid.  Double check your spelling.  Type 'help' for a complete list.");
         } else if (command.type == COMMAND_TYPES::DEBUG) {
-            c_debug(command);
+            c_debug(command); // Debug functionality
         } else if (command.type == COMMAND_TYPES::HELP) {
-            c_help(command);
+            c_help(command); // Help menu listing descriptions of common commands
         } else if (command.type == COMMAND_TYPES::CLEAR_SCREEN) {
-            c_clear(command);
+            c_clear(command); // Clears the screen
         } else if (command.type == COMMAND_TYPES::MOVE) {
-            c_move(command);
-        } else if (command.type == COMMAND_TYPES::DROP) {
-            c_drop(command);
+            c_move(command); // Moves the player in a direction
         } else if (command.type == COMMAND_TYPES::PICKUP) {
-            c_pickup(command);
+            c_pickup(command); // Pickup an item from the room
+        } else if (command.type == COMMAND_TYPES::DROP) {
+            c_drop(command); // Drop an item into the room
+        } else if (command.type == COMMAND_TYPES::TAKE) {
+            c_take(command); // Take an item from a container
         } else if (command.type == COMMAND_TYPES::PLACE) {
-            // c_place(command);
+            c_place(command); // Place an item into a container
         } else if (command.type == COMMAND_TYPES::EXAMINE_ROOM) {
-            c_examine_room(command);
+            c_examine_room(command); // Examine the room
         } else if (command.type == COMMAND_TYPES::EXAMINE_OBJECT) {
-            c_examine_object(command);
+            c_examine_object(command); // Examine an object
         } else if (command.type == COMMAND_TYPES::INVENTORY) {
-            c_inventory(command);
+            c_inventory(command); // List items in your inventory
         } else if (command.type == COMMAND_TYPES::TALK) {
-            c_talk(command);
+            c_talk(command); // Talk to an npc
         } else if (command.type == COMMAND_TYPES::INTERACTION) {
-            c_interaction(command);
+            c_interaction(command); // Advanced item interaction
         }
     } else if (current_game_state == GAME_STATES::PROMPT) {
         LuaRef prompt_callback = getGlobal(L, current_prompt.table_name)[current_prompt.callback_function];
