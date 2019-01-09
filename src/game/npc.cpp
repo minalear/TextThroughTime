@@ -10,12 +10,12 @@ DialogState::DialogState(const std::string &unique_id, NPC *owner) {
     this->owner = owner;
 }
 
-NPC::NPC(const std::string &id) {
+NPC::NPC(const std::string &id) : npc_equipment(this) {
     this->id = id;
     set_name("[NPC NAME]");
     set_description("[NPC DESCRIPTION]");
 }
-NPC::NPC(const std::string &id, const std::string &name, const std::string &desc) {
+NPC::NPC(const std::string &id, const std::string &name, const std::string &desc) : npc_equipment(this) {
     this->id = id;
     set_name(name);
     set_description(desc);
@@ -170,4 +170,7 @@ bool NPC::check_name(const std::string &name) {
 }
 Inventory *NPC::get_inventory() {
     return &npc_inventory;
+}
+Equipment *NPC::get_equipment() {
+    return &npc_equipment;
 }

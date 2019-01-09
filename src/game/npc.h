@@ -9,6 +9,8 @@
 #include <vector>
 #include "game_variable_map.h"
 #include "inventory.h"
+#include "combat/stat_block.h"
+#include "combat/equipment.h"
 
 class NPC; // C++ >.>
 
@@ -38,6 +40,7 @@ class NPC {
     std::vector<DialogState*> dialog_states;
 
     Inventory npc_inventory;
+    Equipment npc_equipment;
 
 public:
 
@@ -90,6 +93,7 @@ public:
     bool check_name(const std::string &name);
 
     Inventory* get_inventory();
+    Equipment* get_equipment();
 };
 
 #endif //TEXTTHROUGHTIME_NPC_H

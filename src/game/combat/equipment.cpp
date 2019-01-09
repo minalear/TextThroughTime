@@ -3,6 +3,7 @@
 //
 
 #include "equipment.h"
+#include "../npc.h"
 
 EQUIPMENT_SLOTS str_to_slot(const std::string &str) {
     if (str == "HEAD") return EQUIPMENT_SLOTS::HEAD;

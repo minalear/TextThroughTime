@@ -3,6 +3,7 @@
 //
 
 #include "npc_container.h"
+#include "npc.h"
 
 void NPCContainer::add_npc(NPC *npc) {
     npcs.emplace_back(npc);

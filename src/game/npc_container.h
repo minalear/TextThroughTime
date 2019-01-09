@@ -7,8 +7,8 @@
 
 #include <vector>
 #include <string>
-#include "npc.h"
 
+class NPC;
 class NPCContainer {
     std::vector<NPC*> npcs;
 
