@@ -119,8 +119,15 @@ GameManager::GameManager(WindowManager *window_manager) {
         .addFunction("AddDialogOption", &NPC::s_add_dialog_option)
     .endClass();
 
+    player = new NPC("PLAYER");
+
+    // Add GameManager to the scripting environment
     push(L, this);
     lua_setglobal(L, "Manager");
+
+    // Add the Player to the scripting environment
+    push(L, player);
+    lua_setglobal(L, "Player");
 
     try {
         luaL_dofile(L, "scripts/init.lua");
@@ -297,7 +304,7 @@ void GameManager::s_create_npc(const char *npc_id, const char *name) {
 void GameManager::s_player_add_item(const char *item_id) {
     InventorySlot *item_slot = nullptr;
     if (game_map.get_inventory()->get_item(item_id, item_slot)) {
-        player_inventory.add_item(item_slot->item, 1);
+        player->get_inventory()->add_item(item_slot->item, 1);
     } else {
         throw ItemNotFoundException(item_id);
     }
@@ -305,20 +312,20 @@ void GameManager::s_player_add_item(const char *item_id) {
 void GameManager::s_player_add_items(const char *item_id, int quantity) {
     InventorySlot *item_slot = nullptr;
     if (game_map.get_inventory()->get_item(item_id, item_slot)) {
-        player_inventory.add_item(item_slot->item, quantity);
+        player->get_inventory()->add_item(item_slot->item, quantity);
     } else {
         throw ItemNotFoundException(item_id);
     }
 }
 bool GameManager::s_player_remove_item(const char *item_id) {
-    return player_inventory.remove_item(item_id);
+    player->get_inventory()->remove_item(item_id);
 }
 bool GameManager::s_player_remove_items(const char *item_id, int quantity) {
-    return player_inventory.remove_item(item_id, quantity);
+    player->get_inventory()->remove_item(item_id, quantity);
 }
 bool GameManager::s_player_has_item(const char *item_id) {
     InventorySlot *item_slot;
-    return player_inventory.get_item(item_id, item_slot);
+    player->get_inventory()->get_item(item_id, item_slot);
 }
 
 void GameManager::s_create_prompt(const char *message, const char *table_name, const char* callback_function) {
@@ -370,7 +377,7 @@ void GameManager::c_debug(const Command &command) {
     try {
         if (command.args[0] == "INVENTORY") {
             window_manager->print_to_log("== Current Player Inventory (Debug) ==");
-            window_manager->print_to_log(player_inventory.get_item_list(false));
+            window_manager->print_to_log(player->get_inventory()->get_item_list(false));
             window_manager->print_to_log("\n== Current Room Inventory (Debug) ==");
             window_manager->print_to_log(current_room->get_inventory()->get_item_list(false));
         } else if (command.args[0] == "MOVE") {
@@ -380,7 +387,7 @@ void GameManager::c_debug(const Command &command) {
             InventorySlot *item_slot = nullptr;
             if (game_map.get_inventory()->get_item(command.args[1], item_slot)) {
                 int quantity = (command.n_args > 1) ? std::stoi(command.args[1]) : 1;
-                player_inventory.add_item(item_slot->item, quantity);
+                player->get_inventory()->add_item(item_slot->item, quantity);
             }
         } else if (command.args[0] == "ITEM") {
             if (command.args[1] == "GETSTATE") { // Get the item's current state DEBUG ITEM GETSTATE [ITEM_ID]
@@ -459,7 +466,7 @@ void GameManager::c_examine_object(const Command &command) {
     InventorySlot *item_slot = nullptr;
     NPC *npc = nullptr;
 
-    if (player_inventory.get_item_by_name(command.args[0], item_slot) || current_room->get_inventory()->get_item_by_name(command.args[0], item_slot)) {
+    if (player->get_inventory()->get_item_by_name(command.args[0], item_slot) || current_room->get_inventory()->get_item_by_name(command.args[0], item_slot)) {
         window_manager->print_to_log(item_slot->item->get_description() + "\n\n");
     } else if (current_room->get_npc_container()->get_npc_by_name(command.args[0], npc)) {
         window_manager->print_to_log(npc->get_description() + "\n\n");
@@ -473,7 +480,7 @@ void GameManager::c_pickup(const Command &command) {
             window_manager->print_to_log("You cannot pick that up!");
         } else {
             // We can pickup non-static items.
-            player_inventory.add_item(item_slot->item, item_slot->quantity);
+            player->get_inventory()->add_item(item_slot->item, item_slot->quantity);
             current_room->get_inventory()->remove_item(item_slot->item->get_id(), item_slot->quantity);
 
             // Execute the room's OnItemPickup trigger
@@ -499,9 +506,9 @@ void GameManager::c_pickup(const Command &command) {
 }
 void GameManager::c_drop(const Command &command) {
     InventorySlot *item_slot = nullptr;
-    if (player_inventory.get_item_by_name(command.args[0], item_slot)) {
+    if (player->get_inventory()->get_item_by_name(command.args[0], item_slot)) {
         current_room->get_inventory()->add_item(item_slot->item, item_slot->quantity);
-        player_inventory.remove_item(item_slot->item->get_id(), item_slot->quantity);
+        player->get_inventory()->remove_item(item_slot->item->get_id(), item_slot->quantity);
 
         window_manager->print_to_log("You remove " + item_slot->item->get_name() + " from your knapsack and place it on the floor.\n");
 
@@ -528,7 +535,7 @@ void GameManager::c_take(const Command &command) {
     InventorySlot *item_slot = nullptr;
 
     // Check the room inventory first then the player's inventory for the container
-    if (current_room->get_inventory()->get_item_by_name(command.args[1], container_slot) || player_inventory.get_item_by_name(command.args[1], container_slot)) {
+    if (current_room->get_inventory()->get_item_by_name(command.args[1], container_slot) || player->get_inventory()->get_item_by_name(command.args[1], container_slot)) {
         // Make sure the item we're taking from is a container and it is not locked
         if (!container_slot->item->s_has_property("CONTAINER")) {
             window_manager->print_to_log("You cannot take an item from that!");
@@ -537,7 +544,7 @@ void GameManager::c_take(const Command &command) {
         } else {
             Inventory *container = container_slot->item->get_inventory();
             if (container->get_item_by_name(command.args[0], item_slot)) {
-                player_inventory.add_item(item_slot->item, item_slot->quantity);
+                player->get_inventory()->add_item(item_slot->item, item_slot->quantity);
                 container->remove_item(item_slot->item->get_id(), item_slot->quantity);
 
                 // Execute the container's OnItemRemoved trigger
@@ -565,7 +572,7 @@ void GameManager::c_place(const Command &command) {
     InventorySlot *item_slot = nullptr;
 
     // Check the room inventory first then the player's inventory for the container
-    if (current_room->get_inventory()->get_item_by_name(command.args[1], container_slot) || player_inventory.get_item_by_name(command.args[1], container_slot)) {
+    if (current_room->get_inventory()->get_item_by_name(command.args[1], container_slot) || player->get_inventory()->get_item_by_name(command.args[1], container_slot)) {
         // Make sure the item we're placing into is a container and it is not locked
         if (!container_slot->item->s_has_property("CONTAINER")) {
             window_manager->print_to_log("You cannot take an item from that!");
@@ -575,7 +582,7 @@ void GameManager::c_place(const Command &command) {
             Inventory *container = container_slot->item->get_inventory();
             if (container->get_item_by_name(command.args[0], item_slot)) {
                 container->add_item(item_slot->item, item_slot->quantity);
-                player_inventory.remove_item(item_slot->item->get_id(), item_slot->quantity);
+                player->get_inventory()->remove_item(item_slot->item->get_id(), item_slot->quantity);
 
                 // Execute the container's OnItemAdded trigger
                 std::string script_table_name = container_slot->item->get_id() + "_SCRIPTS";
@@ -598,7 +605,7 @@ void GameManager::c_place(const Command &command) {
 }
 void GameManager::c_inventory(const Command &command) {
     window_manager->print_to_log("== Current Inventory ==");
-    window_manager->print_to_log(player_inventory.get_item_list());
+    window_manager->print_to_log(player->get_inventory()->get_item_list());
 }
 void GameManager::c_talk(const Command &command) {
     // Talk to [NPC_NAME]
@@ -619,7 +626,7 @@ void GameManager::c_interaction(const Command &command) {
     InventorySlot *item_slot = nullptr;
     // Attempt to find the item by first searching the room and then the player's inventory
     if (!current_room->get_inventory()->get_item_by_name(command.args[0], item_slot)) {
-        player_inventory.get_item_by_name(command.args[0], item_slot);
+        player->get_inventory()->get_item_by_name(command.args[0], item_slot);
     }
 
     // If the item is found, execute the OnInteract script function

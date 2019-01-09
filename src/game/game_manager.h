@@ -34,7 +34,6 @@ class GameManager {
     WindowManager *window_manager;
     Map game_map;
     Room *current_room;
-    Inventory player_inventory;
 
     DiceRoller dice;
 
@@ -42,6 +41,7 @@ class GameManager {
 
     Prompt current_prompt;
     NPC *talking_npc;
+    NPC *player;
     GAME_STATES current_game_state;
 
     GameVariableMap<std::string> global_str_variables;
