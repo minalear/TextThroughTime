@@ -57,12 +57,15 @@ public:
     void s_add_items(const char *item_id, int quantity);
     void s_remove_item(const char *item_id);
     void s_remove_items(const char *item_id, int quantity);
+    void s_set_damage(const char *damage);
+    void s_set_ac_bonus(int bonus);
 
     std::string get_id();
     std::string get_name();
     std::string get_description();
     std::string get_room_description();
     std::string get_state();
+    std::string get_damage();
 
     void set_name(const std::string &name);
     void set_description(const std::string &desc);

@@ -7,6 +7,19 @@
 
 #include "../item.h"
 
+enum struct EQUIPMENT_SLOTS {
+    HEAD = 0,
+    ARMOR = 1,
+    CLOAK = 2,
+    NECK = 3,
+    RING_01 = 4,
+    RING_02 = 5,
+    TRINKET = 6,
+    MAIN_HAND = 7,
+    OFF_HAND = 8,
+    NONE = -1
+};
+
 struct EquipmentSlot {
     Item *equipment = nullptr;
     bool equipped = false;
@@ -14,25 +27,13 @@ struct EquipmentSlot {
 struct Equipment {
     NPC *npc;
 
-    // Armor slots
-    EquipmentSlot headwear;
-    EquipmentSlot armor;
-    EquipmentSlot cloak;
-
-    // Jewelry
-    EquipmentSlot neckpiece;
-    EquipmentSlot ring01;
-    EquipmentSlot ring02;
-    EquipmentSlot trinket;
-
-    // Weapons/Shields
-    EquipmentSlot main_hand;
-    EquipmentSlot off_hand;
+    const static int NUM_SLOTS = 9;
+    EquipmentSlot slots[NUM_SLOTS];
 
     Equipment(NPC *npc);
     int calculate_ac();
     void equip_item(Item *equipment);
-    EquipmentSlot *get_slot()
+    EquipmentSlot *get_equipment_slot(EQUIPMENT_SLOTS slot);
 };
 
 

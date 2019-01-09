@@ -168,3 +168,6 @@ bool NPC::check_name(const std::string &name) {
 
     return false;
 }
+Inventory *NPC::get_inventory() {
+    return &npc_inventory;
+}

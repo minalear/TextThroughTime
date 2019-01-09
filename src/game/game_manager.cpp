@@ -34,6 +34,7 @@ GameManager::GameManager(WindowManager *window_manager) {
         .addFunction("CreateStaticItem", &GameManager::s_create_static_item)
         .addFunction("CreateContainer", &GameManager::s_create_container)
         .addFunction("CreateStaticContainer", &GameManager::s_create_static_container)
+        .addFunction("CreateEquipment", &GameManager::s_create_equipment)
         .addFunction("CreateNPC", &GameManager::s_create_npc)
         .addFunction("PlayerAddItem", &GameManager::s_player_add_item)
         .addFunction("PlayerAddItems", &GameManager::s_player_add_items)
@@ -89,6 +90,8 @@ GameManager::GameManager(WindowManager *window_manager) {
         .addFunction("AddItems", &Item::s_add_items)
         .addFunction("RemoveItem", &Item::s_remove_item)
         .addFunction("RemoveItems", &Item::s_remove_items)
+        .addFunction("SetDamage", &Item::s_set_damage)
+        .addFunction("SetACBonus", &Item::s_set_ac_bonus)
     .endClass()
     .beginClass<NPC>("NPC")
         .addFunction("GetID", &NPC::s_get_id)
@@ -262,6 +265,18 @@ void GameManager::s_create_static_container(const char *item_id, const char *nam
     auto new_item = new Item(std::string(item_id), std::string(name), "NULL DESCRIPTION", &game_map);
     new_item->s_add_property("STATIC");
     new_item->s_add_property("CONTAINER");
+    new_item->set_state("BASE");
+    game_map.get_inventory()->add_item(new_item);
+
+    // Make the item available in the init script
+    push(L, new_item);
+    lua_setglobal(L, item_id);
+}
+void GameManager::s_create_equipment(const char *item_id, const char *name, const char *slot) {
+    // Create the item
+    auto new_item = new Item(std::string(item_id), std::string(name), "NULL DESCRIPTION", &game_map);
+    new_item->s_add_property("EQUIPMENT");
+    new_item->s_add_property(slot);
     new_item->set_state("BASE");
     game_map.get_inventory()->add_item(new_item);
 
@@ -446,10 +461,6 @@ void GameManager::c_examine_object(const Command &command) {
 
     if (player_inventory.get_item_by_name(command.args[0], item_slot) || current_room->get_inventory()->get_item_by_name(command.args[0], item_slot)) {
         window_manager->print_to_log(item_slot->item->get_description() + "\n\n");
-        if (item_slot->item->s_has_property("CONTAINER") && !item_slot->item->s_has_property("LOCKED")) {
-            window_manager->print_to_log("== " + item_slot->item->get_name() + "'s Inventory ==");
-            window_manager->print_to_log(item_slot->item->get_inventory()->get_item_list());
-        }
     } else if (current_room->get_npc_container()->get_npc_by_name(command.args[0], npc)) {
         window_manager->print_to_log(npc->get_description() + "\n\n");
     }

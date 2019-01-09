@@ -32,7 +32,7 @@ void Inventory::add_item(Item *item, int quantity) {
 bool Inventory::remove_item(const std::string &unique_id) {
     for (int i = 0; i < items.size(); i++) {
         if (items[i]->item->get_id() == unique_id) {
-            delete items[i]; // Cleanup inventory slots
+            //delete items[i]; // Cleanup inventory slots
             items.erase(items.begin() + i);
             return true;
         }
@@ -51,7 +51,7 @@ bool Inventory::remove_item(const std::string &unique_id, int quantity) {
             // Decrease the quantity and remove the slot if it is zero or below
             slot->quantity -= quantity;
             if (slot->quantity <= 0) {
-                delete items[i];
+                //delete items[i]; // TODO: Memory leak, deleting this also deletes the item it contains
                 items.erase(items.begin() + i);
                 return true;
             }

@@ -1,6 +1,7 @@
-Manager:CreateItem("SWORD", "Longsword")
+Manager:CreateEquipment("SWORD", "Longsword", "MAIN_HAND")
 AppendItemAlias(SWORD, {"sword"})
 SWORD:SetDescription("A well worn, but reliable, iron longsword.")
+SWORD:SetDamage("1d6")
 
 Manager:CreateStaticContainer("ARENA_ARMORY", "Armory")
 AppendItemAlias(ARENA_ARMORY, {"cabinet", "wardrobe"})

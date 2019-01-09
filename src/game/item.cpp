@@ -95,6 +95,12 @@ void Item::s_remove_item(const char *item_id) {
 void Item::s_remove_items(const char *item_id, int quantity) {
     container_items.remove_item(item_id, quantity);
 }
+void Item::s_set_damage(const char *damage) {
+    this->damage = std::string(damage);
+}
+void Item::s_set_ac_bonus(int bonus) {
+    this->ac_bonus = bonus;
+}
 
 std::string Item::get_id() {
     return this->id;
@@ -103,13 +109,24 @@ std::string Item::get_name() {
     return this->name;
 }
 std::string Item::get_description() {
-    return this->description;
+    std::string description_buffer = this->description + "  ";
+    if (s_has_property("CONTAINER") && !s_has_property("LOCKED")) {
+        description_buffer += "\n\n== " + name + "'s Inventory ==\n";
+        description_buffer += container_items.get_item_list();
+    } else if (s_has_property("MAIN_HAND")) {
+        description_buffer += "Damage: " + damage;
+    }
+
+    return description_buffer;
 }
 std::string Item::get_room_description() {
     return this->room_description;
 }
 std::string Item::get_state() {
     return this->current_state;
+}
+std::string Item::get_damage() {
+    return this->damage;
 }
 
 void Item::set_name(const std::string &name) {

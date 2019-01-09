@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include "game_variable_map.h"
+#include "inventory.h"
 
 class NPC; // C++ >.>
 
@@ -35,6 +36,8 @@ class NPC {
     std::string dialog_script;
     std::string current_dialog_state;
     std::vector<DialogState*> dialog_states;
+
+    Inventory npc_inventory;
 
 public:
 
@@ -85,6 +88,8 @@ public:
     void set_state(const std::string &state);
 
     bool check_name(const std::string &name);
+
+    Inventory* get_inventory();
 };
 
 #endif //TEXTTHROUGHTIME_NPC_H
