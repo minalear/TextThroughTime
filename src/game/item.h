@@ -27,6 +27,10 @@ class Item {
 
     Map *game_map;
 
+    // Equipment stats
+    std::string damage; // dice roll [1d6]
+    int ac_bonus;
+
 public:
     Item(const std::string &id);
     Item(const std::string &id, const std::string &name, const std::string &desc, Map *map);
@@ -65,6 +69,8 @@ public:
     void set_room_description(const std::string &desc);
     void set_state(const std::string &state);
     bool check_name(const std::string &name);
+    int get_ac_bonus();
+    void set_ac_bonus(int bonus);
 
     Inventory* get_inventory();
 };

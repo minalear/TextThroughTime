@@ -134,6 +134,12 @@ bool Item::check_name(const std::string &test) {
 
     return false;
 }
+int Item::get_ac_bonus() {
+    return ac_bonus;
+}
+void Item::set_ac_bonus(int value) {
+    ac_bonus = value;
+}
 
 Inventory* Item::get_inventory() {
     return &container_items;
