@@ -29,10 +29,11 @@ StatBlock::StatBlock(NPC *npc) {
     base_reflex_save = 0;
     base_will_save = 0;
 
-    max_health = health = 10;
+    max_health = health = 50;
 
     calculate_stats();
 }
+
 void StatBlock::calculate_stats() {
     auto npc_equipment = npc->get_equipment();
 
@@ -52,9 +53,10 @@ void StatBlock::calculate_stats() {
     cha_mod = get_mod(total_cha);
     luck_mod = get_mod(total_luck);
 
-    ac = 10 + dex_mod + size_mod + natural_armor + npc_equipment->get_total_ac_bonus();
+    const int equipment_ac = npc_equipment->get_total_ac_bonus();
+    ac = 10 + dex_mod + size_mod + natural_armor + equipment_ac;
     touch_ac = 10 + dex_mod + size_mod;
-    ff_ac = 10 + size_mod + natural_armor;
+    ff_ac = 10 + size_mod + natural_armor + equipment_ac;
 
     initiative = dex_mod;
     fort_save = base_fort_save + vit_mod;
@@ -63,4 +65,7 @@ void StatBlock::calculate_stats() {
 
     cmb = base_attack_bonus + str_mod + size_mod;
     cmd = 10 + base_attack_bonus + str_mod + dex_mod + size_mod;
+}
+int StatBlock::get_attack_bonus() {
+    return base_attack_bonus + str_mod;
 }

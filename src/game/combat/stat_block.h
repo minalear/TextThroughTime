@@ -55,7 +55,9 @@ struct StatBlock {
     int cmb, cmd;
 
     StatBlock(NPC *npc);
+
     void calculate_stats();
+    int get_attack_bonus();
 };
 
 #endif //TEXTTHROUGHTIME_STAT_BLOCK_H

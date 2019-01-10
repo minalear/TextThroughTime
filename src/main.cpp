@@ -1,3 +1,5 @@
+#include <random>
+#include <ctime>
 #include "core/window.h"
 #include "core/font.h"
 #include "glad/glad.h"
@@ -18,6 +20,8 @@ void callback(const std::string &str) {
 }
 
 int main(int argc, char* argv[]) {
+    srand(time(NULL));
+
     minalear::GameWindow game_window("A Text Through Time", 800, 480);
 
     glEnable(GL_BLEND);

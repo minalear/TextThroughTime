@@ -100,7 +100,6 @@ void Equipment::equip_item(Item *equipment) {
     }
 
     slot->equipment = equipment;
-    npc->get_statblock()->calculate_stats(); // Update the NPC's stats
 }
 EquipmentSlot *Equipment::get_equipment_slot(EQUIPMENT_SLOTS slot) {
     return &slots[(int)slot];

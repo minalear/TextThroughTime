@@ -134,15 +134,17 @@ GameManager::GameManager(WindowManager *window_manager) {
         .addFunction("EquipItem", &NPC::s_equip_item)
     .endClass();
 
-    player = new NPC("PLAYER", &game_map);
-
     // Add GameManager to the scripting environment
     push(L, this);
     lua_setglobal(L, "Manager");
 
+    player = new NPC("PLAYER", &game_map);
+
     // Add the Player to the scripting environment
     push(L, player);
     lua_setglobal(L, "Player");
+
+    combat_manager = new CombatManager(this, player);
 
     try {
         luaL_dofile(L, "scripts/init.lua");
@@ -194,6 +196,8 @@ void GameManager::handle_input(const std::string &input) {
             c_inventory(command); // List items in your inventory
         } else if (command.type == COMMAND_TYPES::TALK) {
             c_talk(command); // Talk to an npc
+        } else if (command.type == COMMAND_TYPES::ATTACK) {
+            c_attack(command);
         } else if (command.type == COMMAND_TYPES::INTERACTION) {
             c_interaction(command); // Advanced item interaction
         } else if (command.type == COMMAND_TYPES::ROLL_DICE) {
@@ -221,6 +225,8 @@ void GameManager::handle_input(const std::string &input) {
             }
         }
         // TODO: Else throw error
+    } else if (current_game_state == GAME_STATES::COMBAT) {
+        combat_manager->do_combat_round(command);
     }
 }
 
@@ -299,6 +305,7 @@ void GameManager::s_create_equipment(const char *item_id, const char *name, cons
     auto new_item = new Item(std::string(item_id), std::string(name), "NULL DESCRIPTION", &game_map);
     new_item->s_add_property("EQUIPMENT");
     new_item->s_add_property(slot);
+    new_item->s_set_str_variable("EQUIPMENT_SLOT", slot);
     new_item->set_state("BASE");
     game_map.get_inventory()->add_item(new_item);
 
@@ -635,6 +642,17 @@ void GameManager::c_talk(const Command &command) {
         window_manager->print_to_log("There is no one around with that name!");
     }
 }
+void GameManager::c_attack(const Command &command) {
+    // Attack [NPC_NAME]
+    if (current_game_state != GAME_STATES::COMBAT) {
+        NPC *npc;
+        if (current_room->get_npc_container()->get_npc_by_name(command.args[0], npc)) {
+            current_game_state = GAME_STATES::COMBAT;
+            combat_manager->set_enemy(npc);
+            combat_manager->do_combat_round(command);
+        }
+    }
+}
 
 // TODO: Implement item interactions with other items (ie dumping poo pale into city fountain)
 void GameManager::c_interaction(const Command &command) {
@@ -711,4 +729,7 @@ void GameManager::set_current_room(Room *new_room){
         }
         window_manager->print_to_log("You enter " + current_room->get_name());
     }
+}
+void GameManager::print_to_log(const std::string &str) {
+    window_manager->print_to_log(str);
 }

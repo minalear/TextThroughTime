@@ -103,6 +103,7 @@ void NPC::s_equip_item(const char *item_id) {
     InventorySlot *slot = nullptr;
     if (game_map->get_inventory()->get_item(item_id, slot)) {
         equipment->equip_item(slot->item);
+       stat_block->calculate_stats();
     }
 }
 

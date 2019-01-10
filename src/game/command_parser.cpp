@@ -4,7 +4,7 @@
 
 #include "command_parser.h"
 
-std::vector<std::string> superfluous_list, move_list, drop_list, pickup_list, place_list,
+std::vector<std::string> superfluous_list, move_list, drop_list, pickup_list, place_list, attack_list,
                          examine_list, direction_list, room_list, inventory_list, talk_list;
 
 void init_lists() {
@@ -18,6 +18,7 @@ void init_lists() {
     room_list           = {"ROOM", "LOCATION", "AREA"};
     inventory_list      = {"INVENTORY"};
     talk_list           = {"TALK", "SPEAK", "CONVERSE"};
+    attack_list         = {"ATTACK"};
 }
 
 Command::Command() {
@@ -85,6 +86,8 @@ Command process_input(const TokenGroup &tokens) {
         command.type = COMMAND_TYPES::INVENTORY;
     } else if (contains(command.primary, talk_list)) {
         command.type = COMMAND_TYPES::TALK;
+    } else if (contains(command.primary, attack_list)) {
+        command.type = COMMAND_TYPES::ATTACK;
     } else if (command.primary == "CLEAR") {
         command.type = COMMAND_TYPES::CLEAR_SCREEN;
     } else if (command.primary == "DEBUG") {

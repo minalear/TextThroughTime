@@ -5,17 +5,21 @@
 #include "item.h"
 #include "../tokenizer.h"
 
-Item::Item(const std::string &id, Map *map) {
-    this->id = id;
-    this->game_map = map;
-    set_name("[ITEM]");
-    set_description("[DESCRIPTION]");
-}
+Item::Item(const std::string &id, Map *map) : Item(id, "[ITEM]", "[DESCRIPTION]", map) {}
 Item::Item(const std::string &id, const std::string &name, const std::string &desc, Map *map) {
     this->id = id;
     this->game_map = map;
     set_name(name);
     set_description(desc);
+
+    ac_bonus = 0;
+    str_bonus = 0;
+    dex_bonus = 0;
+    vit_bonus = 0;
+    int_bonus = 0;
+    wis_bonus = 0;
+    cha_bonus = 0;
+    luck_bonus = 0;
 }
 Item::~Item() { }
 

@@ -16,6 +16,7 @@
 #include "command_parser.h"
 #include "game_variable_map.h"
 #include "dice_roller.h"
+#include "combat/combat_manager.h"
 
 class lua_State;
 
@@ -39,6 +40,7 @@ class GameManager {
 
     lua_State* L;
 
+    CombatManager *combat_manager;
     Prompt current_prompt;
     NPC *talking_npc;
     NPC *player;
@@ -46,6 +48,10 @@ class GameManager {
 
     GameVariableMap<std::string> global_str_variables;
     GameVariableMap<int>         global_int_variables;
+
+public:
+    GameManager(WindowManager *window_manager);
+    ~GameManager();
 
     // Scripting functions
     void s_print(const char *msg);
@@ -88,16 +94,14 @@ class GameManager {
     void c_place(const Command &command);
     void c_inventory(const Command &command);
     void c_talk(const Command &command);
+    void c_attack(const Command &command);
     void c_interaction(const Command &command);
 
     void display_room();
     void display_prompt();
     void display_dialog();
     void set_current_room(Room* new_room);
-
-public:
-    GameManager(WindowManager *window_manager);
-    ~GameManager();
+    void print_to_log(const std::string &str);
 
     void initialize_game();
     void handle_input(const std::string &input);

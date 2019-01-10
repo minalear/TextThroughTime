@@ -1,7 +1,17 @@
 Manager:CreateEquipment("SWORD", "Longsword", "MAIN_HAND")
 AppendItemAlias(SWORD, {"sword"})
 SWORD:SetDescription("A well worn, but reliable, iron longsword.")
-SWORD:SetDamage("1d6")
+SWORD:SetDamage("1d8")
+
+Manager:CreateEquipment("GAFF", "Boarding Gaff", "MAIN_HAND")
+AppendItemAlias(GAFF, {"gaff"})
+GAFF:SetDescription("A long wooden pole with a metal hook at the end designed for dock work.")
+GAFF:SetDamage("1d6")
+
+Manager:CreateEquipment("COIF", "Leather Coif", "HEAD")
+AppendItemAlias(COIF, {"coif"})
+COIF:SetDescription("A small leather cap that wraps around the head to give moderate protection.")
+COIF:SetACBonus(1)
 
 Manager:CreateStaticContainer("ARENA_ARMORY", "Armory")
 AppendItemAlias(ARENA_ARMORY, {"cabinet", "wardrobe"})
