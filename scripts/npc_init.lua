@@ -1,3 +1,18 @@
+-- Arena Combatants --
+Manager:CreateNPC("ARENA_FRANK", "Frank Shaw")
+ARENA_FRANK:SetDescription("A scrawny looking man from the local town wielding a tall spear like weapon.  His stance is weak, his arms look heavy, and there seems to be spaghetti stains on his shirt.")
+ARENA_FRANK:SetRoomDescription("A scrawny looking man stands before you, ready for combat.")
+
+ARENA_FRANK:SetStrength(9)
+ARENA_FRANK:SetDexterity(12)
+ARENA_FRANK:SetVitality(14)
+ARENA_FRANK:SetIntelligence(7)
+ARENA_FRANK:SetWisdom(8)
+ARENA_FRANK:SetCharisma(11)
+ARENA_FRANK:SetLuck(16)
+ARENA_FRANK:AddProperty("HORNY")
+
+-- Example --
 Manager:CreateNPC("DEBUG_SANTA", "Santa Claus")
 AppendNPCAlias(DEBUG_SANTA, {"SANTA", "CLAUS", "JOLLY MAN", "JOLLY LOOKING MAN"})
 

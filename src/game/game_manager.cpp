@@ -91,7 +91,14 @@ GameManager::GameManager(WindowManager *window_manager) {
         .addFunction("RemoveItem", &Item::s_remove_item)
         .addFunction("RemoveItems", &Item::s_remove_items)
         .addFunction("SetDamage", &Item::s_set_damage)
-        .addFunction("SetACBonus", &Item::s_set_ac_bonus)
+        .addFunction("SetACBonus", &Item::set_ac_bonus)
+        .addFunction("SetStrengthBonus", &Item::set_str_bonus)
+        .addFunction("SetDexterityBonus", &Item::set_dex_bonus)
+        .addFunction("SetVitalityBonus", &Item::set_vit_bonus)
+        .addFunction("SetIntelligenceBonus", &Item::set_int_bonus)
+        .addFunction("SetWisdomBonus", &Item::set_wis_bonus)
+        .addFunction("SetCharismaBonus", &Item::set_cha_bonus)
+        .addFunction("SetLuckBonus", &Item::set_luck_bonus)
     .endClass()
     .beginClass<NPC>("NPC")
         .addFunction("GetID", &NPC::s_get_id)
@@ -117,9 +124,17 @@ GameManager::GameManager(WindowManager *window_manager) {
         .addFunction("GetDialogState", &NPC::s_get_dialog_state)
         .addFunction("SetDialogString", &NPC::s_set_dialog_string)
         .addFunction("AddDialogOption", &NPC::s_add_dialog_option)
+        .addFunction("SetStrength", &NPC::s_set_str)
+        .addFunction("SetDexterity", &NPC::s_set_dex)
+        .addFunction("SetVitality", &NPC::s_set_vit)
+        .addFunction("SetIntelligence", &NPC::s_set_int)
+        .addFunction("SetWisdom", &NPC::s_set_wis)
+        .addFunction("SetCharisma", &NPC::s_set_cha)
+        .addFunction("SetLuck", &NPC::s_set_luck)
+        .addFunction("EquipItem", &NPC::s_equip_item)
     .endClass();
 
-    player = new NPC("PLAYER");
+    player = new NPC("PLAYER", &game_map);
 
     // Add GameManager to the scripting environment
     push(L, this);
@@ -293,7 +308,7 @@ void GameManager::s_create_equipment(const char *item_id, const char *name, cons
 }
 void GameManager::s_create_npc(const char *npc_id, const char *name) {
     // Create the NPC
-    auto new_npc = new NPC(std::string(npc_id), std::string(name), "NULL DESCRIPTION");
+    auto new_npc = new NPC(std::string(npc_id), std::string(name), "NULL DESCRIPTION", &game_map);
     new_npc->set_state("BASE");
     game_map.get_npc_container()->add_npc(new_npc);
 

@@ -31,7 +31,16 @@ struct Equipment {
     EquipmentSlot slots[NUM_SLOTS];
 
     Equipment(NPC *npc);
-    int calculate_ac();
+
+    int get_total_ac_bonus();
+    int get_total_str_bonus();
+    int get_total_dex_bonus();
+    int get_total_vit_bonus();
+    int get_total_int_bonus();
+    int get_total_wis_bonus();
+    int get_total_cha_bonus();
+    int get_total_luck_bonus();
+
     void equip_item(Item *equipment);
     EquipmentSlot *get_equipment_slot(EQUIPMENT_SLOTS slot);
 };

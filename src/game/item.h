@@ -30,9 +30,16 @@ class Item {
     // Equipment stats
     std::string damage; // dice roll [1d6]
     int ac_bonus;
+    int str_bonus;
+    int dex_bonus;
+    int vit_bonus;
+    int int_bonus;
+    int wis_bonus;
+    int cha_bonus;
+    int luck_bonus;
 
 public:
-    Item(const std::string &id);
+    Item(const std::string &id, Map *map);
     Item(const std::string &id, const std::string &name, const std::string &desc, Map *map);
     ~Item();
 
@@ -58,7 +65,6 @@ public:
     void s_remove_item(const char *item_id);
     void s_remove_items(const char *item_id, int quantity);
     void s_set_damage(const char *damage);
-    void s_set_ac_bonus(int bonus);
 
     std::string get_id();
     std::string get_name();
@@ -72,8 +78,24 @@ public:
     void set_room_description(const std::string &desc);
     void set_state(const std::string &state);
     bool check_name(const std::string &name);
+
     int get_ac_bonus();
+    int get_str_bonus();
+    int get_dex_bonus();
+    int get_vit_bonus();
+    int get_int_bonus();
+    int get_wis_bonus();
+    int get_cha_bonus();
+    int get_luck_bonus();
+
     void set_ac_bonus(int bonus);
+    void set_str_bonus(int bonus);
+    void set_dex_bonus(int bonus);
+    void set_vit_bonus(int bonus);
+    void set_int_bonus(int bonus);
+    void set_wis_bonus(int bonus);
+    void set_cha_bonus(int bonus);
+    void set_luck_bonus(int bonus);
 
     Inventory* get_inventory();
 };

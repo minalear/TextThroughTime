@@ -23,14 +23,71 @@ Equipment::Equipment(NPC *npc) {
     this->npc = npc;
 }
 
-int Equipment::calculate_ac() {
+int Equipment::get_total_ac_bonus() {
     int total = 0;
     for (const auto &slot : slots) {
-        total += (slot.equipped) ? slot.equipment->get_ac_bonus() : 0;
+        if (slot.equipped) total += (slot.equipped) ? slot.equipment->get_ac_bonus() : 0;
     }
 
     return total;
 }
+int Equipment::get_total_str_bonus() {
+    int total = 0;
+    for (const auto &slot : slots) {
+        if (slot.equipped) total += (slot.equipped) ? slot.equipment->get_str_bonus() : 0;
+    }
+
+    return total;
+}
+int Equipment::get_total_dex_bonus() {
+    int total = 0;
+    for (const auto &slot : slots) {
+        if (slot.equipped) total += (slot.equipped) ? slot.equipment->get_dex_bonus() : 0;
+    }
+
+    return total;
+}
+int Equipment::get_total_vit_bonus() {
+    int total = 0;
+    for (const auto &slot : slots) {
+        if (slot.equipped) total += (slot.equipped) ? slot.equipment->get_vit_bonus() : 0;
+    }
+
+    return total;
+}
+int Equipment::get_total_int_bonus() {
+    int total = 0;
+    for (const auto &slot : slots) {
+        if (slot.equipped) total += (slot.equipped) ? slot.equipment->get_int_bonus() : 0;
+    }
+
+    return total;
+}
+int Equipment::get_total_wis_bonus() {
+    int total = 0;
+    for (const auto &slot : slots) {
+        if (slot.equipped) total += (slot.equipped) ? slot.equipment->get_wis_bonus() : 0;
+    }
+
+    return total;
+}
+int Equipment::get_total_cha_bonus() {
+    int total = 0;
+    for (const auto &slot : slots) {
+        if (slot.equipped) total += (slot.equipped) ? slot.equipment->get_cha_bonus() : 0;
+    }
+
+    return total;
+}
+int Equipment::get_total_luck_bonus() {
+    int total = 0;
+    for (const auto &slot : slots) {
+        if (slot.equipped) total += (slot.equipped) ? slot.equipment->get_luck_bonus() : 0;
+    }
+
+    return total;
+}
+
 void Equipment::equip_item(Item *equipment) {
     if (!equipment->s_has_property("EQUIPMENT")) return;
     auto slot = get_equipment_slot(str_to_slot(equipment->s_get_str_variable("EQUIPMENT_SLOT")));
@@ -43,6 +100,7 @@ void Equipment::equip_item(Item *equipment) {
     }
 
     slot->equipment = equipment;
+    npc->get_statblock()->calculate_stats(); // Update the NPC's stats
 }
 EquipmentSlot *Equipment::get_equipment_slot(EQUIPMENT_SLOTS slot) {
     return &slots[(int)slot];

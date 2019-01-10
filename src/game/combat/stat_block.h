@@ -5,7 +5,10 @@
 #ifndef TEXTTHROUGHTIME_STAT_BLOCK_H
 #define TEXTTHROUGHTIME_STAT_BLOCK_H
 
+class NPC;
 struct StatBlock {
+    NPC *npc;
+
     // Set stats
     int strength;
     int dexterity;
@@ -24,6 +27,14 @@ struct StatBlock {
     int base_will_save;
 
     // Calculated stats
+    int total_str;
+    int total_dex;
+    int total_vit;
+    int total_int;
+    int total_wis;
+    int total_cha;
+    int total_luck;
+
     int str_mod;
     int dex_mod;
     int vit_mod;
@@ -43,7 +54,7 @@ struct StatBlock {
 
     int cmb, cmd;
 
-    StatBlock();
+    StatBlock(NPC *npc);
     void calculate_stats();
 };
 

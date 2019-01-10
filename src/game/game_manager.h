@@ -27,7 +27,7 @@ struct Prompt {
 };
 
 enum struct GAME_STATES {
-    TRAVEL, PROMPT, DIALOG
+    TRAVEL, PROMPT, DIALOG, COMBAT
 };
 
 class GameManager {

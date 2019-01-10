@@ -10,15 +10,25 @@ DialogState::DialogState(const std::string &unique_id, NPC *owner) {
     this->owner = owner;
 }
 
-NPC::NPC(const std::string &id) : npc_equipment(this) {
+NPC::NPC(const std::string &id, Map *map) {
     this->id = id;
+    this->game_map = map;
     set_name("[NPC NAME]");
     set_description("[NPC DESCRIPTION]");
+
+    inventory = new Inventory();
+    equipment = new Equipment(this);
+    stat_block = new StatBlock(this);
 }
-NPC::NPC(const std::string &id, const std::string &name, const std::string &desc) : npc_equipment(this) {
+NPC::NPC(const std::string &id, const std::string &name, const std::string &desc, Map *map) {
     this->id = id;
+    this->game_map = map;
     set_name(name);
     set_description(desc);
+
+    inventory = new Inventory();
+    equipment = new Equipment(this);
+    stat_block = new StatBlock(this);
 }
 NPC::~NPC() {
     for (auto &x : dialog_states) {
@@ -88,6 +98,41 @@ void NPC::s_remove_property(const char *prop) {
             properties.erase(properties.begin() + i);
         }
     }
+}
+void NPC::s_equip_item(const char *item_id) {
+    InventorySlot *slot = nullptr;
+    if (game_map->get_inventory()->get_item(item_id, slot)) {
+        equipment->equip_item(slot->item);
+    }
+}
+
+void NPC::s_set_str(int str) {
+    stat_block->strength = str;
+    stat_block->calculate_stats();
+}
+void NPC::s_set_dex(int dex) {
+    stat_block->dexterity = dex;
+    stat_block->calculate_stats();
+}
+void NPC::s_set_vit(int vit) {
+    stat_block->vitality = vit;
+    stat_block->calculate_stats();
+}
+void NPC::s_set_int(int intl) {
+    stat_block->intelligence = intl;
+    stat_block->calculate_stats();
+}
+void NPC::s_set_wis(int wis) {
+    stat_block->wisdom = wis;
+    stat_block->calculate_stats();
+}
+void NPC::s_set_cha(int cha) {
+    stat_block->charisma = cha;
+    stat_block->calculate_stats();
+}
+void NPC::s_set_luck(int luck) {
+    stat_block->luck = luck;
+    stat_block->calculate_stats();
 }
 void NPC::s_set_dialog_script(const char *table_name) {
     this->dialog_script = std::string(table_name);
@@ -169,8 +214,11 @@ bool NPC::check_name(const std::string &name) {
     return false;
 }
 Inventory *NPC::get_inventory() {
-    return &npc_inventory;
+    return inventory;
 }
 Equipment *NPC::get_equipment() {
-    return &npc_equipment;
+    return equipment;
+}
+StatBlock *NPC::get_statblock() {
+    return stat_block;
 }

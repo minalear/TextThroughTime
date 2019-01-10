@@ -31,6 +31,8 @@ class NPC {
     std::string current_state;
     std::vector<std::string> aliases;
 
+    Map *game_map;
+
     std::vector<std::string> properties;
     GameVariableMap<std::string> string_variables;
     GameVariableMap<int>         int_variables;
@@ -39,13 +41,14 @@ class NPC {
     std::string current_dialog_state;
     std::vector<DialogState*> dialog_states;
 
-    Inventory npc_inventory;
-    Equipment npc_equipment;
+    StatBlock *stat_block;
+    Inventory *inventory;
+    Equipment *equipment;
 
 public:
 
-    NPC(const std::string &id);
-    NPC(const std::string &id, const std::string &name, const std::string &desc);
+    NPC(const std::string &id, Map *map);
+    NPC(const std::string &id, const std::string &name, const std::string &desc, Map *map);
     ~NPC();
 
     //Script functions
@@ -67,6 +70,15 @@ public:
     void s_set_int_variable(const char *key, int value);
     void s_add_property(const char *property);
     void s_remove_property(const char *property);
+    void s_equip_item(const char *item_id);
+
+    void s_set_str(int str);
+    void s_set_dex(int dex);
+    void s_set_vit(int vit);
+    void s_set_int(int intl);
+    void s_set_wis(int wis);
+    void s_set_cha(int cha);
+    void s_set_luck(int luck);
 
     // Dialog centric scripting functions
     void s_set_dialog_script(const char *table_name);
@@ -94,6 +106,7 @@ public:
 
     Inventory* get_inventory();
     Equipment* get_equipment();
+    StatBlock* get_statblock();
 };
 
 #endif //TEXTTHROUGHTIME_NPC_H

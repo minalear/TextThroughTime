@@ -5,9 +5,10 @@
 #include "item.h"
 #include "../tokenizer.h"
 
-Item::Item(const std::string &id) {
+Item::Item(const std::string &id, Map *map) {
     this->id = id;
-    set_name("[ROOM]");
+    this->game_map = map;
+    set_name("[ITEM]");
     set_description("[DESCRIPTION]");
 }
 Item::Item(const std::string &id, const std::string &name, const std::string &desc, Map *map) {
@@ -98,9 +99,6 @@ void Item::s_remove_items(const char *item_id, int quantity) {
 void Item::s_set_damage(const char *damage) {
     this->damage = std::string(damage);
 }
-void Item::s_set_ac_bonus(int bonus) {
-    this->ac_bonus = bonus;
-}
 
 std::string Item::get_id() {
     return this->id;
@@ -154,8 +152,51 @@ bool Item::check_name(const std::string &test) {
 int Item::get_ac_bonus() {
     return ac_bonus;
 }
+int Item::get_str_bonus() {
+    return str_bonus;
+}
+int Item::get_dex_bonus() {
+    return dex_bonus;
+}
+int Item::get_vit_bonus() {
+    return vit_bonus;
+}
+int Item::get_int_bonus() {
+    return int_bonus;
+}
+int Item::get_wis_bonus() {
+    return wis_bonus;
+}
+int Item::get_cha_bonus() {
+    return cha_bonus;
+}
+int Item::get_luck_bonus() {
+    return luck_bonus;
+}
+
 void Item::set_ac_bonus(int value) {
     ac_bonus = value;
+}
+void Item::set_str_bonus(int bonus) {
+    str_bonus = bonus;
+}
+void Item::set_dex_bonus(int bonus) {
+    dex_bonus = bonus;
+}
+void Item::set_vit_bonus(int bonus) {
+    vit_bonus = bonus;
+}
+void Item::set_int_bonus(int bonus) {
+    int_bonus = bonus;
+}
+void Item::set_wis_bonus(int bonus) {
+    wis_bonus = bonus;
+}
+void Item::set_cha_bonus(int bonus) {
+    cha_bonus = bonus;
+}
+void Item::set_luck_bonus(int bonus) {
+    luck_bonus = bonus;
 }
 
 Inventory* Item::get_inventory() {
