@@ -4,6 +4,7 @@
 
 #include "dice_roller.h"
 #include "../core/math_utils.h"
+#include "combat/stat_block.h"
 
 int DiceRoller::s_roll_dice(const char *dice) {
     return roll_dice(std::string(dice));
@@ -45,4 +46,93 @@ int DiceRoller::roll_dice(const std::string &dice) {
     }
 
     return total + modifier;
+}
+
+ROLL_RESULTS DiceRoller::roll_check(const std::string &roll, int mod) {
+    return ROLL_RESULTS::FAIL;
+}
+
+ROLL_RESULTS DiceRoller::strength_check(StatBlock *stat_block, int dc) {
+    int roll = roll_dice("1d20");
+    if (roll == 1)  return ROLL_RESULTS::CRITICAL_FAIL;
+    if (roll == 20) return ROLL_RESULTS::CRITICAL_SUCCESS;
+    if (roll + stat_block->str_mod >= dc) return ROLL_RESULTS::SUCCESS;
+
+    return ROLL_RESULTS::FAIL;
+}
+ROLL_RESULTS DiceRoller::dexterity_check(StatBlock *stat_block, int dc) {
+    int roll = roll_dice("1d20");
+    if (roll == 1)  return ROLL_RESULTS::CRITICAL_FAIL;
+    if (roll == 20) return ROLL_RESULTS::CRITICAL_SUCCESS;
+    if (roll + stat_block->dex_mod >= dc) return ROLL_RESULTS::SUCCESS;
+
+    return ROLL_RESULTS::FAIL;
+}
+ROLL_RESULTS DiceRoller::vitality_check(StatBlock *stat_block, int dc) {
+    int roll = roll_dice("1d20");
+    if (roll == 1)  return ROLL_RESULTS::CRITICAL_FAIL;
+    if (roll == 20) return ROLL_RESULTS::CRITICAL_SUCCESS;
+    if (roll + stat_block->vit_mod >= dc) return ROLL_RESULTS::SUCCESS;
+
+    return ROLL_RESULTS::FAIL;
+}
+ROLL_RESULTS DiceRoller::intelligence_check(StatBlock *stat_block, int dc) {
+    int roll = roll_dice("1d20");
+    if (roll == 1)  return ROLL_RESULTS::CRITICAL_FAIL;
+    if (roll == 20) return ROLL_RESULTS::CRITICAL_SUCCESS;
+    if (roll + stat_block->int_mod >= dc) return ROLL_RESULTS::SUCCESS;
+
+    return ROLL_RESULTS::FAIL;
+}
+ROLL_RESULTS DiceRoller::wisdom_check(StatBlock *stat_block, int dc) {
+    int roll = roll_dice("1d20");
+    if (roll == 1)  return ROLL_RESULTS::CRITICAL_FAIL;
+    if (roll == 20) return ROLL_RESULTS::CRITICAL_SUCCESS;
+    if (roll + stat_block->wis_mod >= dc) return ROLL_RESULTS::SUCCESS;
+
+    return ROLL_RESULTS::FAIL;
+}
+ROLL_RESULTS DiceRoller::charisma_check(StatBlock *stat_block, int dc) {
+    int roll = roll_dice("1d20");
+    if (roll == 1)  return ROLL_RESULTS::CRITICAL_FAIL;
+    if (roll == 20) return ROLL_RESULTS::CRITICAL_SUCCESS;
+    if (roll + stat_block->cha_mod >= dc) return ROLL_RESULTS::SUCCESS;
+
+    return ROLL_RESULTS::FAIL;
+}
+ROLL_RESULTS DiceRoller::luck_check(StatBlock *stat_block, int dc) {
+    int roll = roll_dice("1d20");
+    if (roll == 1)  return ROLL_RESULTS::CRITICAL_FAIL;
+    if (roll == 20) return ROLL_RESULTS::CRITICAL_SUCCESS;
+    if (roll + stat_block->luck_mod >= dc) return ROLL_RESULTS::SUCCESS;
+
+    return ROLL_RESULTS::FAIL;
+}
+ROLL_RESULTS DiceRoller::fort_save(StatBlock *stat_block, int dc) {
+    int roll = roll_dice("1d20");
+    if (roll == 1)  return ROLL_RESULTS::CRITICAL_FAIL;
+    if (roll == 20) return ROLL_RESULTS::CRITICAL_SUCCESS;
+    if (roll + stat_block->fort_save >= dc) return ROLL_RESULTS::SUCCESS;
+
+    return ROLL_RESULTS::FAIL;
+}
+ROLL_RESULTS DiceRoller::reflex_save(StatBlock *stat_block, int dc) {
+    int roll = roll_dice("1d20");
+    if (roll == 1)  return ROLL_RESULTS::CRITICAL_FAIL;
+    if (roll == 20) return ROLL_RESULTS::CRITICAL_SUCCESS;
+    if (roll + stat_block->reflex_save >= dc) return ROLL_RESULTS::SUCCESS;
+
+    return ROLL_RESULTS::FAIL;
+}
+ROLL_RESULTS DiceRoller::will_save(StatBlock *stat_block, int dc) {
+    int roll = roll_dice("1d20");
+    if (roll == 1)  return ROLL_RESULTS::CRITICAL_FAIL;
+    if (roll == 20) return ROLL_RESULTS::CRITICAL_SUCCESS;
+    if (roll + stat_block->will_save >= dc) return ROLL_RESULTS::SUCCESS;
+
+    return ROLL_RESULTS::FAIL;
+}
+
+int DiceRoller::initiative(StatBlock *stat_block) {
+    return roll_dice("1d20") + stat_block->initiative;
 }
