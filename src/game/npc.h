@@ -44,6 +44,7 @@ class NPC {
     StatBlock *stat_block;
     Inventory *inventory;
     Equipment *equipment;
+    std::string melee_damage;
 
 public:
 
@@ -79,6 +80,7 @@ public:
     void s_set_wis(int wis);
     void s_set_cha(int cha);
     void s_set_luck(int luck);
+    void s_set_melee_damage(const char *damage);
 
     // Dialog centric scripting functions
     void s_set_dialog_script(const char *table_name);
@@ -96,6 +98,7 @@ public:
     std::string get_state();
     std::string get_dialog_state();
     std::string get_dialog_script();
+    std::string get_melee_damage();
     bool get_dialog_state(const std::string &id, DialogState *&state);
     void set_name(const std::string &name);
     void set_description(const std::string &desc);

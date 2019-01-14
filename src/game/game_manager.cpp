@@ -131,6 +131,7 @@ GameManager::GameManager(WindowManager *window_manager) {
         .addFunction("SetWisdom", &NPC::s_set_wis)
         .addFunction("SetCharisma", &NPC::s_set_cha)
         .addFunction("SetLuck", &NPC::s_set_luck)
+        .addFunction("SetMeleeDamage", &NPC::s_set_melee_damage)
         .addFunction("EquipItem", &NPC::s_equip_item)
     .endClass();
 
@@ -340,14 +341,14 @@ void GameManager::s_player_add_items(const char *item_id, int quantity) {
     }
 }
 bool GameManager::s_player_remove_item(const char *item_id) {
-    player->get_inventory()->remove_item(item_id);
+    return player->get_inventory()->remove_item(item_id);
 }
 bool GameManager::s_player_remove_items(const char *item_id, int quantity) {
-    player->get_inventory()->remove_item(item_id, quantity);
+    return player->get_inventory()->remove_item(item_id, quantity);
 }
 bool GameManager::s_player_has_item(const char *item_id) {
     InventorySlot *item_slot;
-    player->get_inventory()->get_item(item_id, item_slot);
+    return player->get_inventory()->get_item(item_id, item_slot);
 }
 
 void GameManager::s_create_prompt(const char *message, const char *table_name, const char* callback_function) {
@@ -652,6 +653,12 @@ void GameManager::c_attack(const Command &command) {
             combat_manager->do_combat_round(command);
         }
     }
+}
+void GameManager::c_equip_item(const Command &command) {
+
+}
+void GameManager::c_unequip_item(const Command &command) {
+
 }
 
 // TODO: Implement item interactions with other items (ie dumping poo pale into city fountain)

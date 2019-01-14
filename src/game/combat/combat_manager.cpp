@@ -28,7 +28,7 @@ void CombatManager::do_combat_round(const Command &player_input) {
     int  pc_ac      = player->get_statblock()->ac;
     int  pc_luck_ac = (pc_ac + 4) * 5; // Convert the d20 AC to a harder percentile DC (20 * 5 == 100)
     auto pc_weapon  = player->get_equipment()->get_equipment_slot(EQUIPMENT_SLOTS::MAIN_HAND);
-    auto pc_weapon_damage = (pc_weapon->equipped) ? pc_weapon->equipment->get_damage() : "1d4"; // 1d4 being unarmed damage
+    auto pc_weapon_damage = (pc_weapon->equipped) ? pc_weapon->equipment->get_damage() : player->get_melee_damage(); // 1d4 being unarmed damage
 
     int  enemy_attack  = enemy->get_statblock()->get_attack_bonus();
     int  enemy_damage  = enemy->get_statblock()->str_mod;
@@ -36,11 +36,12 @@ void CombatManager::do_combat_round(const Command &player_input) {
     int  enemy_ac      = enemy->get_statblock()->ac;
     int  enemy_luck_ac = (enemy_ac + 4) * 5;
     auto enemy_weapon  = enemy->get_equipment()->get_equipment_slot(EQUIPMENT_SLOTS::MAIN_HAND);
-    auto enemy_weapon_damage = (enemy_weapon->equipped) ? enemy_weapon->equipment->get_damage() : "1d4";
+    auto enemy_weapon_damage = (enemy_weapon->equipped) ? enemy_weapon->equipment->get_damage() : enemy->get_melee_damage();
 
     // Do player combat
     int attack_roll = dice_roller.roll_dice(append_to_dice("1d20", pc_attack));
     int luck_roll   = dice_roller.roll_dice(append_to_dice("1d100", pc_luck));
+    
     if (attack_roll >= enemy_ac) {
         // Regular attack vs ac roll
         game_manager->print_to_log("You hit " + enemy->get_name() + " (" + append_to_dice("1d20", pc_attack) + " = " + std::to_string(attack_roll) + ")!");

@@ -14,6 +14,20 @@ ARENA_FRANK:SetLuck(16)
 ARENA_FRANK:EquipItem("GAFF")
 ARENA_FRANK:EquipItem("COIF")
 
+Manager:CreateNPC("ARENA_MARLIN", "Marlin, the Golem")
+AppendNPCAlias(ARENA_MARLIN, {"marlin", "golem"})
+ARENA_MARLIN:SetDescription("A huge, bronze golem.")
+ARENA_MARLIN:SetRoomDescription("A huge, bronze golem is currently trying to kill you.")
+
+ARENA_MARLIN:SetStrength(28)
+ARENA_MARLIN:SetDexterity(12)
+ARENA_MARLIN:SetVitality(30)
+ARENA_MARLIN:SetIntelligence(24)
+ARENA_MARLIN:SetWisdom(19)
+ARENA_MARLIN:SetCharisma(8)
+ARENA_MARLIN:SetLuck(100)
+ARENA_MARLIN:SetMeleeDamage("1d12")
+
 -- Example --
 Manager:CreateNPC("DEBUG_SANTA", "Santa Claus")
 AppendNPCAlias(DEBUG_SANTA, {"SANTA", "CLAUS", "JOLLY MAN", "JOLLY LOOKING MAN"})

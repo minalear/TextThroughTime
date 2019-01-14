@@ -95,6 +95,8 @@ public:
     void c_inventory(const Command &command);
     void c_talk(const Command &command);
     void c_attack(const Command &command);
+    void c_equip_item(const Command &command);
+    void c_unequip_item(const Command &command);
     void c_interaction(const Command &command);
 
     void display_room();

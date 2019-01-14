@@ -19,6 +19,7 @@ NPC::NPC(const std::string &id, Map *map) {
     inventory = new Inventory();
     equipment = new Equipment(this);
     stat_block = new StatBlock(this);
+    s_set_melee_damage("1d4");
 }
 NPC::NPC(const std::string &id, const std::string &name, const std::string &desc, Map *map) {
     this->id = id;
@@ -29,6 +30,7 @@ NPC::NPC(const std::string &id, const std::string &name, const std::string &desc
     inventory = new Inventory();
     equipment = new Equipment(this);
     stat_block = new StatBlock(this);
+    s_set_melee_damage("1d4");
 }
 NPC::~NPC() {
     for (auto &x : dialog_states) {
@@ -135,6 +137,9 @@ void NPC::s_set_luck(int luck) {
     stat_block->luck = luck;
     stat_block->calculate_stats();
 }
+void NPC::s_set_melee_damage(const char *damage) {
+    this->melee_damage = std::string(damage);
+}
 void NPC::s_set_dialog_script(const char *table_name) {
     this->dialog_script = std::string(table_name);
 }
@@ -181,6 +186,9 @@ std::string NPC::get_dialog_state() {
 }
 std::string NPC::get_dialog_script() {
     return this->dialog_script;
+}
+std::string NPC::get_melee_damage() {
+    return this->melee_damage;
 }
 bool NPC::get_dialog_state(const std::string &id, DialogState *&state) {
     for (auto &x : dialog_states) {
