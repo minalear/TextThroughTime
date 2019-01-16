@@ -215,7 +215,7 @@ void NPC::set_state(const std::string &state) {
 bool NPC::check_name(const std::string &name) {
     // Check the name and all aliases to see if it matches the provided name
     const std::string caps_test = to_caps(name);
-    if (to_caps(name) == caps_test) return true;
+    if (to_caps(this->name) == caps_test) return true;
     for (const auto &x : aliases) {
         if (to_caps(x) == caps_test) return true;
     }

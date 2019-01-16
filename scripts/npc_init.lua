@@ -28,6 +28,22 @@ ARENA_MARLIN:SetCharisma(8)
 ARENA_MARLIN:SetLuck(100)
 ARENA_MARLIN:SetMeleeDamage("1d12")
 
+Manager:CreateNPC("ETHAN_FINCH", "Ethan the Finch")
+AppendNPCAlias(ETHAN_FINCH, {"ethan", "finch"})
+ETHAN_FINCH:SetDescription("A muscle wizard.")
+ETHAN_FINCH:SetRoomDescription("A strong looking wizard boy stands at attention.")
+
+ETHAN_FINCH:SetStrength(412)
+ETHAN_FINCH:SetDexterity(10)
+ETHAN_FINCH:SetVitality(10)
+ETHAN_FINCH:SetIntelligence(1000)
+ETHAN_FINCH:SetWisdom(9)
+ETHAN_FINCH:SetCharisma(10)
+ETHAN_FINCH:SetLuck(304)
+ETHAN_FINCH:SetMeleeDamage("2d12")
+
+ETHAN_FINCH:EquipItem("FINCH_KNUCKLES")
+
 -- Example --
 Manager:CreateNPC("DEBUG_SANTA", "Santa Claus")
 AppendNPCAlias(DEBUG_SANTA, {"SANTA", "CLAUS", "JOLLY MAN", "JOLLY LOOKING MAN"})

@@ -7,4 +7,7 @@ Manager:CreateRoom("ARENA", "Arena")
 ARENA:SetDescription("The roar of the crowd envelopes you as you face off against your opponent.")
 
 ARENA:AddNPC("ARENA_MARLIN")
+ARENA:AddNPC("ETHAN_FINCH")
 ARENA:AddItem("MAGIC_SWORD")
+ARENA:AddItem("CROWBAR")
+ARENA:AddItem("BAZOOKA")

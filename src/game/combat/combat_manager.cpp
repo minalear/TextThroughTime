@@ -23,14 +23,38 @@ std::string append_to_dice(const std::string &dice, int amount) {
 }
 void CombatManager::do_combat_round(const Command &player_input) {
     // Player attack
-    auto player_attack = dice_roller.standard_attack_check(player->get_statblock(), enemy->get_statblock());
-    if (player_attack == ROLL_RESULTS::CRITICAL_SUCCESS) { // Crit
-        //int damage = dice_roller.roll_damage
-    } else if (player_attack == ROLL_RESULTS::SUCCESS || player_attack == ROLL_RESULTS::LUCK_SUCCESS) {
+    auto player_attack_roll = dice_roller.standard_attack_check(player->get_statblock(), enemy->get_statblock());
+    auto player_weapon = player->get_equipment()->get_equipment_slot(EQUIPMENT_SLOTS::MAIN_HAND);
+    auto player_damage = (player_weapon->equipped) ? player_weapon->equipment->get_damage() : player->get_melee_damage();
 
+    if (player_attack_roll == ROLL_RESULTS::CRITICAL_SUCCESS) { // Crit
+        int damage_roll = (dice_roller.roll_dice(player_damage) + player->get_statblock()->str_mod) * 2;
+        game_manager->print_to_log("You critically struck the opponent!  You dealt " + std::to_string(damage_roll) + " damage!");
+        enemy->get_statblock()->health -= damage_roll;
+    } else if (player_attack_roll == ROLL_RESULTS::SUCCESS || player_attack_roll == ROLL_RESULTS::LUCK_SUCCESS) {
+        int damage_roll = dice_roller.roll_dice(player_damage) + player->get_statblock()->str_mod;
+        game_manager->print_to_log("You damaged the opponent!  You dealt " + std::to_string(damage_roll) + " damage!");
+        enemy->get_statblock()->health -= damage_roll;
+    } else {
+        game_manager->print_to_log("You missed your attack!");
     }
 
+    // Enemy attack
+    auto enemy_attack_roll = dice_roller.standard_attack_check(enemy->get_statblock(), player->get_statblock());
+    auto enemy_weapon = enemy->get_equipment()->get_equipment_slot(EQUIPMENT_SLOTS::MAIN_HAND);
+    auto enemy_damage = (enemy_weapon->equipped) ? enemy_weapon->equipment->get_damage() : enemy->get_melee_damage();
 
+    if (enemy_attack_roll == ROLL_RESULTS::CRITICAL_SUCCESS) { // Crit
+        int damage_roll = (dice_roller.roll_dice(enemy_damage) + enemy->get_statblock()->str_mod) * 2;
+        game_manager->print_to_log("You were critically struck by the opponent!  They dealt " + std::to_string(damage_roll) + " damage to you!");
+        player->get_statblock()->health -= damage_roll;
+    } else if (enemy_attack_roll == ROLL_RESULTS::SUCCESS || enemy_attack_roll == ROLL_RESULTS::LUCK_SUCCESS) {
+        int damage_roll = dice_roller.roll_dice(enemy_damage) + enemy->get_statblock()->str_mod;
+        game_manager->print_to_log("You were damaged by the opponent!  They dealt " + std::to_string(damage_roll) + " damage to you!");
+        player->get_statblock()->health -= damage_roll;
+    } else {
+        game_manager->print_to_log("Your opponent missed their attack on you !");
+    }
 
 
     /*int  pc_attack  = player->get_statblock()->get_attack_bonus();
@@ -52,7 +76,7 @@ void CombatManager::do_combat_round(const Command &player_input) {
     // Do player combat
     int attack_roll = dice_roller.roll_dice(append_to_dice("1d20", pc_attack));
     int luck_roll   = dice_roller.roll_dice(append_to_dice("1d100", pc_luck));
-    
+
     if (attack_roll >= enemy_ac) {
         // Regular attack vs ac roll
         game_manager->print_to_log("You hit " + enemy->get_name() + " (" + append_to_dice("1d20", pc_attack) + " = " + std::to_string(attack_roll) + ")!");
