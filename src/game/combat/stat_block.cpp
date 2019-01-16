@@ -67,5 +67,6 @@ void StatBlock::calculate_stats() {
     cmd = 10 + base_attack_bonus + str_mod + dex_mod + size_mod;
 }
 int StatBlock::get_attack_bonus() {
-    return base_attack_bonus + str_mod;
+    int equipment_attack_bonus = npc->get_equipment()->get_total_attack_bonus();
+    return base_attack_bonus + str_mod + equipment_attack_bonus;
 }

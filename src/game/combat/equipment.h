@@ -32,6 +32,7 @@ struct Equipment {
 
     Equipment(NPC *npc);
 
+    int get_total_attack_bonus();
     int get_total_ac_bonus();
     int get_total_str_bonus();
     int get_total_dex_bonus();

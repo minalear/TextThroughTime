@@ -94,6 +94,32 @@ ROLL_RESULTS DiceRoller::luck_check(StatBlock *stat_block, int dc) {
 ROLL_RESULTS DiceRoller::roll_check(const std::string &roll, int mod) {
     return ROLL_RESULTS::FAIL;
 }
+ROLL_RESULTS DiceRoller::standard_attack_check(StatBlock *attacker, StatBlock *defender) {
+    int initial_roll = roll_dice("1d20");
+
+    // Auto fails and auto successes
+    if (initial_roll == 1) return ROLL_RESULTS::CRITICAL_FAIL;
+    if (initial_roll == 20) {
+        auto confirmation = confirm_critical(attacker, defender->ac);
+        if (confirmation == ROLL_RESULTS::SUCCESS) return ROLL_RESULTS::CRITICAL_SUCCESS;
+    }
+
+    int attack_bonus = attacker->get_attack_bonus();
+    if (initial_roll + attack_bonus >= defender->ac) return ROLL_RESULTS::SUCCESS;
+
+    return luck_check(attacker, defender->ac);
+}
+ROLL_RESULTS DiceRoller::confirm_critical(StatBlock *stat_block, int ac) {
+    int initial_roll = roll_dice("1d20");
+
+    if (initial_roll == 20) return ROLL_RESULTS::SUCCESS;
+    if (initial_roll ==  1) return ROLL_RESULTS::FAIL;
+
+    int bonus = stat_block->get_attack_bonus(); // TODO: Implement stats for specific rolls (attack vs crit bonus attack)
+    if (initial_roll + bonus >= ac) return ROLL_RESULTS::SUCCESS;
+
+    return (luck_check(stat_block, ac) == ROLL_RESULTS::LUCK_SUCCESS) ? ROLL_RESULTS::SUCCESS : ROLL_RESULTS::FAIL;
+}
 
 ROLL_RESULTS DiceRoller::strength_check(StatBlock *stat_block, int dc) {
     int roll = roll_dice("1d20");

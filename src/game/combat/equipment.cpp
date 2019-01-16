@@ -23,6 +23,14 @@ Equipment::Equipment(NPC *npc) {
     this->npc = npc;
 }
 
+int Equipment::get_total_attack_bonus() {
+    int total = 0;
+    for (const auto &slot : slots) {
+        if (slot.equipped) total += (slot.equipped) ? slot.equipment->get_attack_bonus() : 0;
+    }
+
+    return total;
+}
 int Equipment::get_total_ac_bonus() {
     int total = 0;
     for (const auto &slot : slots) {

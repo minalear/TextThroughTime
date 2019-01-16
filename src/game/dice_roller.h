@@ -19,9 +19,12 @@ struct DiceRoller {
 
     int s_roll_dice(const char *dice);
     int roll_dice(const std::string &dice);
+    int roll_damage(StatBlock *attacker);
 
     ROLL_RESULTS luck_check(StatBlock *stat_block, int dc);
     ROLL_RESULTS roll_check(const std::string &roll, int mod);
+    ROLL_RESULTS standard_attack_check(StatBlock *attacker, StatBlock *defender);
+    ROLL_RESULTS confirm_critical(StatBlock *stat_block, int ac);
 
     ROLL_RESULTS strength_check(StatBlock *stat_block, int dc);
     ROLL_RESULTS dexterity_check(StatBlock *stat_block, int dc);

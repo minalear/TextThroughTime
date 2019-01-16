@@ -22,7 +22,18 @@ std::string append_to_dice(const std::string &dice, int amount) {
     return dice + ((amount >= 0) ? "+" + std::to_string(amount) : std::to_string(amount));
 }
 void CombatManager::do_combat_round(const Command &player_input) {
-    int  pc_attack  = player->get_statblock()->get_attack_bonus();
+    // Player attack
+    auto player_attack = dice_roller.standard_attack_check(player->get_statblock(), enemy->get_statblock());
+    if (player_attack == ROLL_RESULTS::CRITICAL_SUCCESS) { // Crit
+        //int damage = dice_roller.roll_damage
+    } else if (player_attack == ROLL_RESULTS::SUCCESS || player_attack == ROLL_RESULTS::LUCK_SUCCESS) {
+
+    }
+
+
+
+
+    /*int  pc_attack  = player->get_statblock()->get_attack_bonus();
     int  pc_damage  = player->get_statblock()->str_mod;
     int  pc_luck    = player->get_statblock()->luck_mod;
     int  pc_ac      = player->get_statblock()->ac;
@@ -75,5 +86,5 @@ void CombatManager::do_combat_round(const Command &player_input) {
         game_manager->print_to_log("They dealt " + std::to_string(damage_dealt) + " damage to you.\n\n");
     } else {
         game_manager->print_to_log("They were unable to land a hit on you (" + append_to_dice("1d20", enemy_attack) + " = " + std::to_string(attack_roll) + ")!");
-    }
+    }*/
 }
