@@ -29,6 +29,7 @@ class Item {
 
     // Equipment stats
     std::string damage; // dice roll [1d6]
+    int attack_bonus;
     int ac_bonus;
     int str_bonus;
     int dex_bonus;
@@ -79,6 +80,7 @@ public:
     void set_state(const std::string &state);
     bool check_name(const std::string &name);
 
+    int get_attack_bonus();
     int get_ac_bonus();
     int get_str_bonus();
     int get_dex_bonus();
@@ -88,6 +90,7 @@ public:
     int get_cha_bonus();
     int get_luck_bonus();
 
+    void set_attack_bonus(int bonus);
     void set_ac_bonus(int bonus);
     void set_str_bonus(int bonus);
     void set_dex_bonus(int bonus);

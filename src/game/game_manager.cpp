@@ -91,6 +91,7 @@ GameManager::GameManager(WindowManager *window_manager) {
         .addFunction("RemoveItem", &Item::s_remove_item)
         .addFunction("RemoveItems", &Item::s_remove_items)
         .addFunction("SetDamage", &Item::s_set_damage)
+        .addFunction("SetAttackBonus", &Item::set_attack_bonus)
         .addFunction("SetACBonus", &Item::set_ac_bonus)
         .addFunction("SetStrengthBonus", &Item::set_str_bonus)
         .addFunction("SetDexterityBonus", &Item::set_dex_bonus)
@@ -199,6 +200,10 @@ void GameManager::handle_input(const std::string &input) {
             c_talk(command); // Talk to an npc
         } else if (command.type == COMMAND_TYPES::ATTACK) {
             c_attack(command);
+        } else if (command.type == COMMAND_TYPES::EQUIP) {
+            c_equip_item(command);
+        } else if (command.type == COMMAND_TYPES::UNEQUIP) {
+            c_unequip_item(command);
         } else if (command.type == COMMAND_TYPES::INTERACTION) {
             c_interaction(command); // Advanced item interaction
         } else if (command.type == COMMAND_TYPES::ROLL_DICE) {
@@ -655,7 +660,13 @@ void GameManager::c_attack(const Command &command) {
     }
 }
 void GameManager::c_equip_item(const Command &command) {
+    InventorySlot *item_slot;
+    if (player->get_inventory()->get_item_by_name(command.args[0], item_slot)) {
+        player->get_equipment()->equip_item(item_slot->item);
+        player->get_inventory()->remove_item(item_slot->item->get_id(), 1);
 
+        window_manager->print_to_log("You equip " + item_slot->item->get_name() + "!");
+    }
 }
 void GameManager::c_unequip_item(const Command &command) {
 

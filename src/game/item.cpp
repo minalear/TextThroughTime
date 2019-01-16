@@ -153,6 +153,9 @@ bool Item::check_name(const std::string &test) {
 
     return false;
 }
+int Item::get_attack_bonus() {
+    return attack_bonus;
+}
 int Item::get_ac_bonus() {
     return ac_bonus;
 }
@@ -178,6 +181,9 @@ int Item::get_luck_bonus() {
     return luck_bonus;
 }
 
+void Item::set_attack_bonus(int value) {
+    attack_bonus = value;
+}
 void Item::set_ac_bonus(int value) {
     ac_bonus = value;
 }

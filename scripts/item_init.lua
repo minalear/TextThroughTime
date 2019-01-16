@@ -3,6 +3,12 @@ AppendItemAlias(SWORD, {"sword"})
 SWORD:SetDescription("A well worn, but reliable, iron longsword.")
 SWORD:SetDamage("1d8")
 
+Manager:CreateEquipment("MAGIC_SWORD", "Magic Longsword+1", "MAIN_HAND")
+AppendItemAlias(MAGIC_SWORD, {"sword", "magic sword"})
+MAGIC_SWORD:SetDescription("An enchanted iron longsword.")
+MAGIC_SWORD:SetDamage("1d8+1")
+MAGIC_SWORD:SetAttackBonus(1)
+
 Manager:CreateEquipment("GAFF", "Boarding Gaff", "MAIN_HAND")
 AppendItemAlias(GAFF, {"gaff"})
 GAFF:SetDescription("A long wooden pole with a metal hook at the end designed for dock work.")
