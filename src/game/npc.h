@@ -5,9 +5,7 @@
 #ifndef TEXTTHROUGHTIME_NPC_H
 #define TEXTTHROUGHTIME_NPC_H
 
-#include <string>
-#include <vector>
-#include "game_variable_map.h"
+#include "game_object.h"
 #include "inventory.h"
 #include "combat/stat_block.h"
 #include "combat/equipment.h"
@@ -23,20 +21,7 @@ struct DialogState {
     DialogState(const std::string &unique_id, NPC *owner);
 };
 
-class NPC {
-    std::string id;
-    std::string name;
-    std::string description;
-    std::string room_description;
-    std::string current_state;
-    std::vector<std::string> aliases;
-
-    Map *game_map;
-
-    std::vector<std::string> properties;
-    GameVariableMap<std::string> string_variables;
-    GameVariableMap<int>         int_variables;
-
+class NPC : public GameObject {
     std::string dialog_script;
     std::string current_dialog_state;
     std::vector<DialogState*> dialog_states;
@@ -47,30 +32,10 @@ class NPC {
     std::string melee_damage;
 
 public:
-
-    NPC(const std::string &id, Map *map);
-    NPC(const std::string &id, const std::string &name, const std::string &desc, Map *map);
-    ~NPC();
+    NPC(Map *map, const std::string &id);
+    NPC(Map *map, const std::string &id, const std::string &name, const std::string &desc);
 
     //Script functions
-    const char* s_get_id();
-    const char* s_get_name();
-    const char* s_get_description();
-    const char* s_get_room_description();
-    const char* s_get_state();
-    const char* s_get_str_variable(const char *key);
-    int         s_get_int_variable(const char *key);
-    bool        s_has_property(const char *property);
-
-    void s_set_name(const char *name);
-    void s_set_description(const char *desc);
-    void s_set_room_description(const char *desc);
-    void s_set_state(const char *state);
-    void s_add_alias(const char *alias);
-    void s_set_str_variable(const char *key, const char *value);
-    void s_set_int_variable(const char *key, int value);
-    void s_add_property(const char *property);
-    void s_remove_property(const char *property);
     void s_equip_item(const char *item_id);
 
     void s_set_str(int str);
@@ -93,21 +58,10 @@ public:
     void heal(int amount);
 
     // Getters/Setters
-    std::string get_id();
-    std::string get_name();
-    std::string get_description();
-    std::string get_room_description();
-    std::string get_state();
     std::string get_dialog_state();
     std::string get_dialog_script();
     std::string get_melee_damage();
     bool get_dialog_state(const std::string &id, DialogState *&state);
-    void set_name(const std::string &name);
-    void set_description(const std::string &desc);
-    void set_room_description(const std::string &desc);
-    void set_state(const std::string &state);
-
-    bool check_name(const std::string &name);
 
     Inventory* get_inventory();
     Equipment* get_equipment();

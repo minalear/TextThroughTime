@@ -51,7 +51,6 @@ class GameManager {
 
 public:
     GameManager(WindowManager *window_manager);
-    ~GameManager();
 
     // Scripting functions
     void s_print(const char *msg);

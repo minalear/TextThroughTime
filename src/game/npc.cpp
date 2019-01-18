@@ -10,97 +10,19 @@ DialogState::DialogState(const std::string &unique_id, NPC *owner) {
     this->owner = owner;
 }
 
-NPC::NPC(const std::string &id, Map *map) {
-    this->id = id;
-    this->game_map = map;
-    set_name("[NPC NAME]");
-    set_description("[NPC DESCRIPTION]");
-
+NPC::NPC(Map *map, const std::string &id) : GameObject(map, id) {
     inventory = new Inventory();
     equipment = new Equipment(this);
     stat_block = new StatBlock(this);
     s_set_melee_damage("1d4");
 }
-NPC::NPC(const std::string &id, const std::string &name, const std::string &desc, Map *map) {
-    this->id = id;
-    this->game_map = map;
-    set_name(name);
-    set_description(desc);
-
+NPC::NPC(Map *map, const std::string &id, const std::string &name, const std::string &desc) : GameObject(map, id, name, desc) {
     inventory = new Inventory();
     equipment = new Equipment(this);
     stat_block = new StatBlock(this);
     s_set_melee_damage("1d4");
 }
-NPC::~NPC() {
-    for (auto &x : dialog_states) {
-        delete x;
-    }
-    dialog_states.clear();
-}
 
-const char *NPC::s_get_id() {
-    return this->id.c_str();
-}
-const char *NPC::s_get_name() {
-    return this->name.c_str();
-}
-const char *NPC::s_get_description() {
-    return this->description.c_str();
-}
-const char *NPC::s_get_room_description() {
-    return this->room_description.c_str();
-}
-const char *NPC::s_get_state() {
-    return this->current_state.c_str();
-}
-const char *NPC::s_get_str_variable(const char *key) {
-    return string_variables.get_variable(std::string(key)).c_str();
-}
-int NPC::s_get_int_variable(const char *key) {
-    return int_variables.get_variable(std::string(key));
-}
-bool NPC::s_has_property(const char *prop) {
-    const std::string property = std::string(prop);
-    for (const auto &x : properties) {
-        if (property == x) return true;
-    }
-
-    return false;
-}
-
-void NPC::s_set_name(const char *name) {
-    set_name(std::string(name));
-}
-void NPC::s_set_description(const char *desc) {
-    set_description(std::string(desc));
-}
-void NPC::s_set_room_description(const char *desc) {
-    set_room_description(std::string(desc));
-}
-void NPC::s_set_state(const char *state) {
-    set_state(std::string(state));
-}
-void NPC::s_add_alias(const char *alias) {
-    aliases.emplace_back(std::string(alias));
-}
-void NPC::s_set_str_variable(const char *key, const char *value) {
-    string_variables.set_variable(std::string(key), std::string(value));
-}
-void NPC::s_set_int_variable(const char *key, int value) {
-    int_variables.set_variable(std::string(key), value);
-}
-void NPC::s_add_property(const char *property) {
-    properties.emplace_back(std::string(property));
-}
-void NPC::s_remove_property(const char *prop) {
-    const std::string property = std::string(prop);
-    for (int i = 0; i < properties.size(); i++) {
-        if (property == properties[i]) {
-            properties.erase(properties.begin() + i);
-        }
-    }
-}
 void NPC::s_equip_item(const char *item_id) {
     InventorySlot *slot = nullptr;
     if (game_map->get_inventory()->get_item(item_id, slot)) {
@@ -165,22 +87,6 @@ void NPC::s_add_dialog_option(const char *id, const char *str) {
 const char* NPC::s_get_dialog_state() {
     return current_dialog_state.c_str();
 }
-
-std::string NPC::get_id() {
-    return this->id;
-}
-std::string NPC::get_name() {
-    return this->name;
-}
-std::string NPC::get_description() {
-    return this->description;
-}
-std::string NPC::get_room_description() {
-    return this->room_description;
-}
-std::string NPC::get_state() {
-    return this->current_state;
-}
 std::string NPC::get_dialog_state() {
     return this->current_dialog_state;
 }
@@ -207,28 +113,6 @@ void NPC::heal(int amount) {
         stat_block->health = stat_block->max_health;
 }
 
-void NPC::set_name(const std::string &name) {
-    this->name = name;
-}
-void NPC::set_description(const std::string &desc) {
-    this->description = desc;
-}
-void NPC::set_room_description(const std::string &desc) {
-    this->room_description = desc;
-}
-void NPC::set_state(const std::string &state) {
-    this->current_state = state;
-}
-bool NPC::check_name(const std::string &name) {
-    // Check the name and all aliases to see if it matches the provided name
-    const std::string caps_test = to_caps(name);
-    if (to_caps(this->name) == caps_test) return true;
-    for (const auto &x : aliases) {
-        if (to_caps(x) == caps_test) return true;
-    }
-
-    return false;
-}
 Inventory *NPC::get_inventory() {
     return inventory;
 }

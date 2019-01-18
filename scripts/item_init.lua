@@ -1,3 +1,7 @@
+Manager:CreateItem("TEST_ITEM", "Test Item")
+TEST_ITEM:SetDescription("Help me, for something is broken!")
+TEST_ITEM:SetRoomDescription("A debug item is on the floor here.")
+
 Manager:CreateEquipment("OFFICER_HEAD", "Officer Helmet", "HEAD")
 AppendItemAlias(OFFICER_HEAD, {"helmet"})
 OFFICER_HEAD:SetACBonus(1)
@@ -14,9 +18,9 @@ OFFICER_GEAR:SetDexterityBonus(1)
 Manager:CreateEquipment("HP_REGEN_NECK", "Necklace of Regeneration", "NECK")
 AppendItemAlias(HP_REGEN_NECK, {"necklace", "neck", "regen neck"})
 HP_REGEN_NECK_SCRIPTS = {
-	OnCombatRound = function(entity) {
+	OnCombatRound = function(entity)
 		entity:Heal(1)
-	}
+	end
 }
 
 Manager:CreateEquipment("STONESKIN_RING", "Ring of Stoneskin", "RING")

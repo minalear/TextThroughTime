@@ -16,6 +16,7 @@ class GameVariableMap {
 public:
     const T& get_variable(const std::string &key);
     void set_variable(const std::string &key, T value);
+    bool has_variable(const std::string &key);
 };
 
 template <class T>
@@ -34,6 +35,12 @@ void GameVariableMap<T>::set_variable(const std::string &key, T value) {
     } else {
         find->second = value;
     }
+}
+
+template <class T>
+bool GameVariableMap<T>::has_variable(const std::string &key) {
+    auto find = map.find(key);
+    return (find != map.end());
 }
 
 #endif //TEXTTHROUGHTIME_GAMEVARIABLEMAP_H

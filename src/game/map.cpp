@@ -35,7 +35,7 @@ Directions Map::get_opposite_direction(Directions direction) {
 Room* Map::add_room(const std::string &unique_id, const std::string &name, const std::string &description) {
     // Ensure that there is only one room with that unique id
     assert(game_map.find(unique_id) == game_map.end());
-    auto new_room = new Room(unique_id, name, description, this);
+    auto new_room = new Room(this, unique_id, name, description);
     game_map.insert(RoomIndex(unique_id, new_room));
 
     return new_room;

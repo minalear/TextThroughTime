@@ -8,6 +8,7 @@
 #include "game_manager.h"
 #include "../core/math_utils.h"
 #include "item.h"
+#include "game_object.h"
 
 using namespace luabridge;
 
@@ -51,41 +52,27 @@ GameManager::GameManager(WindowManager *window_manager) {
         .addFunction("GetStrVar", &GameManager::s_get_str_variable)
         .addFunction("GetIntVar", &GameManager::s_get_int_variable)
     .endClass()
-    .beginClass<Room>("Room")
-        .addFunction("GetID", &Room::s_get_id)
-        .addFunction("GetName", &Room::s_get_name)
-        .addFunction("SetName", &Room::s_set_name)
-        .addFunction("SetDescription", &Room::s_set_description)
-        .addFunction("AppendDescription", &Room::s_append_description)
-        .addFunction("AttachRoom", &Room::s_attach_room)
-        .addFunction("ConnectRooms", &Room::s_connect_rooms)
-        .addFunction("AddItem", &Room::s_add_item)
-        .addFunction("AddItems", &Room::s_add_items)
-        .addFunction("RemoveItem", &Room::s_remove_item)
-        .addFunction("RemoveItems", &Room::s_remove_items)
-        .addFunction("AddNPC", &Room::s_add_npc)
-        .addFunction("RemoveNPC", &Room::s_remove_npc)
-        .addFunction("HasProperty", &Room::s_has_property)
-        .addFunction("AddProperty", &Room::s_add_property)
-        .addFunction("RemoveProperty", &Room::s_remove_property)
+    .beginClass<GameObject>("GameObject")
+        .addFunction("GetID", &GameObject::s_get_id)
+        .addFunction("GetName", &GameObject::s_get_name)
+        .addFunction("GetDescription", &GameObject::s_get_description)
+        .addFunction("GetRoomDescription", &GameObject::s_get_room_description)
+        .addFunction("GetState", &GameObject::s_get_state)
+        .addFunction("GetStrVar", &GameObject::s_get_str_variable)
+        .addFunction("GetIntVar", &GameObject::s_get_int_variable)
+        .addFunction("HasVar", &GameObject::s_has_variable)
+        .addFunction("HasProperty", &GameObject::s_has_property)
+        .addFunction("SetName", &GameObject::s_set_name)
+        .addFunction("SetDescription", &GameObject::s_set_description)
+        .addFunction("SetRoomDescription", &GameObject::s_set_room_description)
+        .addFunction("SetState", &GameObject::s_set_state)
+        .addFunction("AddAlias", &GameObject::s_add_alias)
+        .addFunction("SetStrVar", &GameObject::s_set_str_variable)
+        .addFunction("SetIntVar", &GameObject::s_set_int_variable)
+        .addFunction("AddProperty", &GameObject::s_add_property)
+        .addFunction("RemoveProperty", &GameObject::s_remove_property)
     .endClass()
-    .beginClass<Item>("Item")
-        .addFunction("GetID", &Item::s_get_id)
-        .addFunction("GetName", &Item::s_get_name)
-        .addFunction("GetStrVar", &Item::s_get_str_variable)
-        .addFunction("GetIntVar", &Item::s_get_int_variable)
-        .addFunction("GetState", &Item::s_get_state)
-        .addFunction("SetName", &Item::s_set_name)
-        .addFunction("SetDescription", &Item::s_set_description)
-        .addFunction("AppendDescription", &Item::s_append_description)
-        .addFunction("SetRoomDescription", &Item::s_set_room_description)
-        .addFunction("SetState", &Item::s_set_state)
-        .addFunction("SetStrVar", &Item::s_set_str_variable)
-        .addFunction("SetIntVar", &Item::s_set_int_variable)
-        .addFunction("AddAlias", &Item::s_add_alias)
-        .addFunction("HasProperty", &Item::s_has_property)
-        .addFunction("AddProperty", &Item::s_add_property)
-        .addFunction("RemoveProperty", &Item::s_remove_property)
+    .deriveClass<Item, GameObject>("Item")
         .addFunction("AddItem", &Item::s_add_item)
         .addFunction("AddItems", &Item::s_add_items)
         .addFunction("RemoveItem", &Item::s_remove_item)
@@ -101,23 +88,7 @@ GameManager::GameManager(WindowManager *window_manager) {
         .addFunction("SetCharismaBonus", &Item::set_cha_bonus)
         .addFunction("SetLuckBonus", &Item::set_luck_bonus)
     .endClass()
-    .beginClass<NPC>("NPC")
-        .addFunction("GetID", &NPC::s_get_id)
-        .addFunction("GetName", &NPC::s_get_name)
-        .addFunction("GetDescription", &NPC::s_get_description)
-        .addFunction("GetRoomDescription", &NPC::s_get_room_description)
-        .addFunction("GetState", &NPC::s_get_state)
-        .addFunction("GetStrVar", &NPC::s_get_str_variable)
-        .addFunction("GetIntVar", &NPC::s_get_int_variable)
-        .addFunction("SetName", &NPC::s_set_name)
-        .addFunction("SetDescription", &NPC::s_set_description)
-        .addFunction("SetRoomDescription", &NPC::s_set_room_description)
-        .addFunction("SetState", &NPC::s_set_state)
-        .addFunction("AddAlias", &NPC::s_add_alias)
-        .addFunction("SetStrVar", &NPC::s_set_str_variable)
-        .addFunction("SetIntVar", &NPC::s_set_int_variable)
-        .addFunction("HasProperty", &NPC::s_has_property)
-        .addFunction("AddProperty", &NPC::s_add_property)
+    .deriveClass<NPC, GameObject>("NPC")
         .addFunction("RemoveProperty", &NPC::s_remove_property)
         .addFunction("SetDialogScript", &NPC::s_set_dialog_script)
         .addFunction("CreateDialogState", &NPC::s_create_dialog_state)
@@ -135,13 +106,26 @@ GameManager::GameManager(WindowManager *window_manager) {
         .addFunction("SetMeleeDamage", &NPC::s_set_melee_damage)
         .addFunction("EquipItem", &NPC::s_equip_item)
         .addFunction("Heal", &NPC::heal)
+    .endClass()
+    .deriveClass<Room, GameObject>("Room")
+        .addFunction("AttachRoom", &Room::s_attach_room)
+        .addFunction("ConnectRooms", &Room::s_connect_rooms)
+        .addFunction("AddItem", &Room::s_add_item)
+        .addFunction("AddItems", &Room::s_add_items)
+        .addFunction("RemoveItem", &Room::s_remove_item)
+        .addFunction("RemoveItems", &Room::s_remove_items)
+        .addFunction("AddNPC", &Room::s_add_npc)
+        .addFunction("RemoveNPC", &Room::s_remove_npc)
+        .addFunction("HasProperty", &Room::s_has_property)
+        .addFunction("AddProperty", &Room::s_add_property)
+        .addFunction("RemoveProperty", &Room::s_remove_property)
     .endClass();
 
     // Add GameManager to the scripting environment
     push(L, this);
     lua_setglobal(L, "Manager");
 
-    player = new NPC("PLAYER", &game_map);
+    player = new NPC(&game_map, "PLAYER");
 
     // Add the Player to the scripting environment
     push(L, player);
@@ -160,7 +144,6 @@ GameManager::GameManager(WindowManager *window_manager) {
         window_manager->print_to_log(std::string(e.what()));
     }
 }
-GameManager::~GameManager() { }
 
 void GameManager::initialize_game() {
     current_game_state = GAME_STATES::TRAVEL;
@@ -265,7 +248,7 @@ void GameManager::s_create_room(const char *unique_id, const char *name) {
 }
 void GameManager::s_create_item(const char *item_id, const char *name) {
     // Create the item
-    auto new_item = new Item(std::string(item_id), std::string(name), "NULL DESCRIPTION", &game_map);
+    auto new_item = new Item(&game_map, std::string(item_id), std::string(name), "NULL DESCRIPTION");
     new_item->set_state("BASE");
     game_map.get_inventory()->add_item(new_item);
 
@@ -275,7 +258,7 @@ void GameManager::s_create_item(const char *item_id, const char *name) {
 }
 void GameManager::s_create_static_item(const char *item_id, const char *name) {
     // Create the item
-    auto new_item = new Item(std::string(item_id), std::string(name), "NULL DESCRIPTION", &game_map);
+    auto new_item = new Item(&game_map, std::string(item_id), std::string(name), "NULL DESCRIPTION");
     new_item->s_add_property("STATIC");
     new_item->set_state("BASE");
     game_map.get_inventory()->add_item(new_item);
@@ -286,7 +269,7 @@ void GameManager::s_create_static_item(const char *item_id, const char *name) {
 }
 void GameManager::s_create_container(const char *item_id, const char *name) {
     // Create the item
-    auto new_item = new Item(std::string(item_id), std::string(name), "NULL DESCRIPTION", &game_map);
+    auto new_item = new Item(&game_map, std::string(item_id), std::string(name), "NULL DESCRIPTION");
     new_item->s_add_property("CONTAINER");
     new_item->set_state("BASE");
     game_map.get_inventory()->add_item(new_item);
@@ -297,7 +280,7 @@ void GameManager::s_create_container(const char *item_id, const char *name) {
 }
 void GameManager::s_create_static_container(const char *item_id, const char *name) {
     // Create the item
-    auto new_item = new Item(std::string(item_id), std::string(name), "NULL DESCRIPTION", &game_map);
+    auto new_item = new Item(&game_map, std::string(item_id), std::string(name), "NULL DESCRIPTION");
     new_item->s_add_property("STATIC");
     new_item->s_add_property("CONTAINER");
     new_item->set_state("BASE");
@@ -309,7 +292,7 @@ void GameManager::s_create_static_container(const char *item_id, const char *nam
 }
 void GameManager::s_create_equipment(const char *item_id, const char *name, const char *slot) {
     // Create the item
-    auto new_item = new Item(std::string(item_id), std::string(name), "NULL DESCRIPTION", &game_map);
+    auto new_item = new Item(&game_map, std::string(item_id), std::string(name), "NULL DESCRIPTION");
     new_item->s_add_property("EQUIPMENT");
     new_item->s_add_property(slot);
     new_item->s_set_str_variable("EQUIPMENT_SLOT", slot);
@@ -322,7 +305,7 @@ void GameManager::s_create_equipment(const char *item_id, const char *name, cons
 }
 void GameManager::s_create_npc(const char *npc_id, const char *name) {
     // Create the NPC
-    auto new_npc = new NPC(std::string(npc_id), std::string(name), "NULL DESCRIPTION", &game_map);
+    auto new_npc = new NPC(&game_map, std::string(npc_id), std::string(name), "NULL DESCRIPTION");
     new_npc->set_state("BASE");
     game_map.get_npc_container()->add_npc(new_npc);
 
