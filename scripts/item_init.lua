@@ -1,33 +1,41 @@
-Manager:CreateEquipment("SWORD", "Longsword", "MAIN_HAND")
-AppendItemAlias(SWORD, {"sword"})
-SWORD:SetDescription("A well worn, but reliable, iron longsword.")
-SWORD:SetDamage("1d8")
+Manager:CreateEquipment("OFFICER_HEAD", "Officer Helmet", "HEAD")
+AppendItemAlias(OFFICER_HEAD, {"helmet"})
+OFFICER_HEAD:SetACBonus(1)
 
-Manager:CreateEquipment("MAGIC_SWORD", "Magic Longsword+1", "MAIN_HAND")
-AppendItemAlias(MAGIC_SWORD, {"sword", "magic sword"})
-MAGIC_SWORD:SetDescription("An enchanted iron longsword.")
-MAGIC_SWORD:SetDamage("12d8+5")
-MAGIC_SWORD:SetAttackBonus(5)
+Manager:CreateEquipment("OFFICER_GEAR", "Officer Armor", "ARMOR")
+AppendItemAlias(OFFICER_GEAR, {"armor"})
+OFFICER_GEAR:SetACBonus(1)
+OFFICER_GEAR:SetVitalityBonus(2)
 
-Manager:CreateEquipment("CROWBAR", "Crowbar", "MAIN_HAND")
-CROWBAR:SetDescription("It breaks things.")
-CROWBAR:SetDamage("1d17+12")
-CROWBAR:SetAttackBonus(37)
+Manager:CreateEquipment("OFFICER_CLOAK", "Insignia Cloak", "CLOAK")
+AppendItemAlias(OFFICER_CLOAK, {"cloak"})
+OFFICER_GEAR:SetDexterityBonus(1)
 
-Manager:CreateEquipment("GAFF", "Boarding Gaff", "MAIN_HAND")
-AppendItemAlias(GAFF, {"gaff"})
-GAFF:SetDescription("A long wooden pole with a metal hook at the end designed for dock work.")
-GAFF:SetDamage("1d6")
+Manager:CreateEquipment("HP_REGEN_NECK", "Necklace of Regeneration", "NECK")
+AppendItemAlias(HP_REGEN_NECK, {"necklace", "neck", "regen neck"})
+HP_REGEN_NECK_SCRIPTS = {
+	OnCombatRound = function(entity) {
+		entity:Heal(1)
+	}
+}
 
-Manager:CreateEquipment("COIF", "Leather Coif", "HEAD")
-AppendItemAlias(COIF, {"coif"})
-COIF:SetDescription("A small leather cap that wraps around the head to give moderate protection.")
-COIF:SetACBonus(1)
+Manager:CreateEquipment("STONESKIN_RING", "Ring of Stoneskin", "RING")
+AppendItemAlias(STONESKIN_RING, {"ring", "stoneskin"})
 
-Manager:CreateEquipment("BAZOOKA", "Bazooka", "MAIN_HAND")
-BAZOOKA:SetDescription("It shoots rockets at your enemy.")
-BAZOOKA:SetDamage("30d100-50")
-BAZOOKA:SetAttackBonus(12)
+Manager:CreateEquipment("STRENGTH_RING", "Ring of Brute Strength", "RING")
+AppendItemAlias(STRENGTH_RING, {"ring", "strength"})
+
+Manager:CreateEquipment("SPEED_TRINKET", "Trinket of Swiftness", "TRINKET")
+AppendItemAlias(SPEED_TRINKET, {"swiftness", "trinket"})
+
+Manager:CreateEquipment("WRATH_SWORD", "Sword of Wrath", "MAIN_HAND")
+AppendItemAlias(WRATH_SWORD, {"sword", "wrath sword"})
+
+Manager:CreateEquipment("OFFICER_BUCKLER", "Buckler of Justice", "OFF_HAND")
+AppendItemAlias(OFFICER_BUCKLER, {"buckler", "shield"})
+
+Manager:CreateEquipment("OFFICER_DEFENDER", "Defender of Justice", "OFF_HAND")
+AppendItemAlias(OFFICER_DEFENDER, {"defender"})
 
 Manager:CreateEquipment("FINCH_KNUCKLES", "Knuckle Dusters of Finch", "MAIN_HAND")
 AppendItemAlias(FINCH_KNUCKLES, {"knuckles", "dusters"})

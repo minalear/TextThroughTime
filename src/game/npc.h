@@ -90,6 +90,8 @@ public:
     void s_add_dialog_option(const char *state, const char *str);
     const char* s_get_dialog_state();
 
+    void heal(int amount);
+
     // Getters/Setters
     std::string get_id();
     std::string get_name();

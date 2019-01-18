@@ -200,6 +200,13 @@ bool NPC::get_dialog_state(const std::string &id, DialogState *&state) {
 
     return false;
 }
+
+void NPC::heal(int amount) {
+    stat_block->health += amount;
+    if (stat_block->health > stat_block->max_health)
+        stat_block->health = stat_block->max_health;
+}
+
 void NPC::set_name(const std::string &name) {
     this->name = name;
 }

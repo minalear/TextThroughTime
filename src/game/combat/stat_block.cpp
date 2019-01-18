@@ -29,7 +29,7 @@ StatBlock::StatBlock(NPC *npc) {
     base_reflex_save = 0;
     base_will_save = 0;
 
-    max_health = health = 50;
+    max_health = health = 8;
 
     calculate_stats();
 }
@@ -65,6 +65,8 @@ void StatBlock::calculate_stats() {
 
     cmb = base_attack_bonus + str_mod + size_mod;
     cmd = 10 + base_attack_bonus + str_mod + dex_mod + size_mod;
+
+    max_health = health = 10 + vit_mod;
 }
 int StatBlock::get_attack_bonus() {
     int equipment_attack_bonus = npc->get_equipment()->get_total_attack_bonus();

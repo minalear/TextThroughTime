@@ -98,16 +98,35 @@ int Equipment::get_total_luck_bonus() {
 
 void Equipment::equip_item(Item *equipment) {
     if (!equipment->s_has_property("EQUIPMENT")) return;
-    auto slot = get_equipment_slot(str_to_slot(equipment->s_get_str_variable("EQUIPMENT_SLOT")));
+    auto slot_text = std::string(equipment->s_get_str_variable("EQUIPMENT_SLOT"));
 
-    // Add the currently equipped item to the NPC's inventory
-    if (slot->equipped) {
-        npc->get_inventory()->add_item(slot->equipment);
+    if (slot_text == "RING") { // Rings are special case, since there are two ring slots
+        auto ring_slot_01 = get_equipment_slot(EQUIPMENT_SLOTS::RING_01);
+        auto ring_slot_02 = get_equipment_slot(EQUIPMENT_SLOTS::RING_02);
+
+        // Equip the ring to the first unequipped ring slot, otherwise just equip it to slot 1
+        if (!ring_slot_01->equipped) {
+            ring_slot_01->equipped = true;
+            ring_slot_01->equipment = equipment;
+        } else if (!ring_slot_02->equipped) {
+            ring_slot_02->equipped = true;
+            ring_slot_02->equipment = equipment;
+        } else {
+            npc->get_inventory()->add_item(ring_slot_01->equipment);
+            ring_slot_01->equipment = equipment;
+        }
     } else {
-        slot->equipped = true;
-    }
+        auto slot = get_equipment_slot(str_to_slot(slot_text));
 
-    slot->equipment = equipment;
+        // Add the currently equipped item to the NPC's inventory
+        if (slot->equipped) {
+            npc->get_inventory()->add_item(slot->equipment);
+        } else {
+            slot->equipped = true;
+        }
+
+        slot->equipment = equipment;
+    }
 }
 EquipmentSlot *Equipment::get_equipment_slot(EQUIPMENT_SLOTS slot) {
     return &slots[(int)slot];

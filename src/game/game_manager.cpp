@@ -134,6 +134,7 @@ GameManager::GameManager(WindowManager *window_manager) {
         .addFunction("SetLuck", &NPC::s_set_luck)
         .addFunction("SetMeleeDamage", &NPC::s_set_melee_damage)
         .addFunction("EquipItem", &NPC::s_equip_item)
+        .addFunction("Heal", &NPC::heal)
     .endClass();
 
     // Add GameManager to the scripting environment
